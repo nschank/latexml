@@ -1,9 +1,9 @@
 import xml.etree.ElementTree as ET
 import string
 
-TOPICS = string.split("basic big_o circuits counting equivalence_relations graph_theory logic mod number_theory pigeonhole probability relations set_theory todo")
+TOPICS = string.split("basic big_o bijection circuits counting equivalence_relations graph_theory logic mod number_theory pigeonhole probability relations set_theory todo")
 
-TYPES = string.split("bijective computation contradiction contrapositive direct element_method induction large notation piece proof repetitive todo")
+TYPES = string.split("computation core contradiction contrapositive direct element_method induction large notation piece proof repetitive todo")
 
 class ImproperXmlException(Exception):
   pass

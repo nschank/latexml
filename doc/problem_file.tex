@@ -72,6 +72,7 @@
     \begin{itemize}\itemsep0pt
       \item basic\footnote{The `basic' topic should be included on anything that could go on the first homework, before we have really introduced any definitions. As an example, \textit{Prove that $\sqrt 2$ is irrational} would be in the basic topic.}
       \item big\_o
+      \item bijection
       \item circuits
       \item counting
       \item equivalence\_relations
@@ -86,7 +87,43 @@
       \item todo\footnote{If the topics field of a version should be looked at later (e.g. you are unsure about one and want to return to it), \textit{always} include todo as a topic.}
     \end{itemize}
     
-    If ever confused about what topic(s) a problem covers, consider that the topics field is meant to be organizational. If Carly were making the final exam, and wanted to include a question on this topic, would she want to see this problem? If so, include the topic!
+    If ever confused about what topic(s) a problem covers, consider that the topics field is meant to be organizational. Keep two questions in mind:
+    
+    \begin{enumerate}[1.]\itemsep0pt
+      \item If Carly were making the final exam, and wanted to include a question on this topic, would she want to see this problem? If so, include the topic!
+      \item Does the question mention or incorporate a topic, even if the question doesn't seem to be ``about'' that topic? For instance, does this graph theory question define a relation? Is this probability question asking about circuits? Always include \textit{both} topics -- we like to include questions that bring together multiple units, so that students can find connections and recall old definitions.
+    \end{enumerate}
   
   \subsection{Types}
+    A \textbf{type} is a characteristic of the question itself. Like topics, questions can (and usually do) have multiple types. Any unknown type is a fatal error.
     
+    The acceptable types (and their meanings):
+    \begin{description}
+      \item[computation] Any part of the question requires numerical computation \textit{with little justification}, or asks for an explicit instance of something.
+      
+      \textit{Examples}: Encrypt this using RSA; determine the size of this set; provide a coloring of this graph; use Chinese Remainder Theorem; show these logical statements are equivalent using set algebra.
+      
+      \textit{Non-example}: Convert these logical expressions to English (see \textbf{notation}); counting questions (these usually require justification)
+      \item[core] This question is an extremely common question that is definitely simple to Google, but also very important to the class. Some subset of these questions are proven in class every year.
+      
+      \textit{Examples}: Prove the infinitude of primes; prove that $\mod$ is an equivalence relation; prove that there are an equal number of odd- and even-cardinality subsets of any set.
+      \item[contradiction] Any part of the question explicitly asks for a proof by contradiction, or it is the only feasible way to solve the problem.
+      \item[contrapositive] Any part of the question is a proof by contrapositive.
+      \item[direct] Any part of the question explicitly asks for a direct proof, or it is the only feasible way to solve the problem.
+      \item[element\_method] Any part of the question asks for a proof that two sets are equal. (It does not need to say `element method' explicitly)
+      \item[induction] Any part of the question is a proof by induction.
+      \item[large] This question has multiple ($>3$) \textit{small} parts \textit{that build upon each other}, generally while getting progressively harder. If you think your question is hard or long, but it does not satisfy the previous sentence, you should fix that.
+      
+      As a general note, the first part of a `large' problem should be very easy (often just a computation question meant to ease the student in). See a later section on writing good problems.
+      \item[notation] This question is meant to help the student practice notation.
+      
+      \textit{Example}: Put this into set-builder notation.
+      \item[piece] This question is very short, and could probably be incorporated into another problem. This type is a bit subtle: in general, a `piece' is a question that has one or two parts (usually short proofs) that are not all that interesting by themselves. They are called `pieces' because, when trying to come up with interesting problems, we can use several of them as inspiration to build a `large' problem with many small parts.
+      
+      \textit{Example}: ``Given a set of 52 distinct integers, show that there must be 2 whose sum or difference is divisible by 100.'' Easy and not very interesting, but could be used very well as a lead-in to a question about a more general property of divisibility and pigeonhole.
+      \item[proof] Any part of the question asks for a non-trivial proof. 
+      \item[repetitive] A question which asks you to do the same thing to several different examples.
+      
+      \textit{Example}: For each of the following relations, state whether they are injective, surjective, or both; turn the following logical expressions into circuits.
+      \item[todo] If the types field of a version should be looked at later (e.g. you are unsure about one and want to return to it), \textit{always} include todo as a type.
+    \end{description}
