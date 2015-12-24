@@ -229,6 +229,9 @@ class Problem(XmlParseable):
         "Duplicate version {}".format(version.vid))
       self.versions[version.vid] = version
       
+  def parse_tree(self, tree, validate_versions=True):
+    self.parse_element(tree.getroot(), validate_versions)
+      
   def to_element(self):
     root = ET.Element('problem')
     for key in sorted(self.versions.keys(), reverse=True):

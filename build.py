@@ -3,18 +3,18 @@ import os
 from parse import Problem, Document, ImproperXmlException
 from subprocess import call
 from random import randint
-from xml.etree.ElementTree import ParseError
+import xml.etree.ElementTree as ET
 
 def build(document, filename, solutions=False, rubrics=False, metadata=False):
   if filename.endswith(".pdf"):
     filename = filename[:-4]
+    assert filename
   else:
     print "Warning: Output will be named {}.pdf".format(filename)
-  if document.problems:
+  if document.versions:
     tempfilename = filename + ".tmp" + str(randint(0,100000))
     with open(tempfilename + ".tex", "w") as f:
-      f.write(document.header())
-      f.write(document.document(document.problem_str(solutions, rubrics, metadata)))
+      f.write(document.build(solutions, rubrics, metadata))
     code = call(["pdflatex", tempfilename + ".tex", "-quiet"])
     os.remove(tempfilename + ".aux")
     os.remove(tempfilename + ".log")
@@ -41,6 +41,7 @@ def build(document, filename, solutions=False, rubrics=False, metadata=False):
 def build_if(settings):
   document = Document()
   document.name = "".join(settings.title)
+  # TODO:
   document.year = "1901"
   document.due = " "
   
@@ -48,13 +49,19 @@ def build_if(settings):
     for dirpath, dirnames, filenames in os.walk(settings.directory):
       for filename in filenames:
         if filename.endswith(".xml"):
+          filename = os.path.join(dirpath, filename)
           try:
-            problem = Problem(os.path.join(dirpath, filename)).get_newest()
-            sat_allowed = not settings.allowed_topics or not [topic for topic in problem.topics if topic not in settings.allowed_topics]
-            sat_required_topics = not settings.required_topics or [topic for topic in problem.topics if topic in settings.required_topics]
-            sat_required_types = not settings.required_types or [type for type in problem.types if type in settings.required_types]
+            tree = ET.parse(filename)
+            problem = Problem(filename)
+            problem.parse_tree(tree, validate_versions=False)
+            version = problem.newest_version()
+            version.validate()
+            
+            sat_allowed = not settings.allowed_topics or not [topic for topic in version.topics if topic not in settings.allowed_topics]
+            sat_required_topics = not settings.required_topics or [topic for topic in version.topics if topic in settings.required_topics]
+            sat_required_types = not settings.required_types or [type for type in version.types if type in settings.required_types]
             if sat_allowed and sat_required_topics and sat_required_types:
-              document.add_problem(problem)
+              document.versions.append(version)
           except ImproperXmlException:
             pass
     build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
@@ -65,21 +72,29 @@ def build_if(settings):
 def build_specific(settings):
   document = Document()
   document.name = "".join(settings.title)
+  #TODO
   document.year = "1900"
   document.due = " "
   
-  for problem in settings.problems:
+  for filename in settings.problems:
     try:
-      document.add_problem(Problem(problem).get_newest())
-    except ImproperXmlException, ParseError:
-      print "Warning: Could not parse {}".format(problem)
+      tree = ET.parse(filename)
+      problem = Problem(filename)
+      problem.parse_tree(tree, validate_versions=False)
+      version = problem.newest_version()
+      version.validate()
+      
+      document.versions.append(version)
+    except ImproperXmlException, ET.ParseError:
+      print "Warning: Could not parse {}".format(filename)
       
   build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
     
 def add_if_parser(parser):
-  subparser = parser.add_parser('if', help='Builds all problems that satisfy the given predicates within a particular directory')
+  subparser = parser.add_parser('from', help='Builds all problems that satisfy the given predicates within a particular directory')
   subparser.set_defaults(func=build_if)
   subparser.add_argument('directory', help='The search directory containing all problems to examine')
+  subparser.add_argument('filename', metavar='O', help='The destination of the output PDF')
   subparser.add_argument('-m', dest='metadata', action='store_true', default=False, help='Builds the problems with attached metadata')
   subparser.add_argument('-r', dest='rubrics', action='store_true', default=False, help='Builds the problems with rubrics')
   subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
@@ -94,6 +109,7 @@ def add_if_parser(parser):
 def add_problem_parser(parser):
   subparser = parser.add_parser('problems', help='Builds a problem or series of problems, in order')
   subparser.set_defaults(func=build_specific)
+  subparser.add_argument('filename', metavar='O', help='The destination of the output PDF')
   subparser.add_argument('problems', metavar='P', nargs='+', help='The locations of the problems to build')
   subparser.add_argument('-m', dest='metadata', action='store_true', default=False, help='Builds the problems with attached metadata')
   subparser.add_argument('-r', dest='rubrics', action='store_true', default=False, help='Builds the problems with rubrics')
@@ -104,7 +120,6 @@ def add_problem_parser(parser):
 def build_args():
   """Parses command-line arguments using argparse and returns an object containing runtime information."""
   parser = argparse.ArgumentParser(description='Builds PDFs from CS22 XML files')
-  parser.add_argument('filename', metavar='O', help='The destination of the output PDF')
   subparsers = parser.add_subparsers(help='How to choose which files to build')
   
   add_if_parser(subparsers)
