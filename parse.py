@@ -3,7 +3,7 @@ import string
 from os import getlogin
 from datetime import date
 
-TOPICS = string.split("basic big_o bijection circuits counting equivalence_relations graph_theory logic mod number_theory pigeonhole probability relations set_theory todo")
+TOPICS = string.split("basic big_o bijections circuits counting equivalence_relations graph_theory logic mod number_theory pigeonhole probability relations set_theory todo")
 
 TYPES = string.split("computation core contradiction contrapositive direct element_method induction large needs_work notation piece proof repetitive todo")
 
@@ -83,7 +83,8 @@ class Version(XmlParseable):
     return ("\n".join(["\\newcommand\\" + name + "{" + value + "}" 
               for name, value in self.params]) +
             ("\\texttt{" + self.filename.replace('_', "\\_") + "}\\\\\\textbf{Topics Covered: }" +
-              ", ".join(self.topics).replace('_', ' ') if metadata else "")
+              ", ".join(self.topics).replace('_', ' ') + "\\\\\\textbf{Types: }" +
+              ", ".join(self.types).replace('_', ' ') if metadata else "")
             + "\n\n" + self.body +
             ("\\begin{mdframed}\n\\subsubsection*{Solution}\n\n" 
               + self.solution + "\\end{mdframed}\n"

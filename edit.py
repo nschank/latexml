@@ -144,6 +144,34 @@ def create_new(settings):
   except OSError:
     print "Error: File '{}' already exists.".format(settings.filename)
     
+def edit(settings):
+  """
+  Edits the newest version's topics and types
+  """
+  try:
+    tree = ET.parse(settings.filename)
+  except Exception:
+    print "Error: Could not parse {}".format(settings.filename)
+    exit(1)
+    
+  try:
+    problem = Problem(settings.filename)
+    problem.parse_tree(tree)
+    version = problem.newest_version()
+  except ImproperXmlException:
+    print "Error: {} has invalid problem XML. Try `validate'".format(settings.filename)
+    exit(1)
+    
+  print "SELECT TOPICS\n-------------"
+  version.topics = interactive_select(TOPICS, version.topics)
+  print "SELECT TYPES\n-------------"
+  version.types = interactive_select(TYPES, version.types)
+    
+  root = problem.to_element()
+  indent(root)
+  with open(settings.filename, "w") as f:
+    f.write(ET.tostring(root))
+    
 def validate(settings):
   """
   Validates the correctness and style of a problem XML document.
@@ -190,6 +218,11 @@ def add_new_parser(parser):
   subparser.add_argument('filename', metavar='F', help='The XML file to create, edit, or validate')
   subparser.add_argument('-i', dest='interactive', action='store_true', default=False, help='Allows for the tool to interactively add all required fields')
 
+def add_edit_parser(parser)
+  subparser = parser.add_parser('edit', help='The interactive editor for topics and types')
+  subparser.set_defaults(func=edit)
+  subparser.add_argument('filename', metavar='F', help='The XML file to create, edit, or validate')  
+  
 def add_validate_parser(parser):
   subparser = parser.add_parser('validate', help='Validates the correctness of a problem XML file')
   subparser.add_argument('filename', metavar='F', help='The XML file to create, edit, or validate')
@@ -200,6 +233,7 @@ def build_args():
   parser = argparse.ArgumentParser(description='Validates, edits, or creates a 22 XML file')
   subparsers = parser.add_subparsers(help='sub-command help')
   
+  add_edit_parser(subparsers)
   add_branch_parser(subparsers)
   add_new_parser(subparsers)
   add_validate_parser(subparsers)
