@@ -162,6 +162,12 @@ def edit(settings):
     print "Error: {} has invalid problem XML. Try `validate'".format(settings.filename)
     exit(1)
     
+  if settings.remove_todo:
+    if "todo" in version.topics:
+      version.topics.remove("todo")
+    if "todo" in version.types:
+      version.types.remove("todo")
+    
   print "SELECT TOPICS\n-------------"
   version.topics = interactive_select(TOPICS, version.topics)
   print "SELECT TYPES\n-------------"
@@ -218,10 +224,11 @@ def add_new_parser(parser):
   subparser.add_argument('filename', metavar='F', help='The XML file to create, edit, or validate')
   subparser.add_argument('-i', dest='interactive', action='store_true', default=False, help='Allows for the tool to interactively add all required fields')
 
-def add_edit_parser(parser)
+def add_edit_parser(parser):
   subparser = parser.add_parser('edit', help='The interactive editor for topics and types')
   subparser.set_defaults(func=edit)
   subparser.add_argument('filename', metavar='F', help='The XML file to create, edit, or validate')  
+  subparser.add_argument('--remove-todo', dest='remove_todo', action='store_true', default=False, help='Removes the todo topic and type automatically, if present')
   
 def add_validate_parser(parser):
   subparser = parser.add_parser('validate', help='Validates the correctness of a problem XML file')
