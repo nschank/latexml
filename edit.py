@@ -90,8 +90,8 @@ def branch(settings):
     exit(1)
     
   version = deepcopy(problem.newest_version())
-  version.id = str(next_id)
-  problem.versions[id] = version
+  version.vid = str(next_id)
+  problem.versions[version.vid] = version
   
   version.add_defaults()
   
@@ -124,7 +124,7 @@ def create_new(settings):
     with os.fdopen(fd, 'w') as f:
       problem = Problem(settings.filename)
       version = Version(settings.filename, "1")
-      
+        
       problem.versions["1"] = version
     
       version.add_defaults()
@@ -162,7 +162,7 @@ def validate(settings):
   except ImproperXmlException:
     print "Fix the error above and rerun validation"
     exit(1)
-  newest = problem.get_newest()
+  newest = problem.newest_version()
   if "\\newcommand" in newest.body or "\\newcommand" in newest.solution or "\\newcommand" in newest.rubric:
     print "Should not be using `\\newcommand' within the body, solution, or rubric of a problem XML. Use <param> instead."
     exit(1)

@@ -20,7 +20,7 @@ class XmlParseable:
   an initial tree.
   """
   
-  def __xml_assert(self, predicate, str):
+  def xml_assert(self, predicate, str):
     """Used internally: check that something is true about the structure of an XML tree"""
     if not predicate:
       print "Error in {}: {}".format(self.filename, str)
@@ -53,16 +53,16 @@ class Version(XmlParseable):
   """
   Internal representation of a problem Version.
   """
-  def __xml_assert(self, predicate, str):
+  def xml_assert(self, predicate, str):
     """Overridden to show ID"""
     if not predicate:
-      print "Error in {} (version {}): {}".format(self.filename, self.id, str)
+      print "Error in {} (version {}): {}".format(self.filename, self.vid, str)
       raise ImproperXmlException()
       
-  def __init__(self, filename, id=None):
+  def __init__(self, filename, vid=None):
     """Has public fields so that the tools can use them, there isn't much point in protecting them"""
     self.filename = filename
-    self.id = id
+    self.vid = vid
     
     self.authors = []
     self.topics = []
@@ -94,7 +94,7 @@ class Version(XmlParseable):
     
   def to_element(self):
     version = ET.Element('version')
-    version.set('id', self.id)
+    version.set('id', self.vid)
     
     author = ET.SubElement(version, 'authors')
     author.text = " ".join(self.authors)
@@ -129,39 +129,39 @@ class Version(XmlParseable):
     
   def validate(self):
     """Asserts that the Version satisfies the minimal requirements of being complete"""
-    self.__xml_assert(self.authors, "No authors")
-    self.__xml_assert(self.body, "No body")
-    self.__xml_assert(self.rubric, "No rubric")
-    self.__xml_assert(self.solution, "No solution")
-    self.__xml_assert(self.topics, "No topics")
+    self.xml_assert(self.authors, "No authors")
+    self.xml_assert(self.body, "No body")
+    self.xml_assert(self.rubric, "No rubric")
+    self.xml_assert(self.solution, "No solution")
+    self.xml_assert(self.topics, "No topics")
     for t in self.topics:
-      self.__xml_assert(t in TOPICS, "Invalid topic: {}".format(t))
-    self.__xml_assert(self.types, "No question types")
+      self.xml_assert(t in TOPICS, "Invalid topic: {}".format(t))
+    self.xml_assert(self.types, "No question types")
     for t in self.types:
-      self.__xml_assert(t in TYPES, "Invalid type: {}".format(t))
+      self.xml_assert(t in TYPES, "Invalid type: {}".format(t))
       
   def __parse_author(self, attributes, body):
     self.authors = split_add(self.authors, body)
   
   def __parse_body(self, attributes, body):
-    self.__xml_assert(self.body is None, "duplicate body")
+    self.xml_assert(self.body is None, "duplicate body")
     self.body = body
     
   def __parse_dep(self, attributes, body):
     self.deps = split_add(self.deps, body)
     
   def __parse_param(self, attributes, body):
-    self.__xml_assert('name' in attributes, "parameter has no name")
-    self.__xml_assert(attributes['name'] not in self.params,
+    self.xml_assert('name' in attributes, "parameter has no name")
+    self.xml_assert(attributes['name'] not in self.params,
         "duplicate parameter {}".format(attributes['name']))
     self.params[attributes['name']] = string.strip(body)
     
   def __parse_rubric(self, attributes, body):
-    self.__xml_assert(self.rubric is None, "duplicate rubric")
+    self.xml_assert(self.rubric is None, "duplicate rubric")
     self.rubric = body
     
   def __parse_solution(self, attributes, body):
-    self.__xml_assert(self.solution is None, "duplicate solution")
+    self.xml_assert(self.solution is None, "duplicate solution")
     self.solution = body
     
   def __parse_topic(self, attributes, body):
@@ -171,7 +171,7 @@ class Version(XmlParseable):
     self.types = split_add(self.types, body)
     
   def __parse_year(self, attributes, body):
-    self.__xml_assert(self.year is None, "duplicate year tag")
+    self.xml_assert(self.year is None, "duplicate year tag")
     self.year = body
     
   __parsers = {'author':__parse_author, 'authors':__parse_author,
@@ -186,12 +186,12 @@ class Version(XmlParseable):
       'year':__parse_year}
 
   def parse_element(self, element):
-    self.__xml_assert(element.tag == 'version', 
-        "Invalid version tag '{}'".format(block.tag))
-    self.__xml_assert('id' in element.attrib, "Version with no id")
-    self.id = element.attrib['id']
+    self.xml_assert(element.tag == 'version', 
+        "Invalid version tag '{}'".format(element.tag))
+    self.xml_assert('id' in element.attrib, "Version with no id")
+    self.vid = element.attrib['id']
     for tag in element:
-      self.__xml_assert(tag.tag in Version.__parsers, 
+      self.xml_assert(tag.tag in Version.__parsers, 
           "Invalid tag '{}'".format(tag.tag))
       Version.__parsers[tag.tag](self, tag.attrib, tag.text)
     
@@ -207,27 +207,27 @@ class Problem(XmlParseable):
     self.versions = dict()
     
   def newest_version(self):
-    return self.__versions[max(self.__versions.keys())]
+    return self.versions[max(self.versions)]
     
   def next_id(self):
-    try: return 1 + max([int(key) for key in self.versions.keys()])
+    try: return 1 + int(max(self.versions))
     except ValueError: 
-      self.__xml_assert(False, "Some invalid version id: {}".format(self.versions.keys()))
+      self.xml_assert(False, "Some invalid version id: {}".format(self.versions.keys()))
     
   def parse_element(self, root, validate_versions=True):
-    self.__xml_assert(root.tag == 'problem', 
+    self.xml_assert(root.tag == 'problem', 
         "Invalid root tag '{}' (should be 'problem')".format(root.tag))
-    self.__xml_assert(len(root) > 0, "Empty file")
+    self.xml_assert(len(root) > 0, "Empty file")
     
     for child in root:
-      self.__xml_assert(child.tag != 'usedin', "<usedin> not yet supported")
+      self.xml_assert(child.tag != 'usedin', "<usedin> not yet supported")
       version = Version(self.filename)
       version.parse_element(child)
       if validate_versions:
         version.validate()
-      self.__xml_assert(version.id not in self.__versions, 
-        "Duplicate version {}".format(version.id))
-      self.versions[id] = version
+      self.xml_assert(version.vid not in self.versions, 
+        "Duplicate version {}".format(version.vid))
+      self.versions[version.vid] = version
       
   def to_element(self):
     root = ET.Element('problem')
@@ -254,10 +254,10 @@ class Document(XmlParseable):
     """
     Ensures that a Document is ready for building
     """
-    self.__xml_assert(self.year is not None, "no year provided")
-    self.__xml_assert(self.name is not None, "no assignment name provided")
-    self.__xml_assert(self.due is not None, "no due date provided")
-    self.__xml_assert(self.problems, "no problems provided")
+    self.xml_assert(self.year is not None, "no year provided")
+    self.xml_assert(self.name is not None, "no assignment name provided")
+    self.xml_assert(self.due is not None, "no due date provided")
+    self.xml_assert(self.problems, "no problems provided")
     
   def _additional_dependencies(self):
     deps = set()
@@ -299,11 +299,11 @@ class Document(XmlParseable):
         for i, v in enumerate(self.versions)])
 
   def __parse_due(self, attributes, body):
-    self.__xml_assert(self.due is None, "duplicate due tag")
+    self.xml_assert(self.due is None, "duplicate due tag")
     self.due = body
     
   def __parse_name(self, attributes, body):
-    self.__xml_assert(self.name is None, "duplicate name tag")
+    self.xml_assert(self.name is None, "duplicate name tag")
     self.name = body
     
   def __parse_problem(self, attributes, body):
@@ -316,7 +316,7 @@ class Document(XmlParseable):
       self.problems.append(prob.newest_version())
       
   def __parse_year(self, attributes, body):
-    self.__xml_assert(self.year is None, "duplicate year tag")
+    self.xml_assert(self.year is None, "duplicate year tag")
     self.year = body
       
   __parsers = {
@@ -326,10 +326,10 @@ class Document(XmlParseable):
       'year':__parse_year}
       
   def parse_element(self, root):
-    self.__xml_assert(root.tag == 'assignment',
+    self.xml_assert(root.tag == 'assignment',
         "Invalid root tag '{}' (should be 'assignment')".format(root.tag))
     for tag in root:
-      self.__xml_assert(tag.tag in Document.__parsers, 
+      self.xml_assert(tag.tag in Document.__parsers, 
           "Invalid tag '{}'".format(tag.tag))
       Document.__parsers[tag.tag](self, tag.attrib, tag.text)
     
