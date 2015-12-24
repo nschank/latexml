@@ -1,5 +1,7 @@
 import xml.etree.ElementTree as ET
 import string
+from os import getlogin
+from datetime import date
 
 TOPICS = string.split("basic big_o bijection circuits counting equivalence_relations graph_theory logic mod number_theory pigeonhole probability relations set_theory todo")
 
@@ -71,6 +73,10 @@ class Version(XmlParseable):
     self.body = None
     self.solution = None
     self.rubric = None
+    
+  def add_defaults(self):
+    self.authors = [getlogin()]
+    self.year = str(date.today().year)
     
   def pretty_print(self, solution=False, rubric=False, metadata=False):
     """Prints this version's contents as valid LaTeX, for building"""
@@ -208,7 +214,7 @@ class Problem(XmlParseable):
     except ValueError: 
       self.__xml_assert(False, "Some invalid version id: {}".format(self.versions.keys()))
     
-  def parse_element(self, root):
+  def parse_element(self, root, validate_versions=True):
     self.__xml_assert(root.tag == 'problem', 
         "Invalid root tag '{}' (should be 'problem')".format(root.tag))
     self.__xml_assert(len(root) > 0, "Empty file")
@@ -217,6 +223,8 @@ class Problem(XmlParseable):
       self.__xml_assert(child.tag != 'usedin', "<usedin> not yet supported")
       version = Version(self.filename)
       version.parse_element(child)
+      if validate_versions:
+        version.validate()
       self.__xml_assert(version.id not in self.__versions, 
         "Duplicate version {}".format(version.id))
       self.versions[id] = version

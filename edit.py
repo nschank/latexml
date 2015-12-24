@@ -6,6 +6,9 @@ from copy import deepcopy
 from datetime import date
 
 def indent(elem, level=0):
+  """
+  Edits an XML tree so that it indents nicely when written.
+  """
   i = "\n" + level*"  "
   if len(elem):
     if not elem.text or not elem.text.strip():
@@ -21,6 +24,10 @@ def indent(elem, level=0):
       elem.tail = i
       
 def interactive_select(space, current):
+  """
+  Given a list {space} and an existing selection {current}, interacts with the user and returns
+  their updated selection among space. Requires that the selection be non-empty.
+  """
   print "Type an element name, an element index, or an unambiguous prefix to add to your selection."
   print "Type 'list' to see the list of valid selections/indices."
   print "Type 'clear' to clear selection."
@@ -62,93 +69,51 @@ def interactive_select(space, current):
     else:
       print "Error: Unknown token: {}".format(tentative)
           
-  return " ".join(current)
-  
-def empty_version(root, id='1'):
-  version = ET.SubElement(root, 'version')
-  version.set('id', id)
-  
-  author = ET.SubElement(version, 'author')
-  author.text = os.getlogin()
-  
-  year = ET.SubElement(version, 'year')
-  year.text = str(date.today().year)
-  
-  topics = ET.SubElement(version, 'topics')
-  topics.text = " "
-  types = ET.SubElement(version, 'types')
-  types.text = " "
-  
-  body = ET.SubElement(version, 'body')
-  body.text = "\n\n    "
-  
-  solution = ET.SubElement(version, 'solution')
-  solution.text = "\n      TODO\n    "
-  
-  rubric = ET.SubElement(version, 'rubric')
-  rubric.text = "\n      TODO\n    "
-  
-  return version, topics, types
+  return current
   
 def branch(settings):
+  """
+  Adds a new Version to the problem
+  """
   try:
     tree = ET.parse(settings.filename)
-    problem = Problem(settings.filename, tree)
-  except ImproperXmlException:
-    print "Error: {} has invalid problem XML. Try `validate'".format(settings.filename)
-    exit(1)
   except Exception:
     print "Error: Could not parse {}".format(settings.filename)
     exit(1)
-  try: next_id = 1 + int(problem.get_newest().id)
-  except ValueError: 
-    print "Error: Highest version has invalid id {}".format(problem.get_newest().id)
+    
+  try:
+    problem = Problem(settings.filename)
+    problem.parse_tree(tree)
+    next_id = problem.next_id()
+  except ImproperXmlException:
+    print "Error: {} has invalid problem XML. Try `validate'".format(settings.filename)
     exit(1)
-  root = tree.getroot()
-  if settings.action == 0:
-    empty_version(root, str(next_id))
-  elif settings.action == 1:
-    version, topics, types = empty_version(root)
-    print "SELECT TOPICS\n-------------"
-    topics.text = interactive_select(TOPICS, [])
-    print "SELECT TYPES\n-------------"
-    types.text = interactive_select(TYPES, [])
-  else:
-    previous = problem.get_newest()
     
-    version = ET.SubElement(root, 'version')
-    version.set('id', str(next_id))
-    
-    author = ET.SubElement(version, 'author')
-    author.text = os.getlogin()
-    
-    year = ET.SubElement(version, 'year')
-    year.text = str(date.today().year)
-    
-    topics = ET.SubElement(version, 'topics')
-    topics.text = " ".join(previous.topics)
-    types = ET.SubElement(version, 'types')
-    types.text = " ".join(previous.types)
-    
-    for name,value in previous.params.iteritems():
-      param = ET.SubElement(version, 'param')
-      param.set('name', name)
-      param.text = value
-    
-    if previous.deps:
-      deps = ET.SubElement(version, 'deps')
-      deps.text = " ".join(previous.deps)
-      
-    body = ET.SubElement(version, 'body')
-    body.text = previous.body
-    
-    solution = ET.SubElement(version, 'solution')
-    solution.text = previous.solution
-    
-    rubric = ET.SubElement(version, 'rubric')
-    rubric.text = previous.rubric
-    
+  version = deepcopy(problem.newest_version())
+  version.id = str(next_id)
+  problem.versions[id] = version
   
+  version.add_defaults()
+  
+  if settings.action in [0,1]:
+    version.body = "\n      TODO\n    "
+    version.solution = "\n      TODO\n    "
+    version.rubric = "\n      TODO\n    "
+    version.deps = []
+    version.params = dict()
+    
+  if settings.action == 0:
+    version.topics = []
+    version.types = []
+  elif settings.action == 1:
+    print "SELECT TOPICS\n-------------"
+    version.topics = interactive_select(TOPICS, version.topics)
+    print "SELECT TYPES\n-------------"
+    version.types = interactive_select(TYPES, version.types)
+  else:
+    assert settings.action == 2
+    
+  root = problem.to_element()
   indent(root)
   with open(settings.filename, "w") as f:
     f.write(ET.tostring(root))
@@ -157,30 +122,43 @@ def create_new(settings):
   try:
     fd = os.open(settings.filename, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
     with os.fdopen(fd, 'w') as f:
-      root = ET.Element('problem')
-      version, topics, types = empty_version(root)
+      problem = Problem(settings.filename)
+      version = Version(settings.filename)
+      
+      problem.versions["0"] = version
+    
+      version.add_defaults()
+      version.body = "\n      TODO\n    "
+      version.solution = "\n      TODO\n    "
+      version.rubric = "\n      TODO\n    "
       
       if settings.interactive:
         print "SELECT TOPICS\n-------------"
-        topics.text = interactive_select(TOPICS, [])
+        version.topics = interactive_select(TOPICS, [])
         print "SELECT TYPES\n-------------"
-        types.text = interactive_select(TYPES, [])
+        version.types = interactive_select(TYPES, [])
       
+      root = problem.to_element()
       indent(root)
       f.write(ET.tostring(root))
   except OSError:
     print "Error: File '{}' already exists.".format(settings.filename)
     
 def validate(settings):
+  """
+  Validates the correctness and style of a problem XML document.
+  TODO: INCOMPLETE
+  """
   if not settings.filename.endswith(".xml"):
-    print "Error: {} must have a .xml extension to interoperate with build22".format(settings.filename)
+    print "Error: {} must have a .xml extension to interoperate with build tool".format(settings.filename)
   try:
     tree = ET.parse(settings.filename)
   except Exception:
     print "Error: XML in {} could not be parsed.".format(settings.filename)
     exit(1)  
   try:
-    problem = Problem(settings.filename, tree)
+    problem = Problem(settings.filename)
+    problem.parse_tree(tree)
   except ImproperXmlException:
     print "Fix the error above and rerun validation"
     exit(1)
@@ -199,6 +177,7 @@ def validate(settings):
 
 def add_branch_parser(parser):
   subparser = parser.add_parser('branch', help='Adds a new version to an XML file')
+  subparser.add_argument('filename', metavar='F', help='The XML file to create, edit, or validate')
   subparser.set_defaults(func=branch, action=0)
   how_to_add = subparser.add_mutually_exclusive_group()
   how_to_add.add_argument('-c', dest='action', action='store_const', const=2, help='The tool copies the previous version exactly and adds it as a new version')
@@ -208,16 +187,17 @@ def add_branch_parser(parser):
 def add_new_parser(parser):
   subparser = parser.add_parser('new', help='Creates a new XML file')
   subparser.set_defaults(func=create_new)
+  subparser.add_argument('filename', metavar='F', help='The XML file to create, edit, or validate')
   subparser.add_argument('-i', dest='interactive', action='store_true', default=False, help='Allows for the tool to interactively add all required fields')
 
 def add_validate_parser(parser):
   subparser = parser.add_parser('validate', help='Validates the correctness of a problem XML file')
+  subparser.add_argument('filename', metavar='F', help='The XML file to create, edit, or validate')
   subparser.set_defaults(func=validate)
   
 def build_args():
   """Parses command-line arguments using argparse and returns an object containing runtime information."""
   parser = argparse.ArgumentParser(description='Validates, edits, or creates a 22 XML file')
-  parser.add_argument('filename', metavar='F', help='The XML file to create, edit, or validate')
   subparsers = parser.add_subparsers(help='sub-command help')
   
   add_branch_parser(subparsers)
