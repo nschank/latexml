@@ -1,0 +1,25 @@
+\section{The \textit{Build} Tool}
+  \subsection{Building Specific Problems}
+    You can build any problem(s) into a PDF in one step by running the following command:
+    \begin{align*}\pybuild\texttt{problems }&\texttt{\textit{output[.pdf]} problem1.xml [problem2.xml \dots]}\\
+        ~&\texttt{[-s] [-m] [-r] [--title ``TITLE'']}\end{align*}
+    
+    The build script is overwrite-safe and tolerant of multiple people building the same pdf simultaneously. In particular, it will build a randomly named temporary file and check for overwriting afterwards, allowing you to specify another name or to overwrite if necessary. The generated \texttt{.tex} file is removed, as are the logs and auxiliary files -- if you need these for some reason, let Nick know and he'll add an option to keep them. Exception: the \texttt{.tex} file is not removed if there were \LaTeX\ errors, so that you can find where the error occurred.
+    
+    The most recent version (by highest ID) of each problem will be built in order, with repetition if requested. The header on top is temporary and will be removed in a later version of the builder. To change the title of the output, use the \texttt{--title} flag (which takes one argument, so may need quotes).
+    
+    The \texttt{-s}, \texttt{-m}, and \texttt{-r} flags control whether solutions, metadata (like filename and topics), and rubrics are printed, respectively. All are optional, and they can be used together arbitrarily.
+    
+    An invalid problem XML will be skipped and a warning will be printed, but the build will continue.
+    
+  \subsection{Building All Problems of a Type}
+    Given a directory full of problem XML files, the builder script can search all of them individually and build those that meet a set of criteria. You should run
+    \begin{align*}\pybuild\texttt{from }&\texttt{\textit{problems/\ \ output[.pdf]} [CRITERIA]}\\~&\texttt{[-s] [-m] [-r] [--title ``TITLE'']}\end{align*}
+    If no criteria are given, the above command builds every problem in the directory \texttt{problems/}, with the four optional flags acting just as in the previous section.
+    
+    The criteria for inclusion can be specified with any or all of the following flags, where a problem will be included only if it satisfies all specified flags.
+    \begin{description}
+      \item[\texttt{--allowed-topics}] After this flag, include one or more topic names, separated by spaces. A problem will be included only if its topics are a subset of this list. \textbf{Common use case}: List all topics that the students have learned so far, and you will never include problems that they are not qualified to answer.
+      \item[\texttt{--required-topics}] After this flag, include one or more topic names, separated by spaces. A problem will be included only if it has at least one required topic. Note that it does not need to possess \textit{all} required topics. \textbf{Common use case}: List the topics that the homework should focus on to get a good set of tentative problems for a homework.
+      \item[\texttt{--required-types}] After this flag, include one or more topic names, separated by spaces. A problem will be included only if it has at least one required type. Note that it does not need to possess \textit{all} required types. \textbf{Common use cases}: Finding (for instance) an inductive proof on a particular topic; listing all `pieces' related to a topic, to get inspiration; finding things that need work.
+    \end{description}

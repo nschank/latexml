@@ -1,0 +1,25 @@
+\section{The \textit{Edit} Tool}
+  \subsection{Creating a New Problem}
+    If you are building a new problem from scratch, you should first make sure that no question like it already exists. You can check this by opening the all-problem PDF (ask the HTAs where this is) and searching for some keywords about your problem.
+    
+    Then, you should make a new XML file in the root \texttt{problems/} directory, wherever makes the most sense to you.\footnote{Replace this once there's some kind of organization convention!} There is a simple tool for constructing the skeleton of a new problem XML. On a command line, run: \[\pytool\texttt{new \textit{filename.xml}}\] This command builds a new problem with one version, the current year, your login as the sole author, and other required fields ready to be filled in.
+    
+    The optional \texttt{-i} flag allows you to select the topics and types of the new file with a convenient interactive command-line interface. 
+    
+  \subsection{Creating a New Version}
+    If you are adding a new version to an existing problem, the edit tool will let you add a new version with minimal effort. Run: \[\pytool\texttt{branch \textit{a\_problem.xml} [-c|-e|-i]}\]
+    
+    The final flag is optional, and defaults to \texttt{-e}.
+    
+    \texttt{-e} means the new version will be \underline{e}mpty; the version number will be correctly incremented, the year will be set to the current year, and the sole author will be your login, but all other fields will be empty or ``TODO''.
+    
+    \texttt{-i} is the same as \texttt{-e}, except it uses the same \underline{i}nteractive interface as \pytool\texttt{new} to let you choose topics and types.
+    
+    \texttt{-c} \underline{c}opies the previous version's contents (topics, types, parameters, dependencies, body, solution, and rubric), and updates the version number, author, and year in the same way that \texttt{-e} does.
+    
+  \subsection{Validating a Problem File}
+    To make you feel reassured that your problem XML looks like it's up to the specifications, you can run \[\pytool\texttt{validate \textit{a\_problem.xml}}\] Validation is actually stricter (but more verbose) than the build tools: it looks closely at things like \LaTeX\ style, probable errors, and possible misspellings of topics which the build tool would simply reject without much explanation. It also prints all likely exceptions simultaneously, rather than halting at the first sign of a problem. You should always run validate, even if your problem builds successfully.
+    
+    Note that validate cannot help you if your XML is invalid (since the third-party parser will fail), and will not verify that your \LaTeX\ will correctly compile.
+    
+    \textbf{Note}: The current version does not have some of the features mentioned above (it will have these features within a few days), and is approximately equivalent to the build tool validator.
