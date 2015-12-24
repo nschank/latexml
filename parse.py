@@ -103,9 +103,9 @@ class Version(XmlParseable):
     year.text = self.year
     
     topics = ET.SubElement(version, 'topics')
-    topics.text = " ".join(self.topics)
+    topics.text = " ".join(self.topics) if self.topics else " "
     types = ET.SubElement(version, 'types')
-    types.text = " ".join(self.types)
+    types.text = " ".join(self.types) if self.types else " "
     
     for name, value in self.params.iteritems():
       param = ET.SubElement(version, 'param')

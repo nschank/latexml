@@ -123,9 +123,9 @@ def create_new(settings):
     fd = os.open(settings.filename, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
     with os.fdopen(fd, 'w') as f:
       problem = Problem(settings.filename)
-      version = Version(settings.filename)
+      version = Version(settings.filename, "1")
       
-      problem.versions["0"] = version
+      problem.versions["1"] = version
     
       version.add_defaults()
       version.body = "\n      TODO\n    "
