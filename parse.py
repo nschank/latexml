@@ -8,14 +8,131 @@ TYPES = string.split("computation core contradiction contrapositive direct eleme
 class ImproperXmlException(Exception):
   pass
   
+class ParseNotImplementedException(Exception):
+  pass
+  
+class XmlParseable:
+  """
+  An object which can be built or modified by providing it with a tree.
+  It may also be returned back as a new tree, modified directly, or created without
+  an initial tree.
+  """
+  
+  def __xml_assert(self, predicate, str):
+    """Used internally: check that something is true about the structure of an XML tree"""
+    if not predicate:
+      print "Error in {}: {}".format(self.filename, str)
+      raise ImproperXmlException()
+
+  def __init__(self, filename=None):
+    self.filename = filename
+    
+  def parse_element(self, element):
+    """Should be overridden to use the information in a root element to overwrite any relevant data in this tree"""
+    raise ParseNotImplementedException()
+    
+  def parse_tree(self, tree):
+    """Should be overridden to use the information in a tree to overwrite any relevant data in this tree"""
+    self.parse_element(tree.getroot())
+    
+    
+  def to_element(self):
+    """
+    Should be overridden such that the tree returned, if re-parsed by another object, would be semantically
+    identical to this object
+    """
+    raise ParseNotImplementedException()
+  
 def split_add(before, raw):
+  """Used by any fields which can be whitespace/comma separated"""
   return before + map(lambda x: string.strip(x, " ,\t"), string.split(raw))
       
-class Version:
+class Version(XmlParseable):
+  """
+  Internal representation of a problem Version.
+  """
   def __xml_assert(self, predicate, str):
+    """Overridden to show ID"""
     if not predicate:
       print "Error in {} (version {}): {}".format(self.filename, self.id, str)
       raise ImproperXmlException()
+      
+  def __init__(self, filename, id=None):
+    """Has public fields so that the tools can use them, there isn't much point in protecting them"""
+    self.filename = filename
+    self.id = id
+    
+    self.authors = []
+    self.topics = []
+    self.types = []
+    self.year = None
+    self.params = dict()
+    self.deps = []
+    self.body = None
+    self.solution = None
+    self.rubric = None
+    
+  def pretty_print(self, solution=False, rubric=False, metadata=False):
+    """Prints this version's contents as valid LaTeX, for building"""
+    return ("\n".join(["\\newcommand\\" + name + "{" + value + "}" 
+              for name, value in self.params]) +
+            ("\\texttt{" + self.filename.replace('_', "\\_") + "}\\\\\\textbf{Topics Covered: }" +
+              ", ".join(self.topics).replace('_', ' ') if metadata else "")
+            + "\n\n" + self.body +
+            ("\\begin{mdframed}\n\\subsubsection*{Solution}\n\n" 
+              + self.solution + "\\end{mdframed}\n"
+             if solution else "") +
+            ("\\begin{mdframed}\n\\subsubsection*{Rubric}\n\n" 
+              + self.rubric + "\\end{mdframed}\n"
+             if rubric else ""))
+    
+  def to_element(self):
+    version = ET.Element('version')
+    version.set('id', self.id)
+    
+    author = ET.SubElement(version, 'authors')
+    author.text = " ".join(self.authors)
+    
+    year = ET.SubElement(version, 'year')
+    year.text = self.year
+    
+    topics = ET.SubElement(version, 'topics')
+    topics.text = " ".join(self.topics)
+    types = ET.SubElement(version, 'types')
+    types.text = " ".join(self.types)
+    
+    for name, value in self.params.iteritems():
+      param = ET.SubElement(version, 'param')
+      param.set('name', name)
+      param.text = value
+    
+    if self.deps:
+      deps = ET.SubElement(version, 'dependencies')
+      deps.text = " ".join(self.deps)
+      
+    body = ET.SubElement(version, 'body')
+    body.text = self.body
+    
+    solution = ET.SubElement(version, 'solution')
+    solution.text = self.solution
+    
+    rubric = ET.SubElement(version, 'rubric')
+    rubric.text = self.rubric
+    
+    return version
+    
+  def validate(self):
+    """Asserts that the Version satisfies the minimal requirements of being complete"""
+    self.__xml_assert(self.authors, "No authors")
+    self.__xml_assert(self.body, "No body")
+    self.__xml_assert(self.rubric, "No rubric")
+    self.__xml_assert(self.solution, "No solution")
+    self.__xml_assert(self.topics, "No topics")
+    for t in self.topics:
+      self.__xml_assert(t in TOPICS, "Invalid topic: {}".format(t))
+    self.__xml_assert(self.types, "No question types")
+    for t in self.types:
+      self.__xml_assert(t in TYPES, "Invalid type: {}".format(t))
       
   def __parse_author(self, attributes, body):
     self.authors = split_add(self.authors, body)
@@ -62,168 +179,96 @@ class Version:
       'type':__parse_type, 'types':__parse_type,
       'year':__parse_year}
 
-  def __init__(self, filename, id):
-    self.filename = filename
-    self.id = id
-    
-    self.authors = []
-    self.topics = []
-    self.types = []
-    self.year = None
-    self.params = dict()
-    self.deps = []
-    self.body = None
-    self.solution = None
-    self.rubric = None
-    
-  def parse(self, tag):
-    self.__xml_assert(tag.tag in Version.__parsers, 
-        "Invalid tag '{}'".format(tag.tag))
-    Version.__parsers[tag.tag](self, tag.attrib, tag.text)
-    
-  def pretty_print(self, solution=False, rubric=False, metadata=False):
-    return ("\n".join(["\\newcommand\\" + name + "{" + value + "}" 
-              for name, value in self.params]) +
-            ("\\texttt{" + self.filename.replace('_', "\\_") + "}\\\\\\textbf{Topics Covered: }" +
-              ", ".join(self.topics).replace('_', ' ') if metadata else "")
-            + "\n\n" + self.body +
-            ("\\begin{mdframed}\n\\subsubsection*{Solution}\n\n" 
-              + self.solution + "\\end{mdframed}\n"
-             if solution else "") +
-            ("\\begin{mdframed}\n\\subsubsection*{Rubric}\n\n" 
-              + self.rubric + "\\end{mdframed}\n"
-             if rubric else ""))
-    
-  def validate(self):
-    self.__xml_assert(self.authors, "No authors")
-    self.__xml_assert(self.body, "No body")
-    self.__xml_assert(self.rubric, "No rubric")
-    self.__xml_assert(self.solution, "No solution")
-    self.__xml_assert(self.topics, "No topics")
-    for t in self.topics:
-      self.__xml_assert(t in TOPICS, "Invalid topic: {}".format(t))
-    self.__xml_assert(self.types, "No question types")
-    for t in self.types:
-      self.__xml_assert(t in TYPES, "Invalid type: {}".format(t))
-    
-class Problem:
-  def __xml_assert(self, predicate, str):
-    if not predicate:
-      print "Error in {}: {}".format(self.filename, str)
-      raise ImproperXmlException()
-
-  def add_version(self, block):
-    self.__xml_assert(block.tag == 'version', 
+  def parse_element(self, element):
+    self.__xml_assert(element.tag == 'version', 
         "Invalid version tag '{}'".format(block.tag))
-    self.__xml_assert('id' in block.attrib, "Version with no id")
-    v = Version(self.filename, block.attrib['id'])
-    self.__xml_assert(v.id not in self.__versions, 
-        "Duplicate version {}".format(v.id))
-    self.__versions[v.id] = v
-    for child in block:
-      v.parse(child)
-    v.validate()
+    self.__xml_assert('id' in element.attrib, "Version with no id")
+    self.id = element.attrib['id']
+    for tag in element:
+      self.__xml_assert(tag.tag in Version.__parsers, 
+          "Invalid tag '{}'".format(tag.tag))
+      Version.__parsers[tag.tag](self, tag.attrib, tag.text)
     
-  def get_version(self, id):
-    if id in self.__versions:
-      return self.__versions[id]
-    raise AttributeError()
     
-  def get_newest(self):
-    return self.__versions[max(self.__versions.keys())]
-
-  def __init__(self, filename, tree=None):
+    
+class Problem(XmlParseable):
+  """
+  Internal representation of a Problem, which contains many Versions 
+  (TODO: and will eventually have usedin information)
+  """
+  def __init__(self, filename):
     self.filename = filename
-    if tree is None:
-      try:
-        tree = ET.parse(filename)
-      except ET.ParseError:
-        print "Error: Could not parse {}".format(filename)
-        raise ImproperXmlException()
-    root = tree.getroot()
+    self.versions = dict()
     
+  def newest_version(self):
+    return self.__versions[max(self.__versions.keys())]
+    
+  def next_id(self):
+    try: return 1 + max([int(key) for key in self.versions.keys()])
+    except ValueError: 
+      self.__xml_assert(False, "Some invalid version id: {}".format(self.versions.keys()))
+    
+  def parse_element(self, root):
     self.__xml_assert(root.tag == 'problem', 
         "Invalid root tag '{}' (should be 'problem')".format(root.tag))
     self.__xml_assert(len(root) > 0, "Empty file")
     
-    self.__versions = dict()
-    map(self.add_version, root[:])
-    
-class Document:
-  def __xml_assert(self, predicate, str):
-    if not predicate:
-      print "Error in {}: {}".format(self.filename, str)
-      raise ImproperXmlException()
+    for child in root:
+      self.__xml_assert(child.tag != 'usedin', "<usedin> not yet supported")
+      version = Version(self.filename)
+      version.parse_element(child)
+      self.__xml_assert(version.id not in self.__versions, 
+        "Duplicate version {}".format(version.id))
+      self.versions[id] = version
       
-  def __parse_due(self, attributes, body):
-    self.__xml_assert(self.due is None, "duplicate due tag")
-    self.due = body
-    
-  def __parse_name(self, attributes, body):
-    self.__xml_assert(self.name is None, "duplicate name tag")
-    self.name = body
-    
-  def __parse_problem(self, attributes, body):
-    prob = Problem(body)
-    if 'version' in attributes:
-      self.problems.append(prob.get_version(attributes['version']))
-    else:
-      if attributes:
-        print "Warning: tag for problem {} has unknown attributes {}".format(body, attributes.keys())
-      self.problems.append(prob.get_newest())
+  def to_element(self):
+    root = ET.Element('problem')
+    for key in sorted(self.versions.keys(), reverse=True):
+      root.append(self.versions[key].to_element())
+    return root
       
+class Document(XmlParseable):
+  """
+  Internal representation of a Document, which contains an ordered list of Versions to print as well
+  as metadata used to create headers or other LaTeX things.
+  """
+  def __init__(self, filename=None):
+    self.year = None
+    self.due = None
+    self.name = None
+    self.filename = filename
+    self.versions = []
     
-  def __parse_year(self, attributes, body):
-    self.__xml_assert(self.year is None, "duplicate year tag")
-    self.year = body
-      
-  __parsers = {
-      'name':__parse_name,
-      'due':__parse_due,
-      'problem':__parse_problem,
-      'year':__parse_year}
-      
-  def __parse_child(self, tag):
-    self.__xml_assert(tag.tag in Document.__parsers, 
-        "Invalid tag '{}'".format(tag.tag))
-    Document.__parsers[tag.tag](self, tag.attrib, tag.text)
-    
+  def build(self, solutions=False, rubrics=False, metadata=False):
+    return self._header() + self._document(self._problems(solutions, rubrics, metadata))
+  
   def validate(self):
+    """
+    Ensures that a Document is ready for building
+    """
     self.__xml_assert(self.year is not None, "no year provided")
     self.__xml_assert(self.name is not None, "no assignment name provided")
     self.__xml_assert(self.due is not None, "no due date provided")
     self.__xml_assert(self.problems, "no problems provided")
     
-  def parse(self, filename):
-    self.filename = filename
-    tree = ET.parse(filename)
-    root = tree.getroot()
-    
-    self.__xml_assert(root.tag == 'assignment',
-        "Invalid root tag '{}' (should be 'assignment')".format(root.tag))
-    
-    for child in root:
-      self.parse(child)
-    self.validate()
-    
-  def add_problem(self, version):
-    self.problems.append(version)
-    
-  def __init__(self):
-    self.year = None
-    self.due = None
-    self.name = None
-    self.problems = []
-    
-  def problem_dependencies(self):
+  def _additional_dependencies(self):
     deps = set()
-    for p in self.problems:
-      deps = deps.union(p.deps)
+    for v in self.versions:
+      deps = deps.union(v.deps)
     
     return "\n".join(["\\usepackage{" + x + "}" for x in deps]) if deps else ""
-    
-  def header(self):
-    dependencies = self.problem_dependencies()
+  
+  def _document(self, body):
+    return "\\begin{document}\n\
+  \\thispagestyle{firstpagestyle}\n\
+  \\begin{center}\n\
+    {\\huge \\textbf{" + self.name + "}}\n\n\
+    {\\large \\textit{Due: " + self.due + "}}\n\
+  \\end{center}\n\n\
+  \\hwblurb\n\n" + body + "\end{document}"
+  
+  def _header(self):
+    dependencies = self._additional_dependencies()
     return "\\documentclass[12pt,letterpaper]{article}\n\n\
 \\usepackage{simple22}\n\
 \\fancypagestyle{firstpagestyle} {\n\
@@ -238,18 +283,46 @@ class Document:
   \\chead{" + self.name + "}%\n\
   \\rhead{\\textit{" + self.due + "}}%\n\
 }\n\\pagestyle{fancyplain}\n" + dependencies + "\n\n"
-  
-  def document(self, body):
-    return "\\begin{document}\n\
-  \\thispagestyle{firstpagestyle}\n\
-  \\begin{center}\n\
-    {\\huge \\textbf{" + self.name + "}}\n\n\
-    {\\large \\textit{Due: " + self.due + "}}\n\
-  \\end{center}\n\n\
-  \\hwblurb\n\n" + body + "\end{document}"
-  
-  def problem_str(self, solutions=False, rubrics=False, metadata=False):
+
+  def _problems(self, solutions=False, rubrics=False, metadata=False):
     return "\n\n".join(
       ["\\subsection*{Problem " + str(i+1) + "}\n{\n" + 
         v.pretty_print(solutions,rubrics,metadata) + "\n}\n\n" 
-        for i, v in enumerate(self.problems)])
+        for i, v in enumerate(self.versions)])
+
+  def __parse_due(self, attributes, body):
+    self.__xml_assert(self.due is None, "duplicate due tag")
+    self.due = body
+    
+  def __parse_name(self, attributes, body):
+    self.__xml_assert(self.name is None, "duplicate name tag")
+    self.name = body
+    
+  def __parse_problem(self, attributes, body):
+    prob = Problem(body)
+    if 'version' in attributes:
+      self.problems.append(prob.versions[attributes['version']])
+    else:
+      if attributes:
+        print "Warning: tag for problem {} has unknown attributes {}".format(body, attributes.keys())
+      self.problems.append(prob.newest_version())
+      
+  def __parse_year(self, attributes, body):
+    self.__xml_assert(self.year is None, "duplicate year tag")
+    self.year = body
+      
+  __parsers = {
+      'name':__parse_name,
+      'due':__parse_due,
+      'problem':__parse_problem,
+      'year':__parse_year}
+      
+  def parse_element(self, root):
+    self.__xml_assert(root.tag == 'assignment',
+        "Invalid root tag '{}' (should be 'assignment')".format(root.tag))
+    for tag in root:
+      self.__xml_assert(tag.tag in Document.__parsers, 
+          "Invalid tag '{}'".format(tag.tag))
+      Document.__parsers[tag.tag](self, tag.attrib, tag.text)
+    
+    
