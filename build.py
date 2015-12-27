@@ -57,11 +57,31 @@ def build_if(settings):
             version = problem.newest_version()
             version.validate()
             
-            sat_allowed = not settings.allowed_topics or not [topic for topic in version.topics if topic not in settings.allowed_topics]
-            sat_required_topics = not settings.required_topics or [topic for topic in version.topics if topic in settings.required_topics]
-            sat_required_types = not settings.required_types or [type for type in version.types if type in settings.required_types]
-            if sat_allowed and sat_required_topics and sat_required_types:
-              document.versions.append(version)
+            if (settings.allowed_topics and 
+                [topic for topic in version.topics 
+                    if topic not in settings.allowed_topics]):
+              continue
+            if (settings.required_topics and 
+                [topic for topic in version.topics 
+                    if topic not in settings.required_topics]):
+              continue
+            if (settings.required_types and 
+                [type for type in version.types 
+                    if type not in settings.required_types]):
+              continue
+            if settings.todo or settings.grep:
+              lower_sol = version.solution.lower()
+              lower_rub = version.rubric.lower()
+              if (settings.todo and lower_sol.find("todo") == -1 
+                  and lower_rub.find("todo") == -1):
+                continue
+              if settings.grep:
+                search = version.body.lower() + lower_sol + lower_rub
+                for word in settings.grep:
+                  if search.find(word) == -1:
+                    continue
+            document.versions.append(version)
+            
           except ImproperXmlException:
             pass
     build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
@@ -98,13 +118,14 @@ def add_if_parser(parser):
   subparser.add_argument('-m', dest='metadata', action='store_true', default=False, help='Builds the problems with attached metadata')
   subparser.add_argument('-r', dest='rubrics', action='store_true', default=False, help='Builds the problems with rubrics')
   subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
-  subparser.add_argument('--allowed-topics', required=False, dest='allowed_topics', nargs='+', 
-      help='If present, will restrict the allowed topics: a problem will be not be built if it uses any topic outside of the provided')
+  subparser.add_argument('--allowed-topics', required=False, dest='allowed_topics', nargs='+', help='If present, will restrict the allowed topics: a problem will be not be built if it uses any topic outside of the provided')
+  subparser.add_argument('--grep', required=False, dest='grep', nargs='+', help='If present, restricts to problems which contain within the rubric, solution, or body that contain all of the given words. Words are treated separately, but case-insensitively.')
   subparser.add_argument('--required-topics', required=False, dest='required_topics', nargs='+', 
       help='If present, will specify the required topics: a problem will be built only if it uses at least one of the provided')
   subparser.add_argument('--required-types', required=False, dest='required_types', nargs='+', 
       help='If present, will specify the required types: a problem will be built only if it uses at least one of the provided')
   subparser.add_argument('--title', nargs=1, required=False, default="Problem", help='Sets the title of the problem build')
+  subparser.add_argument('--todo', dest='todo', action='store_true', default=False, help='If present, restricts to problems that have "todo" in their solution or rubric.')
     
 def add_problem_parser(parser):
   subparser = parser.add_parser('problems', help='Builds a problem or series of problems, in order')
