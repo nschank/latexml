@@ -312,12 +312,13 @@ class Document(XmlParseable):
     
   def __parse_problem(self, attributes, body):
     prob = Problem(body)
+    prob.parse_tree(ET.parse(body))
     if 'version' in attributes:
-      self.problems.append(prob.versions[attributes['version']])
+      self.versions.append(prob.versions[attributes['version']])
     else:
       if attributes:
         print "Warning: tag for problem {} has unknown attributes {}".format(body, attributes.keys())
-      self.problems.append(prob.newest_version())
+      self.versions.append(prob.newest_version())
       
   def __parse_year(self, attributes, body):
     self.xml_assert(self.year is None, "duplicate year tag")
@@ -327,6 +328,7 @@ class Document(XmlParseable):
       'name':__parse_name,
       'due':__parse_due,
       'problem':__parse_problem,
+      'title':__parse_name,
       'year':__parse_year}
       
   def parse_element(self, root):

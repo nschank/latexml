@@ -38,6 +38,17 @@ def build(document, filename, solutions=False, rubrics=False, metadata=False):
   else:
     print "Error: No problems were added to the build successfully"
 
+def build_doc(settings):
+  document = Document(settings.document)
+  try:
+    tree = ET.parse(settings.document)
+    document.parse_tree(tree)
+    build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
+  except ImproperXmlException, ET.ParseError:
+    print "Error: Could not parse {}".format(settings.document)
+    
+  
+    
 def build_if(settings):
   document = Document()
   document.name = "".join(settings.title)
@@ -90,7 +101,7 @@ def build_if(settings):
   
 
 def build_specific(settings):
-  document = Document()
+  document = Document(settings.document)
   document.name = "".join(settings.title)
   #TODO
   document.year = "1900"
@@ -106,9 +117,18 @@ def build_specific(settings):
       
       document.versions.append(version)
     except ImproperXmlException, ET.ParseError:
-      print "Warning: Could not parse {}".format(filename)
+      print "Warning: Could not parse {}".format(settings.filename)
       
   build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
+    
+def add_doc_parser(parser):
+  subparser = parser.add_parser('doc', help='Builds a particular document XML file into a pdf')
+  subparser.set_defaults(func=build_doc)
+  subparser.add_argument('document', metavar='D', help='The document XML file to build')
+  subparser.add_argument('filename', metavar='O', help='The destination of the output PDF')
+  subparser.add_argument('-m', dest='metadata', action='store_true', default=False, help='Builds the problems with attached metadata')
+  subparser.add_argument('-r', dest='rubrics', action='store_true', default=False, help='Builds the problems with rubrics')
+  subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
     
 def add_if_parser(parser):
   subparser = parser.add_parser('from', help='Builds all problems that satisfy the given predicates within a particular directory')
@@ -143,6 +163,7 @@ def build_args():
   parser = argparse.ArgumentParser(description='Builds PDFs from CS22 XML files')
   subparsers = parser.add_subparsers(help='How to choose which files to build')
   
+  add_doc_parser(subparsers)
   add_if_parser(subparsers)
   add_problem_parser(subparsers)
   
