@@ -79,7 +79,7 @@ class Version(XmlParseable):
   def pretty_print(self, solution=False, rubric=False, metadata=False):
     """Prints this version's contents as valid LaTeX, for building"""
     return ("\n".join(["\\newcommand\\" + name + "{" + value + "}" 
-              for name, value in self.params]) +
+              for name, value in self.params.iteritems()]) +
             ("\\texttt{" + self.filename.replace('_', "\\_") + "}\\\\\\textbf{Topics Covered: }" +
               ", ".join(self.topics).replace('_', ' ') + "\\\\\\textbf{Types: }" +
               ", ".join(self.types).replace('_', ' ') if metadata else "")

@@ -1,0 +1,20 @@
+<problem>
+  <version id="1">
+    <authors>nschank</authors>
+    <year>1995</year>
+    <topics>set_theory probability</topics>
+    <types>piece proof</types>
+    <body>Body 1</body>
+    <solution>Solution 1</solution>
+    <rubric>Rubric 1</rubric>
+  </version>
+  <version id="0">
+    <authors>nschank</authors>
+    <year>1994</year>
+    <topics>set_theory probability</topics>
+    <types>piece proof</types>
+    <body>Body 0</body>
+    <solution>Solution 0</solution>
+    <rubric>Rubric 0</rubric>
+  </version>
+</problem>
