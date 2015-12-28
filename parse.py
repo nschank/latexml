@@ -210,6 +210,7 @@ class Problem(XmlParseable):
   def __init__(self, filename):
     self.filename = filename
     self.versions = dict()
+    self.used_in = []
     
   def newest_version(self):
     return self.versions[max(self.versions)]
@@ -223,14 +224,18 @@ class Problem(XmlParseable):
     self.xml_assert(len(root) > 0, "Empty file")
     
     for child in root:
-      self.xml_assert(child.tag != 'usedin', "<usedin> not yet supported")
-      version = Version(self.filename)
-      version.parse_element(child)
-      if validate_versions:
-        version.validate()
-      self.xml_assert(version.vid not in self.versions, 
-        "Duplicate version {}".format(version.vid))
-      self.versions[version.vid] = version
+      if child.tag == 'usedin':
+        self.xml_assert('year' in child.attrib, "usedin tag must have year")
+        self.xml_assert('assign' in child.attrib, "usedin tag must have assign attribute")
+        self.used_in.append(UsedIn(child.attrib['year'], child.attrib['assign']))
+      else:
+        version = Version(self.filename)
+        version.parse_element(child)
+        if validate_versions:
+          version.validate()
+        self.xml_assert(version.vid not in self.versions, 
+          "Duplicate version {}".format(version.vid))
+        self.versions[version.vid] = version
       
   def parse_tree(self, tree, validate_versions=True):
     self.parse_element(tree.getroot(), validate_versions)
@@ -341,4 +346,8 @@ class Document(XmlParseable):
           "Invalid tag '{}'".format(tag.tag))
       Document.__parsers[tag.tag](self, tag.attrib, tag.text)
     
+class UsedIn:
+  def __init__(year, assignment_name):
+    self.year = year
+    self.assignment_name = assignment_name
     

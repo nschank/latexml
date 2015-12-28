@@ -1,7 +1,7 @@
 import argparse
 import os
 import xml.etree.ElementTree as ET
-from parse import TOPICS, TYPES, Problem, Version, ImproperXmlException
+from parse import TOPICS, TYPES, Problem, Version, ImproperXmlException, UsedIn
 from copy import deepcopy
 from datetime import date
 
@@ -118,6 +118,25 @@ def branch(settings):
   with open(settings.filename, "w") as f:
     f.write(ET.tostring(root))
     
+def finalize(settings):
+  document = Document(settings.document)
+  try:
+    tree = ET.parse(settings.document)
+    document.parse_tree(tree)
+    for version in document.versions:
+      prob_tree = ET.parse(version.filename)
+      problem = Problem(version.filename)
+      problem.parse_tree(prob_tree, validate_versions=False)
+      problem.used_in.append(UsedIn(document.year, document.name))
+      
+      root = problem.to_element()
+      indent(root)
+      with open(version.filename, "w") as f:
+        f.write(ET.tostring(root))
+      
+  except ImproperXmlException, ET.ParseError:
+    print "Error: Could not parse {}".format(settings.document)
+    
 def create_new(settings):
   try:
     fd = os.open(settings.filename, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
@@ -190,7 +209,6 @@ def validate(settings):
   except Exception:
     print "Error: XML in {} could not be parsed.".format(settings.filename)
     exit(1)
-  root = tree.getroot()  
   try:
     problem = Problem(settings.filename)
     problem.parse_tree(tree)
@@ -219,6 +237,11 @@ def add_branch_parser(parser):
   how_to_add.add_argument('-e', dest='action', action='store_const', const=0, help='The tool creates an empty version and adds it')
   how_to_add.add_argument('-i', dest='action', action='store_const', const=1, help='The tool creates an empty version and interactively adds topics and types')
 
+def add_finalize_parser(parser):
+  subparser = parser.add_parser('finalize', help='Marks that a document XML has been released, and thus <usedin> tags should be added to appropriate problems')
+  subparser.add_argument('document', metavar='D', help='The document file which has been released as an assignment')
+  subparser.set_defaults(func=finalize)
+  
 def add_new_parser(parser):
   subparser = parser.add_parser('new', help='Creates a new XML file')
   subparser.set_defaults(func=create_new)
@@ -241,8 +264,9 @@ def build_args():
   parser = argparse.ArgumentParser(description='Validates, edits, or creates a 22 XML file')
   subparsers = parser.add_subparsers(help='sub-command help')
   
-  add_edit_parser(subparsers)
   add_branch_parser(subparsers)
+  add_edit_parser(subparsers)
+  add_finalize_parser(subparsers)
   add_new_parser(subparsers)
   add_validate_parser(subparsers)
   
