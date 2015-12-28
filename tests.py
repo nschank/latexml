@@ -1,5 +1,7 @@
+import xml.etree.ElementTree as ET
 import unittest
 from parse import Version
+import os
 
 test_filename = "test_filename"
 
@@ -33,7 +35,7 @@ class TestVersion(unittest.TestCase):
     for name, value in version1.params.iteritems():
       self.assertTrue(name in version2.params)
       self.assertEqual(version2.params[name], value)
-
+      
   def test_add_defaults(self):
     version = Version(test_filename)
     self.assertFalse(version.authors)
@@ -41,6 +43,16 @@ class TestVersion(unittest.TestCase):
     version.add_defaults()
     self.assertTrue(len(version.authors) == 1)
     self.assertFalse(version.year is None)
+    
+  def test_parse(self):
+    for file in os.listdir("test"):
+      if file.startswith("version_valid"):
+        tree = ET.parse("test/" + file)
+        version = Version(file)
+        version.parse_tree(tree)
+        version2 = Version(file)
+        version2.parse_element(tree.getroot())
+        self.versions_equal(version, version2)
     
   def test_pretty_print(self):
     version = Version(test_filename, 1)
@@ -91,6 +103,25 @@ class TestVersion(unittest.TestCase):
     self.assertTrue(rubric.find('theta') != -1)
     self.assertTrue(meta.find('theta') == -1)
 
+  def test_to_element(self):
+    for file in os.listdir("test"):
+      if file.startswith("version_valid"):
+        tree = ET.parse("test/" + file)
+        version = Version(file)
+        version.parse_tree(tree)
+        
+        version2 = Version(file)
+        version2.parse_element(version.to_element())
+        
+        self.versions_equal(version, version2)
+    
+  def test_validate(self):
+    for file in os.listdir("test"):
+      if file.startswith("version_valid"):
+        tree = ET.parse("test/" + file)
+        version = Version(file)
+        version.parse_tree(tree)
+        version.validate()
     
 if __name__ == '__main__':
   unittest.main()
