@@ -1,8 +1,11 @@
-<version id="1">
-  <authors>nschank</authors>
-  <year>1995</year>
-  <types>piece proof</types>
-  <body>Body 1</body>
-  <solution>Solution 1</solution>
-  <rubric>Rubric 1</rubric>
-</version>
+<test>
+  <error>No topics</error>
+  <version id="1">
+    <authors>nschank</authors>
+    <year>1995</year>
+    <types>piece proof</types>
+    <body>Body 1</body>
+    <solution>Solution 1</solution>
+    <rubric>Rubric 1</rubric>
+  </version>
+</test>

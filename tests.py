@@ -20,21 +20,11 @@ class TestVersion(unittest.TestCase):
     self.assertEqual(len(version1.params), len(version2.params))
     self.assertEqual(len(version1.deps), len(version2.deps))
     
-    for elem in version1.authors:
-      self.assertTrue(elem in version2.authors)
-      
-    for elem in version1.topics:
-      self.assertTrue(elem in version2.topics)
-      
-    for elem in version1.types:
-      self.assertTrue(elem in version2.types)
-      
-    for elem in version1.deps:
-      self.assertTrue(elem in version2.deps)
-      
-    for name, value in version1.params.iteritems():
-      self.assertTrue(name in version2.params)
-      self.assertEqual(version2.params[name], value)
+    self.assertEqual(version1.authors, version2.authors)
+    self.assertEqual(version1.types, version2.types)
+    self.assertEqual(version1.topics, version2.topics)
+    self.assertEqual(version1.deps, version2.deps)
+    self.assertEqual(version1.params, version2.params)
       
   def test_add_defaults(self):
     version = Version(test_filename)
@@ -49,8 +39,13 @@ class TestVersion(unittest.TestCase):
       if file.startswith("version_invalid"):
         tree = ET.parse("test/" + file)
         version = Version(file)
-        with self.assertRaises(ImproperXmlException):
-          version.parse_tree(tree)
+        root = tree.getroot()
+        if root.tag != 'test' or len(root) != 2 or root[0].tag != 'error':
+          print "Warning: Invalid version_invalid test {}".format(file)
+          continue
+        
+        with self.assertRaisesRegexp(ImproperXmlException, root[0].text):
+          version.parse_element(root[1])
           version.validate()
         
   def test_parse(self):

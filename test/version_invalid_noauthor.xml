@@ -1,8 +1,11 @@
-<version id="1">
-  <year>1995</year>
-  <topics>set_theory probability</topics>
-  <types>piece proof</types>
-  <body>Body 1</body>
-  <solution>Solution 1</solution>
-  <rubric>Rubric 1</rubric>
-</version>
+<test>
+  <error>No authors</error>
+  <version id="1">
+    <year>1995</year>
+    <topics>set_theory probability</topics>
+    <types>piece proof</types>
+    <body>Body 1</body>
+    <solution>Solution 1</solution>
+    <rubric>Rubric 1</rubric>
+  </version>
+</test>

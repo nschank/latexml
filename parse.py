@@ -135,10 +135,11 @@ class Version(XmlParseable):
     self.xml_assert(self.topics, "No topics")
     for t in self.topics:
       self.xml_assert(t in TOPICS, "Invalid topic: {}".format(t))
-    self.xml_assert(self.types, "No question types")
+    self.xml_assert(self.types, "No types")
     for t in self.types:
       self.xml_assert(t in TYPES, "Invalid type: {}".format(t))
     self.xml_assert(self.year, "No year")
+    self.xml_assert(self.vid, "No id")
       
   def __parse_author(self, attributes, body):
     self.authors = split_add(self.authors, body)

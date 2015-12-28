@@ -1,8 +1,11 @@
-<version id="1">
-  <authors>nschank</authors>
-  <year>1995</year>
-  <topics>set_theory probability</topics>
-  <types>piece proof</types>
-  <solution>Solution 1</solution>
-  <rubric>Rubric 1</rubric>
-</version>
+<test>
+  <error>No body</error>
+  <version id="1">
+    <authors>nschank</authors>
+    <year>1995</year>
+    <topics>set_theory probability</topics>
+    <types>piece proof</types>
+    <solution>Solution 1</solution>
+    <rubric>Rubric 1</rubric>
+  </version>
+</test>
