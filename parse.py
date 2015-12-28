@@ -23,8 +23,7 @@ class XmlParseable:
   def xml_assert(self, predicate, str):
     """Used internally: check that something is true about the structure of an XML tree"""
     if not predicate:
-      print "Error in {}: {}".format(self.filename, str)
-      raise ImproperXmlException()
+      raise ImproperXmlException("Error in {}: {}".format(self.filename, str))
 
   def __init__(self, filename=None):
     self.filename = filename
@@ -56,8 +55,7 @@ class Version(XmlParseable):
   def xml_assert(self, predicate, str):
     """Overridden to show ID"""
     if not predicate:
-      print "Error in {} (version {}): {}".format(self.filename, self.vid, str)
-      raise ImproperXmlException()
+      raise ImproperXmlException("Error in {} (version {}): {}".format(self.filename, self.vid, str))
       
   def __init__(self, filename, vid=None):
     """Has public fields so that the tools can use them, there isn't much point in protecting them"""
