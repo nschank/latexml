@@ -156,7 +156,7 @@ def edit(settings):
     
   try:
     problem = Problem(settings.filename)
-    problem.parse_tree(tree)
+    problem.parse_tree(tree, validate_versions=False)
     version = problem.newest_version()
   except ImproperXmlException:
     print "Error: {} has invalid problem XML. Try `validate'".format(settings.filename)
@@ -189,7 +189,8 @@ def validate(settings):
     tree = ET.parse(settings.filename)
   except Exception:
     print "Error: XML in {} could not be parsed.".format(settings.filename)
-    exit(1)  
+    exit(1)
+  root = tree.getroot()  
   try:
     problem = Problem(settings.filename)
     problem.parse_tree(tree)

@@ -95,7 +95,7 @@ class Version(XmlParseable):
     
   def to_element(self):
     version = ET.Element('version')
-    version.set('id', self.vid)
+    version.set('id', str(self.vid))
     
     author = ET.SubElement(version, 'authors')
     author.text = " ".join(self.authors)
@@ -190,7 +190,11 @@ class Version(XmlParseable):
     self.xml_assert(element.tag == 'version', 
         "Invalid version tag '{}'".format(element.tag))
     self.xml_assert('id' in element.attrib, "Version with no id")
-    self.vid = element.attrib['id']
+    try: self.vid = int(element.attrib['id'])
+    except ValueError: 
+      self.xml_assert(False, 
+        "Version has non-numeric id {}".format(element.attrib['id']))
+    
     for tag in element:
       self.xml_assert(tag.tag in Version.__parsers, 
           "Invalid tag '{}'".format(tag.tag))
@@ -211,9 +215,7 @@ class Problem(XmlParseable):
     return self.versions[max(self.versions)]
     
   def next_id(self):
-    try: return 1 + int(max(self.versions))
-    except ValueError: 
-      self.xml_assert(False, "Some invalid version id: {}".format(self.versions.keys()))
+    return 1 + max(self.versions)
     
   def parse_element(self, root, validate_versions=True):
     self.xml_assert(root.tag == 'problem', 
@@ -271,30 +273,30 @@ class Document(XmlParseable):
     return "\n".join(["\\usepackage{" + x + "}" for x in deps]) if deps else ""
   
   def _document(self, body):
-    return "\\begin{document}\n\
-  \\thispagestyle{firstpagestyle}\n\
-  \\begin{center}\n\
-    {\\huge \\textbf{" + self.name + "}}\n\n\
-    {\\large \\textit{Due: " + self.due + "}}\n\
-  \\end{center}\n\n\
-  \\hwblurb\n\n" + body + "\end{document}"
+    return """\\begin{document}
+  \\thispagestyle{firstpagestyle}
+  \\begin{center}
+    {\\huge \\textbf{""" + self.name + """}}\n
+    {\\large \\textit{Due: """ + self.due + """}}
+  \\end{center}\n
+  \\hwblurb\n\n""" + body + "\\end{document}"
   
   def _header(self):
     dependencies = self._additional_dependencies()
-    return "\\documentclass[12pt,letterpaper]{article}\n\n\
-\\usepackage{simple22}\n\
-\\fancypagestyle{firstpagestyle} {\n\
-  \\renewcommand{\\headrulewidth}{0pt}%\n\
-  \\lhead{\\textbf{CSCI 0220}}%\n\
-  \\chead{\\textbf{Discrete Structures and Probability}}%\n\
-  \\rhead{C. Klivans}%\n\
-}\n\n\
-\\fancypagestyle{fancyplain} {%\n\
-  \\renewcommand{\\headrulewidth}{0pt}%\n\
-  \\lhead{\\textbf{CSCI 0220}}%\n\
-  \\chead{" + self.name + "}%\n\
-  \\rhead{\\textit{" + self.due + "}}%\n\
-}\n\\pagestyle{fancyplain}\n" + dependencies + "\n\n"
+    return """\\documentclass[12pt,letterpaper]{article}\n
+\\usepackage{simple22}
+\\fancypagestyle{firstpagestyle} {
+  \\renewcommand{\\headrulewidth}{0pt}%
+  \\lhead{\\textbf{CSCI 0220}}%
+  \\chead{\\textbf{Discrete Structures and Probability}}%
+  \\rhead{C. Klivans}%
+}\n
+\\fancypagestyle{fancyplain} {%
+  \\renewcommand{\\headrulewidth}{0pt}%
+  \\lhead{\\textbf{CSCI 0220}}%
+  \\chead{""" + self.name + """}%
+  \\rhead{\\textit{""" + self.due + """}}%
+}\n\\pagestyle{fancyplain}\n""" + dependencies + "\n\n"
 
   def _problems(self, solutions=False, rubrics=False, metadata=False):
     return "\n\n".join(
