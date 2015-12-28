@@ -1,12 +1,31 @@
 import xml.etree.ElementTree as ET
 import unittest
-from parse import Version, ImproperXmlException
+from parse import Version, ImproperXmlException, Problem
 import os
 import string
 
 test_filename = "test_filename"
 
-class TestVersion(unittest.TestCase):
+class ProblemTest(unittest.TestCase):
+  def test_newest(self):
+    problem = Problem(test_filename)
+    
+    versions = [Version(test_filename, 0), Version(test_filename, 1), 
+        Version(test_filename, 2), Version(test_filename, 3)]
+    problem.versions[0] = versions[0]
+    self.assertEqual(problem.newest_version(), versions[0])
+    problem.versions[1] = versions[1]
+    self.assertEqual(problem.newest_version(), versions[1])
+    problem.versions[2] = versions[2]
+    self.assertEqual(problem.newest_version(), versions[2])
+    problem.versions[3] = versions[3]
+    self.assertEqual(problem.newest_version(), versions[3])
+    del problem.versions[3]
+    self.assertEqual(problem.newest_version(), versions[2])
+    
+
+
+class VersionTest(unittest.TestCase):
   def versions_equal(self, version1, version2):
     self.assertEqual(version1.filename, version2.filename)
     self.assertEqual(version1.vid, version2.vid)
