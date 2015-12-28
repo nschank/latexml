@@ -45,8 +45,8 @@ class XmlParseable:
     raise ParseNotImplementedException()
   
 def split_add(before, raw):
-  """Used by any fields which can be whitespace/comma separated"""
-  return before + map(lambda x: string.strip(x, " ,\t"), string.split(raw))
+  """Used by any fields which can be whitespace separated"""
+  return before + map(lambda x: string.strip(x), string.split(raw))
       
 class Version(XmlParseable):
   """

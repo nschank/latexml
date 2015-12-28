@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import unittest
 from parse import Version, ImproperXmlException
 import os
+import string
 
 test_filename = "test_filename"
 
@@ -33,6 +34,20 @@ class TestVersion(unittest.TestCase):
     version.add_defaults()
     self.assertTrue(len(version.authors) == 1)
     self.assertFalse(version.year is None)
+    
+  def test_authors(self):
+    for file in os.listdir("test"):
+      if file.startswith("version_valid"):
+        tree = ET.parse("test/" + file)
+        version = Version(file)
+        root = tree.getroot()
+        
+        version.parse_element(root)
+        authors = []
+        for child in root:
+          if child.tag in ['author', 'authors']:
+            authors = authors + string.split(child.text)
+        self.assertEqual(authors, version.authors)
     
   def test_invalid(self):
     for file in os.listdir("test"):
