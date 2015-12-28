@@ -7,6 +7,34 @@ import string
 test_filename = "test_filename"
 
 class ProblemTest(unittest.TestCase):
+  def test_invalid(self):
+    for file in os.listdir("test"):
+      if file.startswith("problem_invalid"):
+        tree = ET.parse("test/" + file)
+        problem = Problem(file)
+        root = tree.getroot()
+        if root.tag != 'test' or len(root) != 2 or root[0].tag != 'error':
+          print "Warning: Invalid problem_invalid test {}".format(file)
+          continue
+        
+        with self.assertRaisesRegexp(ImproperXmlException, root[0].text):
+          problem.parse_element(root[1], validate_versions=True)
+      elif file.startswith("version_invalid"):
+        tree = ET.parse("test/" + file)
+        problem = Problem(file)
+        version_root = tree.getroot()
+        if (version_root.tag != 'test' or len(version_root) != 2 
+            or version_root[0].tag != 'error'):
+          print "Warning: Invalid version_invalid test {}".format(file)
+          continue
+        
+        with self.assertRaisesRegexp(ImproperXmlException, 
+            version_root[0].text):
+          root = ET.Element("problem")
+          root.append(version_root[1])
+          problem.parse_element(root, validate_versions=True)
+        
+          
   def test_newest(self):
     problem = Problem(test_filename)
     
@@ -22,6 +50,22 @@ class ProblemTest(unittest.TestCase):
     self.assertEqual(problem.newest_version(), versions[3])
     del problem.versions[3]
     self.assertEqual(problem.newest_version(), versions[2])
+    
+  def test_next_id_direct(self):
+    problem = Problem(test_filename)
+    
+    versions = [Version(test_filename, 0), Version(test_filename, 1), 
+        Version(test_filename, 2), Version(test_filename, 3)]
+    problem.versions[0] = versions[0]
+    self.assertEqual(problem.next_id(), 1)
+    problem.versions[1] = versions[1]
+    self.assertEqual(problem.next_id(), 2)
+    problem.versions[2] = versions[2]
+    self.assertEqual(problem.next_id(), 3)
+    problem.versions[3] = versions[3]
+    self.assertEqual(problem.next_id(), 4)
+    del problem.versions[3]
+    self.assertEqual(problem.next_id(), 3)
     
 
 
