@@ -5,11 +5,11 @@ p1
 (dp2
 S'category'
 p3
-S'ID'
+S'DOC'
 p4
 sS'text'
 p5
-S'actually make it an integer'
+S'split on only whitespace'
 p6
 sS'duedate'
 p7
@@ -18,7 +18,7 @@ p8
 cdatetime
 date
 p9
-(S'\x07\xdf\x0c\x1b'
+(S'\x07\xdf\x0c\x1c'
 p10
 tp11
 Rp12
@@ -27,7 +27,7 @@ TodoItem
 p13
 (dp14
 g5
-S'finalize documents'
+S'build documents'
 p15
 sg7
 Nsg8
@@ -41,12 +41,12 @@ TodoItem
 p19
 (dp20
 g5
-S'real validation'
+S'edit should not validate'
 p21
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1b'
+(S'\x07\xdf\x0c\x1a'
 p22
 tp23
 Rp24
@@ -55,12 +55,12 @@ TodoItem
 p25
 (dp26
 g5
-S'settings file'
+S'finalize documents'
 p27
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1b'
+(S'\x07\xdf\x0c\x1a'
 p28
 tp29
 Rp30

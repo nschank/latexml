@@ -37,7 +37,7 @@ class TestVersion(unittest.TestCase):
     
   def test_authors(self):
     for file in os.listdir("test"):
-      if file.startswith("version_valid"):
+      if file.startswith("version_valid_author"):
         tree = ET.parse("test/" + file)
         version = Version(file)
         root = tree.getroot()
@@ -134,6 +134,36 @@ class TestVersion(unittest.TestCase):
         
         self.versions_equal(version, version2)
     
+    
+  def test_topics(self):
+    for file in os.listdir("test"):
+      if file.startswith("version_valid_topic"):
+        tree = ET.parse("test/" + file)
+        version = Version(file)
+        root = tree.getroot()
+        
+        version.parse_element(root)
+        topics = []
+        for child in root:
+          if child.tag in ['topic', 'topics']:
+            topics = topics + string.split(child.text)
+        self.assertEqual(topics, version.topics)
+        
+    
+  def test_types(self):
+    for file in os.listdir("test"):
+      if file.startswith("version_valid_type"):
+        tree = ET.parse("test/" + file)
+        version = Version(file)
+        root = tree.getroot()
+        
+        version.parse_element(root)
+        types = []
+        for child in root:
+          if child.tag in ['type', 'types']:
+            types = types + string.split(child.text)
+        self.assertEqual(types, version.types)
+        
   def test_validate(self):
     for file in os.listdir("test"):
       if file.startswith("version_valid"):
