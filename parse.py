@@ -138,6 +138,7 @@ class Version(XmlParseable):
     self.xml_assert(self.types, "No question types")
     for t in self.types:
       self.xml_assert(t in TYPES, "Invalid type: {}".format(t))
+    self.xml_assert(self.year, "No year")
       
   def __parse_author(self, attributes, body):
     self.authors = split_add(self.authors, body)
@@ -153,6 +154,8 @@ class Version(XmlParseable):
     self.xml_assert('name' in attributes, "parameter has no name")
     self.xml_assert(attributes['name'] not in self.params,
         "duplicate parameter {}".format(attributes['name']))
+    self.xml_assert(body, 
+        "Parameter {} has no value".format(attributes['name']))
     self.params[attributes['name']] = string.strip(body)
     
   def __parse_rubric(self, attributes, body):
