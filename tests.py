@@ -63,15 +63,19 @@ class TestVersion(unittest.TestCase):
           version.parse_element(root[1])
           version.validate()
         
-  def test_parse(self):
+  def test_params(self):
     for file in os.listdir("test"):
-      if file.startswith("version_valid"):
+      if file.startswith("version_valid_param"):
         tree = ET.parse("test/" + file)
         version = Version(file)
-        version.parse_tree(tree)
-        version2 = Version(file)
-        version2.parse_element(tree.getroot())
-        self.versions_equal(version, version2)
+        root = tree.getroot()
+        
+        version.parse_element(root)
+        params = dict()
+        for child in root:
+          if child.tag in ['param', 'params']:
+            params[child.attrib['name']] = child.text
+        self.assertEqual(params, version.params)
     
   def test_pretty_print(self):
     version = Version(test_filename, 1)
@@ -134,7 +138,6 @@ class TestVersion(unittest.TestCase):
         
         self.versions_equal(version, version2)
     
-    
   def test_topics(self):
     for file in os.listdir("test"):
       if file.startswith("version_valid_topic"):
@@ -149,7 +152,6 @@ class TestVersion(unittest.TestCase):
             topics = topics + string.split(child.text)
         self.assertEqual(topics, version.topics)
         
-    
   def test_types(self):
     for file in os.listdir("test"):
       if file.startswith("version_valid_type"):
