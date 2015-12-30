@@ -101,7 +101,7 @@ def build_if(settings):
   
 
 def build_specific(settings):
-  document = Document(settings.document)
+  document = Document("")
   document.name = "".join(settings.title)
   #TODO
   document.year = "1900"
