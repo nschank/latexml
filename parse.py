@@ -228,8 +228,9 @@ class Problem(XmlParseable):
     for child in root:
       if child.tag == 'usedin':
         self.xml_assert('year' in child.attrib, "usedin tag must have year")
-        self.xml_assert('assign' in child.attrib, "usedin tag must have assign attribute")
-        self.used_in.append(UsedIn(child.attrib['year'], child.attrib['assign']))
+        self.xml_assert(child.text, "usedin tag must have text")
+        self.xml_assert(child.attrib['year'] and child.attrib['year'] != 'unknown', "usedin year must be present and not 'unknown'")
+        self.used_in.append(UsedIn(child.attrib['year'], child.text))
       else:
         version = Version(self.filename)
         version.parse_element(child)
@@ -244,6 +245,10 @@ class Problem(XmlParseable):
       
   def to_element(self):
     root = ET.Element('problem')
+    for pair in self.used_in:
+      usedin = ET.SubElement(root, 'usedin')
+      usedin.set("year", pair.year)
+      usedin.text = pair.assignment_name
     for key in sorted(self.versions.keys(), reverse=True):
       root.append(self.versions[key].to_element())
     return root
