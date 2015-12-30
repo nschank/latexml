@@ -80,6 +80,8 @@ def build_if(settings):
                 [type for type in version.types 
                     if type not in settings.required_types]):
               continue
+            if (settings.written and version.year not in settings.written):
+              continue
             if settings.todo or settings.grep:
               lower_sol = version.solution.lower()
               lower_rub = version.rubric.lower()
@@ -146,6 +148,8 @@ def add_if_parser(parser):
       help='If present, will specify the required types: a problem will be built only if it uses at least one of the provided')
   subparser.add_argument('--title', nargs=1, required=False, default="Problem", help='Sets the title of the problem build')
   subparser.add_argument('--todo', dest='todo', action='store_true', default=False, help='If present, restricts to problems that have "todo" in their solution or rubric.')
+  subparser.add_argument('--written', required=False, dest='written', nargs='+', 
+      help='If present, will specify a set of years that a problem\'s most recent version may have been written (to be included)')
     
 def add_problem_parser(parser):
   subparser = parser.add_parser('problems', help='Builds a problem or series of problems, in order')

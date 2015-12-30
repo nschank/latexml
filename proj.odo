@@ -47,12 +47,12 @@ g3
 S'DOC'
 p22
 sg5
-S'writing tips'
+S'library enumeration'
 p23
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1c'
+(S'\x07\xdf\x0c\x1e'
 p24
 tp25
 Rp26
@@ -61,16 +61,33 @@ TodoItem
 p27
 (dp28
 g3
-S'FINAL'
+S'DOC'
 p29
 sg5
-S'reify version attribute'
+S'writing tips'
 p30
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1e'
+(S'\x07\xdf\x0c\x1c'
 p31
 tp32
 Rp33
+sba(iodo_item
+TodoItem
+p34
+(dp35
+g3
+S'STY'
+p36
+sg5
+S'inject instead of import'
+p37
+sg7
+Nsg8
+g9
+(S'\x07\xdf\x0c\x1e'
+p38
+tp39
+Rp40
 sba.
