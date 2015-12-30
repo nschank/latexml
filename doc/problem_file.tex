@@ -6,8 +6,8 @@
     \begin{mdframed}
       \begin{lstlisting}[language=XML,columns=fullflexible,breaklines=true]
 <problem>
-  <used year="2015">Homework 5</used>
-  <used year="2014" private="true">Midterm 1</used>
+  <usedin year="2015">Homework 5</usedin>
+  <usedin year="2014" private="true">Midterm 1</usedin>
   <version id="2">
     <author>cjk</author>
     <year>2016</year>
@@ -38,9 +38,9 @@
     
     \textbf{Each version MUST have exactly one year} (in a \texttt{<year>} tag), which may be ``Unknown''. This is the year that the version was written.
     
-    \textbf{Each version MUST have at least one author, at least one topic, and at least one type.} Each of these tags accepts a comma and/or whitespace separated list of items; thus,
+    \textbf{Each version MUST have at least one author, at least one topic, and at least one type.} Each of these tags accepts a whitespace separated list of items; thus,
     \begin{center}
-      \texttt{<authors>cjk nschank, kl47</authors>}
+      \texttt{<authors>cjk nschank\ \ \ kl47</authors>}
     \end{center}
     would be parsed as three authors: cjk, nschank, and kl47. Additional instances of a tag will append to the list, so e.g. multiple \texttt{<author>} tags within a version are allowed.
     
@@ -51,11 +51,11 @@
       \item[Type] \texttt{<type>} or \texttt{<types>}
     \end{description}
     
-    Note that, while either tagame is accepted, the beginning and ending tags must match.
+    Note that, while either tagname is accepted, the beginning and ending tags must match.
     
     See the next section for an explanation of acceptable values for topic and type.
     
-    \textbf{Each version MUST have a body, a solution, and a rubric.} Each of these fields should be filled with arbitrary \LaTeX; whatever you would have put between \texttt{\textbackslash begin\{document\}} and \texttt{\textbackslash end\{document\}} goes here. It is expected that, if a solution or rubric is not complete, the four letters ``TODO'' (case sensitive) should appear somewhere within their text. This allows the \LaTeX ML tools to keep track of any problems that need attention.
+    \textbf{Each version MUST have a body, a solution, and a rubric.} Each of these fields should be filled with arbitrary \LaTeX; whatever you would have put between \texttt{\textbackslash begin\{document\}} and \texttt{\textbackslash end\{document\}} goes here. It is expected that, if a solution or rubric is not complete, the four letters ``TODO'' (case insensitive) should appear somewhere within their text. This allows the \LaTeX ML tools to keep track of any problems that need attention.
     
     As an important note, the characters \&, $<$, and $>$ are special characters within XML. In order for the problem to be parsed, you MUST escape them with the XML sequences \texttt{\&amp;}, \texttt{\&lt;}, and \texttt{\&gt;} respectively. They will be unescaped before being parsed as \LaTeX, so should be treated identically to their corresponding characters (e.g. tables will contain many instances of ``\texttt{\&amp;}'').
     
@@ -63,7 +63,7 @@
     
     A version MAY have zero or more \texttt{param} or, equivalently, \texttt{parameter} tags, which MUST have a name attribute. This is equivalent to temporarily creating a command \texttt{\textbackslash name} which produces the value given in the tag's field. In the provided example, the command ``\texttt{\textbackslash modulus}'' will evaluate to 3. This field is intended for use within problems that can be easily changed without needing to create a new version. As an example, the name of a person or object within a problem should be refactored into a parameter, so that the problem can be changed easily.
     
-    A version MAY have zero or more \texttt{dependency} (also allowed: \texttt{dep}, \texttt{deps}, \texttt{dependencies}) tags, each of which should be a comma and/or whitespace-separated list of packages which are required in order to build the problem. \texttt{tikz} is the most commonly included by far. These dependencies will by dynamically imported when building an assignment including this problem.
+    A version MAY have zero or more \texttt{dependency} (also allowed: \texttt{dep}, \texttt{deps}, \texttt{dependencies}) tags, each of which should be a whitespace-separated list of packages which are required in order to build the problem. \texttt{tikz} is the most commonly included by far. These dependencies will by dynamically imported when building an assignment including this problem.
     
     \texttt{usedin} tags should never be created or edited by hand.
   

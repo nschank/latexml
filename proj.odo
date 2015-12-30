@@ -77,14 +77,17 @@ sba(iodo_item
 TodoItem
 p34
 (dp35
-g5
-S'finalize documents'
+g3
+S'FINAL'
 p36
+sg5
+S'reify version attribute'
+p37
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1a'
-p37
-tp38
-Rp39
+(S'\x07\xdf\x0c\x1e'
+p38
+tp39
+Rp40
 sba.
