@@ -20,6 +20,31 @@ class DocumentTest(unittest.TestCase):
         with self.assertRaisesRegexp(ImproperXmlException, root[0].text):
           document.parse_element(root[1])
           document.validate()
+          
+  def test_version(self):
+    root = ET.Element("assignment")
+    
+    year = ET.SubElement(root, "year")
+    year.text = "2016"
+    due = ET.SubElement(root, "due")
+    due.text = "Never"
+    name = ET.SubElement(root, "name")
+    name.text = "Midterm 1"
+    
+    problem = ET.SubElement(root, "problem")
+    problem.text = "test/valid1.xml"
+    
+    document1 = Document(test_filename)
+    document1.parse_element(root)
+    document1.validate()
+    
+    problem.set("version", "0")
+    document2 = Document(test_filename)
+    document2.parse_element(root)
+    document2.validate()
+    
+    self.assertNotEqual(document1.versions[0].body, 
+        document2.versions[0].body)
   
 
 class ProblemTest(unittest.TestCase):

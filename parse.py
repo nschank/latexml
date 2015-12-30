@@ -318,7 +318,11 @@ class Document(XmlParseable):
     prob = Problem(body)
     prob.parse_tree(ET.parse(body))
     if 'version' in attributes:
-      self.versions.append(prob.versions[attributes['version']])
+      try: self.versions.append(prob.versions[int(attributes['version'])])
+      except ValueError:
+        self.xml_assert(False, "Non-numeric version '{}' does not exist".format(attributes['version']))
+      except KeyError:
+        self.xml_assert(False, "No such version '{}'".format(attributes['version']))
     else:
       if attributes:
         print "Warning: tag for problem {} has unknown attributes {}".format(body, attributes.keys())
