@@ -47,7 +47,7 @@ g3
 S'DOC'
 p22
 sg5
-S'split on only whitespace'
+S'writing tips'
 p23
 sg7
 Nsg8
@@ -61,33 +61,16 @@ TodoItem
 p27
 (dp28
 g3
-S'DOC'
+S'FINAL'
 p29
 sg5
-S'writing tips'
+S'reify version attribute'
 p30
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1c'
+(S'\x07\xdf\x0c\x1e'
 p31
 tp32
 Rp33
-sba(iodo_item
-TodoItem
-p34
-(dp35
-g3
-S'FINAL'
-p36
-sg5
-S'reify version attribute'
-p37
-sg7
-Nsg8
-g9
-(S'\x07\xdf\x0c\x1e'
-p38
-tp39
-Rp40
 sba.

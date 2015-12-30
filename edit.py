@@ -123,19 +123,24 @@ def finalize(settings):
   try:
     tree = ET.parse(settings.document)
     document.parse_tree(tree)
-    for version in document.versions:
-      prob_tree = ET.parse(version.filename)
-      problem = Problem(version.filename)
-      problem.parse_tree(prob_tree, validate_versions=False)
-      problem.used_in.append(UsedIn(document.year, document.name))
-      
-      root = problem.to_element()
-      indent(root)
-      with open(version.filename, "w") as f:
-        f.write(ET.tostring(root))
-      
   except ImproperXmlException, ET.ParseError:
     print "Error: Could not parse {}".format(settings.document)
+    exit(1)
+    
+  for version in document.versions:
+    prob_tree = ET.parse(version.filename)
+    problem = Problem(version.filename)
+    problem.parse_tree(prob_tree, validate_versions=False)
+    problem.used_in.append(UsedIn(document.year, document.name))
+    
+    root = problem.to_element()
+    indent(root)
+    with open(version.filename, "w") as f:
+      f.write(ET.tostring(root))
+  doc = document.to_element()
+  indent(doc)
+  with open(settings.document, "w") as f:
+    f.write(ET.tostring(doc))
     
 def create_new(settings):
   try:

@@ -267,6 +267,26 @@ class Document(XmlParseable):
     
   def build(self, solutions=False, rubrics=False, metadata=False):
     return self._header() + self._document(self._problems(solutions, rubrics, metadata))
+    
+  def to_element(self):
+    assign = ET.Element('assignment')
+    
+    year = ET.SubElement(assign, 'year')
+    year.text = self.year
+    
+    name = ET.SubElement(assign, 'name')
+    name.text = self.name
+    
+    due = ET.SubElement(assign, 'due')
+    due.text = self.due
+    
+    for v in self.versions:
+      prob = ET.SubElement(assign, 'problem')
+      prob.text = v.filename
+      prob.set('version', str(v.vid))
+    
+    return assign
+    
   
   def validate(self):
     """
