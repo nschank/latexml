@@ -90,7 +90,7 @@ def branch(settings):
     exit(1)
     
   version = deepcopy(problem.newest_version())
-  version.vid = str(next_id)
+  version.vid = next_id
   problem.versions[version.vid] = version
   
   version.add_defaults()
@@ -212,8 +212,8 @@ def validate(settings):
   try:
     problem = Problem(settings.filename)
     problem.parse_tree(tree)
-  except ImproperXmlException:
-    print "Fix the error above and rerun validation"
+  except ImproperXmlException as e:
+    print "{}\nRerun validation".format(e.strerror)
     exit(1)
   newest = problem.newest_version()
   if "\\newcommand" in newest.body or "\\newcommand" in newest.solution or "\\newcommand" in newest.rubric:
