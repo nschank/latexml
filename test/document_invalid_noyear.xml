@@ -1,0 +1,8 @@
+<test>
+  <error>no year</error>
+  <assignment>
+    <title>Homework 1</title>
+    <due>Never</due>
+    <problem>test/valid1.xml</problem>
+  </assignment>
+</test>

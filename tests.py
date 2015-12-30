@@ -1,10 +1,26 @@
 import xml.etree.ElementTree as ET
 import unittest
-from parse import Version, ImproperXmlException, Problem
+from parse import Version, ImproperXmlException, Problem, Document
 import os
 import string
 
 test_filename = "test_filename"
+
+class DocumentTest(unittest.TestCase):
+  def test_invalid(self):
+    for file in os.listdir("test"):
+      if file.startswith("document_invalid"):
+        tree = ET.parse("test/" + file)
+        document = Document(file)
+        root = tree.getroot()
+        if root.tag != 'test' or len(root) != 2 or root[0].tag != 'error':
+          print "Warning: Invalid document_invalid test {}".format(file)
+          continue
+        
+        with self.assertRaisesRegexp(ImproperXmlException, root[0].text):
+          document.parse_element(root[1])
+          document.validate()
+  
 
 class ProblemTest(unittest.TestCase):
   def test_invalid(self):

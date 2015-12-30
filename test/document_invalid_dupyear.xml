@@ -1,0 +1,10 @@
+<test>
+  <error>duplicate year tag</error>
+  <assignment>
+    <title>Homework 1</title>
+    <year>2015</year>
+    <due>Never</due>
+    <year>2016</year>
+    <problem>valid1.xml</problem>
+  </assignment>
+</test>

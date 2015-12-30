@@ -139,7 +139,7 @@ class Version(XmlParseable):
     for t in self.types:
       self.xml_assert(t in TYPES, "Invalid type: {}".format(t))
     self.xml_assert(self.year, "No year")
-    self.xml_assert(self.vid, "No id")
+    self.xml_assert(self.vid is not None, "No id")
       
   def __parse_author(self, attributes, body):
     self.authors = split_add(self.authors, body)
@@ -265,7 +265,7 @@ class Document(XmlParseable):
     self.xml_assert(self.year is not None, "no year provided")
     self.xml_assert(self.name is not None, "no assignment name provided")
     self.xml_assert(self.due is not None, "no due date provided")
-    self.xml_assert(self.problems, "no problems provided")
+    self.xml_assert(self.versions, "no problems provided")
     
   def _additional_dependencies(self):
     deps = set()
