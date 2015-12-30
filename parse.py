@@ -358,7 +358,7 @@ class Document(XmlParseable):
       Document.__parsers[tag.tag](self, tag.attrib, tag.text)
     
 class UsedIn:
-  def __init__(year, assignment_name):
+  def __init__(self, year, assignment_name):
     self.year = year
     self.assignment_name = assignment_name
     

@@ -1,7 +1,7 @@
 import argparse
 import os
 import xml.etree.ElementTree as ET
-from parse import TOPICS, TYPES, Problem, Version, ImproperXmlException, UsedIn
+from parse import TOPICS, TYPES, Problem, Version, ImproperXmlException, UsedIn, Document
 from copy import deepcopy
 from datetime import date
 
