@@ -1,0 +1,11 @@
+<version id="1">
+  <authors>nschank</authors>
+  <year>1995</year>
+  <topics>set_theory probability</topics>
+  <types>piece proof</types>
+  <param name="name">value</param>
+  <param name="name2">value2</param>
+  <body>Body 1</body>
+  <solution>Solution 1</solution>
+  <rubric>Rubric 1</rubric>
+</version>

@@ -1,0 +1,11 @@
+<test>
+  <error>No rubric</error>
+  <version id="1">
+    <authors>nschank</authors>
+    <year>1995</year>
+    <topics>set_theory probability</topics>
+    <types>piece proof</types>
+    <body>Body 1</body>
+    <solution>Solution 1</solution>
+  </version>
+</test>

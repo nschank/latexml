@@ -1,0 +1,10 @@
+<test>
+  <error>duplicate name tag</error>
+  <assignment>
+    <title>Homework 1</title>
+    <title>Homework 2</title>
+    <due>Never</due>
+    <year>2016</year>
+    <problem>valid1.xml</problem>
+  </assignment>
+</test>

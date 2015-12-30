@@ -1,0 +1,9 @@
+<test>
+  <error>Invalid root tag</error>
+  <wrongroot>
+    <title>Homework 1</title>
+    <due>Never</due>
+    <year>2016</year>
+    <problem>valid1.xml</problem>
+  </wrongroot>
+</test>

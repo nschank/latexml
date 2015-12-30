@@ -1,0 +1,9 @@
+<test>
+  <error>Non-numeric version</error>
+  <assignment>
+    <title>Homework 1</title>
+    <due>Never</due>
+    <year>2016</year>
+    <problem version="hello">test/valid1.xml</problem>
+  </assignment>
+</test>

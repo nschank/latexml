@@ -23,8 +23,7 @@ class XmlParseable:
   def xml_assert(self, predicate, str):
     """Used internally: check that something is true about the structure of an XML tree"""
     if not predicate:
-      print "Error in {}: {}".format(self.filename, str)
-      raise ImproperXmlException()
+      raise ImproperXmlException("Error in {}: {}".format(self.filename, str))
 
   def __init__(self, filename=None):
     self.filename = filename
@@ -46,8 +45,8 @@ class XmlParseable:
     raise ParseNotImplementedException()
   
 def split_add(before, raw):
-  """Used by any fields which can be whitespace/comma separated"""
-  return before + map(lambda x: string.strip(x, " ,\t"), string.split(raw))
+  """Used by any fields which can be whitespace separated"""
+  return before + map(lambda x: string.strip(x), string.split(raw))
       
 class Version(XmlParseable):
   """
@@ -56,8 +55,7 @@ class Version(XmlParseable):
   def xml_assert(self, predicate, str):
     """Overridden to show ID"""
     if not predicate:
-      print "Error in {} (version {}): {}".format(self.filename, self.vid, str)
-      raise ImproperXmlException()
+      raise ImproperXmlException("Error in {} (version {}): {}".format(self.filename, self.vid, str))
       
   def __init__(self, filename, vid=None):
     """Has public fields so that the tools can use them, there isn't much point in protecting them"""
@@ -81,7 +79,7 @@ class Version(XmlParseable):
   def pretty_print(self, solution=False, rubric=False, metadata=False):
     """Prints this version's contents as valid LaTeX, for building"""
     return ("\n".join(["\\newcommand\\" + name + "{" + value + "}" 
-              for name, value in self.params]) +
+              for name, value in self.params.iteritems()]) +
             ("\\texttt{" + self.filename.replace('_', "\\_") + "}\\\\\\textbf{Topics Covered: }" +
               ", ".join(self.topics).replace('_', ' ') + "\\\\\\textbf{Types: }" +
               ", ".join(self.types).replace('_', ' ') if metadata else "")
@@ -137,9 +135,11 @@ class Version(XmlParseable):
     self.xml_assert(self.topics, "No topics")
     for t in self.topics:
       self.xml_assert(t in TOPICS, "Invalid topic: {}".format(t))
-    self.xml_assert(self.types, "No question types")
+    self.xml_assert(self.types, "No types")
     for t in self.types:
       self.xml_assert(t in TYPES, "Invalid type: {}".format(t))
+    self.xml_assert(self.year, "No year")
+    self.xml_assert(self.vid is not None, "No id")
       
   def __parse_author(self, attributes, body):
     self.authors = split_add(self.authors, body)
@@ -155,6 +155,8 @@ class Version(XmlParseable):
     self.xml_assert('name' in attributes, "parameter has no name")
     self.xml_assert(attributes['name'] not in self.params,
         "duplicate parameter {}".format(attributes['name']))
+    self.xml_assert(body, 
+        "Parameter {} has no value".format(attributes['name']))
     self.params[attributes['name']] = string.strip(body)
     
   def __parse_rubric(self, attributes, body):
@@ -268,7 +270,7 @@ class Document(XmlParseable):
     self.xml_assert(self.year is not None, "no year provided")
     self.xml_assert(self.name is not None, "no assignment name provided")
     self.xml_assert(self.due is not None, "no due date provided")
-    self.xml_assert(self.problems, "no problems provided")
+    self.xml_assert(self.versions, "no problems provided")
     
   def _additional_dependencies(self):
     deps = set()
@@ -321,7 +323,11 @@ class Document(XmlParseable):
     prob = Problem(body)
     prob.parse_tree(ET.parse(body))
     if 'version' in attributes:
-      self.versions.append(prob.versions[attributes['version']])
+      try: self.versions.append(prob.versions[int(attributes['version'])])
+      except ValueError:
+        self.xml_assert(False, "Non-numeric version '{}' does not exist".format(attributes['version']))
+      except KeyError:
+        self.xml_assert(False, "No such version '{}'".format(attributes['version']))
     else:
       if attributes:
         print "Warning: tag for problem {} has unknown attributes {}".format(body, attributes.keys())
