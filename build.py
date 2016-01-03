@@ -1,6 +1,7 @@
 import argparse
 import os
-from parse import Problem, Document, ImproperXmlException
+from parseable import ImproperXmlException
+from problem import Problem, Document
 from subprocess import call
 from random import randint
 import xml.etree.ElementTree as ET

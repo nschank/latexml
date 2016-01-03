@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import unittest
-from parse import Version, ImproperXmlException, Problem, Document
+from parseable import ImproperXmlException
+from problem import Version, ImproperXmlException, Problem, Document
 import os
 import string
 

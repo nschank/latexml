@@ -2,47 +2,8 @@ import xml.etree.ElementTree as ET
 import string
 from os import getlogin
 from datetime import date
-
-TOPICS = string.split("basic big_o bijections circuits counting equivalence_relations graph_theory logic mod number_theory pigeonhole probability relations set_theory todo")
-
-TYPES = string.split("computation core contradiction contrapositive direct element_method induction large needs_work notation piece proof repetitive todo")
-
-class ImproperXmlException(Exception):
-  pass
-  
-class ParseNotImplementedException(Exception):
-  pass
-  
-class XmlParseable:
-  """
-  An object which can be built or modified by providing it with a tree.
-  It may also be returned back as a new tree, modified directly, or created without
-  an initial tree.
-  """
-  
-  def xml_assert(self, predicate, str):
-    """Used internally: check that something is true about the structure of an XML tree"""
-    if not predicate:
-      raise ImproperXmlException("Error in {}: {}".format(self.filename, str))
-
-  def __init__(self, filename=None):
-    self.filename = filename
-    
-  def parse_element(self, element):
-    """Should be overridden to use the information in a root element to overwrite any relevant data in this tree"""
-    raise ParseNotImplementedException()
-    
-  def parse_tree(self, tree):
-    """Should be overridden to use the information in a tree to overwrite any relevant data in this tree"""
-    self.parse_element(tree.getroot())
-    
-    
-  def to_element(self):
-    """
-    Should be overridden such that the tree returned, if re-parsed by another object, would be semantically
-    identical to this object
-    """
-    raise ParseNotImplementedException()
+from parseable import XmlParseable, ImproperXmlException
+from config import get_topics, get_types
   
 def split_add(before, raw):
   """Used by any fields which can be whitespace separated"""
@@ -134,10 +95,10 @@ class Version(XmlParseable):
     self.xml_assert(self.solution, "No solution")
     self.xml_assert(self.topics, "No topics")
     for t in self.topics:
-      self.xml_assert(t in TOPICS, "Invalid topic: {}".format(t))
+      self.xml_assert(t in get_topics(), "Invalid topic: {}".format(t))
     self.xml_assert(self.types, "No types")
     for t in self.types:
-      self.xml_assert(t in TYPES, "Invalid type: {}".format(t))
+      self.xml_assert(t in get_types(), "Invalid type: {}".format(t))
     self.xml_assert(self.year, "No year")
     self.xml_assert(self.vid is not None, "No id")
       
@@ -316,7 +277,7 @@ class Document(XmlParseable):
   def _header(self):
     dependencies = self._additional_dependencies()
     return """\\documentclass[12pt,letterpaper]{article}\n
-\\usepackage{simple22}
+\\usepackage{include/simple22}
 \\fancypagestyle{firstpagestyle} {
   \\renewcommand{\\headrulewidth}{0pt}%
   \\lhead{\\textbf{CSCI 0220}}%

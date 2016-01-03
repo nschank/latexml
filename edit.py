@@ -1,7 +1,9 @@
 import argparse
 import os
 import xml.etree.ElementTree as ET
-from parse import TOPICS, TYPES, Problem, Version, ImproperXmlException, UsedIn, Document
+from problem import Problem, Version, UsedIn, Document
+from parseable import ImproperXmlException
+from config import get_topics, get_types
 from copy import deepcopy
 from datetime import date
 
@@ -107,9 +109,9 @@ def branch(settings):
     version.types = []
   elif settings.action == 1:
     print "SELECT TOPICS\n-------------"
-    version.topics = interactive_select(TOPICS, version.topics)
+    version.topics = interactive_select(get_topics(), version.topics)
     print "SELECT TYPES\n-------------"
-    version.types = interactive_select(TYPES, version.types)
+    version.types = interactive_select(get_types(), version.types)
   else:
     assert settings.action == 2
     
@@ -158,9 +160,9 @@ def create_new(settings):
       
       if settings.interactive:
         print "SELECT TOPICS\n-------------"
-        version.topics = interactive_select(TOPICS, [])
+        version.topics = interactive_select(get_topics(), [])
         print "SELECT TYPES\n-------------"
-        version.types = interactive_select(TYPES, [])
+        version.types = interactive_select(get_types(), [])
       
       root = problem.to_element()
       indent(root)
@@ -193,9 +195,9 @@ def edit(settings):
       version.types.remove("todo")
     
   print "SELECT TOPICS\n-------------"
-  version.topics = interactive_select(TOPICS, version.topics)
+  version.topics = interactive_select(get_topics(), version.topics)
   print "SELECT TYPES\n-------------"
-  version.types = interactive_select(TYPES, version.types)
+  version.types = interactive_select(get_types(), version.types)
     
   root = problem.to_element()
   indent(root)
