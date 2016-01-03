@@ -93,6 +93,20 @@ def build_if(settings):
                 for word in settings.grep:
                   if search.find(word) == -1:
                     continue
+            if settings.used_in or settings.not_used_in:
+              matches_used = not settings.used_in
+              matches_unused = True
+              for actual in problem.used_in:
+                if settings.used_in and actual.year in settings.used_in:
+                  matches_used = True
+                if settings.not_used_in and actual.year in settings.not_used_in:
+                  matches_unused = False
+              if not problem.used_in:
+                if settings.used_in and "none" in settings.used_in: matches_used = True
+                if settings.not_used_in and "none" in settings.not_used_in: matches_unused = False
+              if not matches_used or not matches_unused:
+                continue
+                
             document.versions.append(version)
             
           except ImproperXmlException:
@@ -142,12 +156,16 @@ def add_if_parser(parser):
   subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
   subparser.add_argument('--allowed-topics', required=False, dest='allowed_topics', nargs='+', help='If present, will restrict the allowed topics: a problem will be not be built if it uses any topic outside of the provided')
   subparser.add_argument('--grep', required=False, dest='grep', nargs='+', help='If present, restricts to problems which contain within the rubric, solution, or body that contain all of the given words. Words are treated separately, but case-insensitively.')
+  subparser.add_argument('--not-used-in', required=False, dest='not_used_in', nargs='+', 
+      help='If present, restricts to problems which were used in none of the given years')
   subparser.add_argument('--required-topics', required=False, dest='required_topics', nargs='+', 
       help='If present, will specify the required topics: a problem will be built only if it uses at least one of the provided')
   subparser.add_argument('--required-types', required=False, dest='required_types', nargs='+', 
       help='If present, will specify the required types: a problem will be built only if it uses at least one of the provided')
   subparser.add_argument('--title', nargs=1, required=False, default="Problem", help='Sets the title of the problem build')
   subparser.add_argument('--todo', dest='todo', action='store_true', default=False, help='If present, restricts to problems that have "todo" in their solution or rubric.')
+  subparser.add_argument('--used-in', required=False, dest='used_in', nargs='+', 
+      help='If present, restricts to problems which were used in any of the given years')
   subparser.add_argument('--written', required=False, dest='written', nargs='+', 
       help='If present, will specify a set of years that a problem\'s most recent version may have been written (to be included)')
     
