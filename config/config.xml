@@ -1,0 +1,8 @@
+<!-- 
+  This is the configuration for LaTeXML building.
+  See the documentation for more information about how to
+  use this or to edit it.
+-->
+<configuration>
+  <includedir>/course/cs022/latexml/include</includedir>
+</configuration>

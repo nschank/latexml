@@ -58,3 +58,5 @@ target/
 
 problems/
 *.pdf
+proj.odo
+config
