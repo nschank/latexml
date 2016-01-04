@@ -3,7 +3,7 @@ import string
 from os import getlogin
 from datetime import date
 from parseable import XmlParseable, ImproperXmlException
-from config import get_topics, get_types
+from config import get_topics, get_types, get_blurb, get_inclusions
   
 def split_add(before, raw):
   """Used by any fields which can be whitespace separated"""
@@ -168,7 +168,6 @@ class Version(XmlParseable):
 class Problem(XmlParseable):
   """
   Internal representation of a Problem, which contains many Versions 
-  (TODO: and will eventually have usedin information)
   """
   def __init__(self, filename):
     self.filename = filename
@@ -271,14 +270,13 @@ class Document(XmlParseable):
   \\begin{center}
     {\\huge \\textbf{""" + self.name + """}}\n
     {\\large \\textit{Due: """ + self.due + """}}
-  \\end{center}\n
-  \\hwblurb\n\n""" + body + "\\end{document}"
+  \\end{center}\n\n""" + get_blurb() + "\n\n" + body + "\\end{document}"
   
   def _header(self):
     dependencies = self._additional_dependencies()
-    return """\\documentclass[12pt,letterpaper]{article}\n
-\\usepackage{include/simple22}
-\\fancypagestyle{firstpagestyle} {
+    return ("\\documentclass[12pt,letterpaper]{article}\n\n" +
+      get_inclusions() +
+      """\\fancypagestyle{firstpagestyle} {
   \\renewcommand{\\headrulewidth}{0pt}%
   \\lhead{\\textbf{CSCI 0220}}%
   \\chead{\\textbf{Discrete Structures and Probability}}%
@@ -289,7 +287,7 @@ class Document(XmlParseable):
   \\lhead{\\textbf{CSCI 0220}}%
   \\chead{""" + self.name + """}%
   \\rhead{\\textit{""" + self.due + """}}%
-}\n\\pagestyle{fancyplain}\n""" + dependencies + "\n\n"
+}\n\\pagestyle{fancyplain}\n""" + dependencies + "\n\n")
 
   def _problems(self, solutions=False, rubrics=False, metadata=False):
     return "\n\n".join(

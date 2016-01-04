@@ -1,8 +1,17 @@
 <!-- 
-  This is the configuration for LaTeXML building.
+  This is the configuration for LaTeXML.
   See the documentation for more information about how to
   use this or to edit it.
 -->
 <configuration>
-  <includedir>/course/cs022/latexml/include</includedir>
+  <topics>basic big_o bijections circuits counting equivalence_relations graph_theory logic mod number_theory pigeonhole probability relations set_theory todo</topics>
+  <types>computation core contradiction contrapositive direct element_method induction large needs_work notation piece proof repetitive todo</types>
+  <include>/course/cs022/latexml/include/simple22.sty</include>
+  <blurb>
+    All homeworks are due at 11:00 PM in the CS22 bin on the CIT second floor, next to the Fishbowl.
+
+    Include our cover sheet or equivalent, write your \textit{full name} and CS login on each page of your homework, label all work with the problem number, and staple the entire handin before submitting.
+
+    Be sure to fully explain your reasoning and show all work for full credit. Consult the style guide for more information.
+  </blurb>
 </configuration>

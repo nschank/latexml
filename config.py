@@ -6,14 +6,27 @@ import string
 class ConfigurationError(Exception):
   pass
 
-class AssignmentType(XmlParseable):
-  pass
-
 class BuildConfiguration(XmlParseable):
   def __init__(self, filename=None):
     self.filename = filename
     self.topics = []
     self.types = []
+    self.blurb = None
+    self.include = []
+    
+  def __parse_blurb(self, attributes, body):
+    self.xml_assert(not attributes, "blurb tag should have no attributes")
+    self.xml_assert(self.blurb is None, "duplicate blurb tag")
+    self.blurb = body
+    
+  def __parse_include(self, attributes, body):
+    self.xml_assert(not attributes, "include tag should have no attributes")
+    self.xml_assert(body, "include tag must have a body")
+    try:
+      with open(string.strip(body)) as f:
+        self.include.append(''.join(f.readlines()))
+    except IOError:
+      raise ConfigurationError("Could not include {}".format(body))
     
   def __parse_topics(self, attributes, body):
     self.xml_assert(not attributes, "topics tag should have no attributes")
@@ -25,8 +38,11 @@ class BuildConfiguration(XmlParseable):
     self.xml_assert(not self.types, "duplicate types tag")
     self.types = frozenset(string.split(body))
     
-  __parsers = {'topics':__parse_topics,
-      'types':__parse_types}
+  __parsers = {
+    'blurb':__parse_blurb,
+    'include':__parse_include,
+    'topics':__parse_topics,
+    'types':__parse_types}
 
   def parse_element(self, element):
     self.xml_assert(element.tag == 'configuration', 
@@ -42,6 +58,7 @@ class BuildConfiguration(XmlParseable):
     """Asserts that the BuildConfiguration satisfies the minimal requirements of being complete"""
     self.xml_assert(self.topics, "No topics")
     self.xml_assert(self.types, "No types")
+    self.xml_assert(self.blurb is not None, "No blurb")
     
 __configuration = None
 
@@ -64,6 +81,12 @@ def get_configuration():
   if __configuration is None:
     __build_configuration()
   return __configuration
+  
+def get_blurb():
+  return get_configuration().blurb
+  
+def get_inclusions():
+  return ''.join(get_configuration().include)
   
 def get_topics():
   return get_configuration().topics
