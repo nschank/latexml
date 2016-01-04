@@ -1,0 +1,11 @@
+<test>
+  <error>No types</error>
+  <configuration>
+    <topics>basic big_o bijections circuits counting equivalence_relations graph_theory logic mod number_theory pigeonhole probability relations set_theory todo</topics>
+    <include>include/simple22.sty</include>
+    <problemroot>test</problemroot>
+    <blurb>
+      This is a blurb
+    </blurb>
+  </configuration>
+</test>

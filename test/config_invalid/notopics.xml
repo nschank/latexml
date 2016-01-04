@@ -1,0 +1,11 @@
+<test>
+  <error>No topics</error>
+  <configuration>
+    <types>computation core contradiction contrapositive direct element_method induction large needs_work notation piece proof repetitive todo</types>
+    <include>include/simple22.sty</include>
+    <problemroot>test</problemroot>
+    <blurb>
+      This is a blurb
+    </blurb>
+  </configuration>
+</test>

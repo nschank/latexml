@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 import unittest
+from config import BuildConfiguration
 from parseable import ImproperXmlException
 from problem import Version, ImproperXmlException, Problem, Document
 import os
@@ -7,6 +8,21 @@ import string
 
 test_filename = "test_filename"
 
+class ConfigurationTest(unittest.TestCase):
+  def test_invalid(self):
+    for file in os.listdir("test/config_invalid"):
+      if file.endswith(".xml"):
+        tree = ET.parse("test/config_invalid/" + file)
+        config = BuildConfiguration(file)
+        root = tree.getroot()
+        if root.tag != 'test' or len(root) != 2 or root[0].tag != 'error':
+          print "Warning: Invalid config_invalid test {}".format(file)
+          continue
+        
+        with self.assertRaisesRegexp(ImproperXmlException, root[0].text):
+          config.parse_element(root[1])
+          config.validate()
+          
 class DocumentTest(unittest.TestCase):
   def test_invalid(self):
     for file in os.listdir("test/document_invalid"):
