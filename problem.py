@@ -1,9 +1,10 @@
 import xml.etree.ElementTree as ET
 import string
 from os import getlogin
+from os.path import exists, isabs, join
 from datetime import date
 from parseable import XmlParseable, ImproperXmlException
-from config import get_topics, get_types, get_blurb, get_inclusions
+from config import get_topics, get_types, get_blurb, get_inclusions, get_problem_root
   
 def split_add(before, raw):
   """Used by any fields which can be whitespace separated"""
@@ -304,6 +305,14 @@ class Document(XmlParseable):
     self.name = body
     
   def __parse_problem(self, attributes, body):
+    if isabs(body):
+      self.xml_assert(exists(body), "Problem file {} does not exist".format(body))
+    elif not exists(body):
+      tentative = join(get_problem_root(), body)
+      self.xml_assert(exists(tentative), 
+          "Could not find a problem file at either {} or in problem directory at {}".format(body, tentative))
+      body = tentative
+         
     prob = Problem(body)
     prob.parse_tree(ET.parse(body))
     if 'version' in attributes:

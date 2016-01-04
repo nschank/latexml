@@ -13,6 +13,7 @@ class BuildConfiguration(XmlParseable):
     self.types = []
     self.blurb = None
     self.include = []
+    self.problemroot = None
     
   def __parse_blurb(self, attributes, body):
     self.xml_assert(not attributes, "blurb tag should have no attributes")
@@ -27,6 +28,12 @@ class BuildConfiguration(XmlParseable):
         self.include.append(''.join(f.readlines()))
     except IOError:
       raise ConfigurationError("Could not include {}".format(body))
+      
+  def __parse_problemroot(self, attributes, body):
+    self.xml_assert(not attributes, "problemroot tag should have no attributes")
+    self.xml_assert(body, "problemroot tag must have a body")
+    self.xml_assert(self.problemroot is None, "duplicate problemroot tag")
+    self.problemroot = string.strip(body)
     
   def __parse_topics(self, attributes, body):
     self.xml_assert(not attributes, "topics tag should have no attributes")
@@ -41,6 +48,7 @@ class BuildConfiguration(XmlParseable):
   __parsers = {
     'blurb':__parse_blurb,
     'include':__parse_include,
+    'problemroot':__parse_problemroot,
     'topics':__parse_topics,
     'types':__parse_types}
 
@@ -59,6 +67,7 @@ class BuildConfiguration(XmlParseable):
     self.xml_assert(self.topics, "No topics")
     self.xml_assert(self.types, "No types")
     self.xml_assert(self.blurb is not None, "No blurb")
+    self.xml_assert(self.problemroot is not None, "No problemroot")
     
 __configuration = None
 
@@ -87,6 +96,9 @@ def get_blurb():
   
 def get_inclusions():
   return ''.join(get_configuration().include)
+  
+def get_problem_root():
+  return get_configuration().problemroot
   
 def get_topics():
   return get_configuration().topics
