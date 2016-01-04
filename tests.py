@@ -9,9 +9,9 @@ test_filename = "test_filename"
 
 class DocumentTest(unittest.TestCase):
   def test_invalid(self):
-    for file in os.listdir("test"):
-      if file.startswith("document_invalid"):
-        tree = ET.parse("test/" + file)
+    for file in os.listdir("test/document_invalid"):
+      if file.endswith(".xml"):
+        tree = ET.parse("test/document_invalid/" + file)
         document = Document(file)
         root = tree.getroot()
         if root.tag != 'test' or len(root) != 2 or root[0].tag != 'error':
@@ -50,9 +50,9 @@ class DocumentTest(unittest.TestCase):
 
 class ProblemTest(unittest.TestCase):
   def test_invalid(self):
-    for file in os.listdir("test"):
-      if file.startswith("problem_invalid"):
-        tree = ET.parse("test/" + file)
+    for file in os.listdir("test/problem_invalid"):
+      if file.endswith(".xml"):
+        tree = ET.parse("test/problem_invalid/" + file)
         problem = Problem(file)
         root = tree.getroot()
         if root.tag != 'test' or len(root) != 2 or root[0].tag != 'error':
@@ -61,8 +61,9 @@ class ProblemTest(unittest.TestCase):
         
         with self.assertRaisesRegexp(ImproperXmlException, root[0].text):
           problem.parse_element(root[1], validate_versions=True)
-      elif file.startswith("version_invalid"):
-        tree = ET.parse("test/" + file)
+    for file in os.listdir("test/version_invalid"):
+      if file.endswith(".xml"):
+        tree = ET.parse("test/version_invalid/" + file)
         problem = Problem(file)
         version_root = tree.getroot()
         if (version_root.tag != 'test' or len(version_root) != 2 
@@ -141,9 +142,9 @@ class VersionTest(unittest.TestCase):
     self.assertFalse(version.year is None)
     
   def test_authors(self):
-    for file in os.listdir("test"):
+    for file in os.listdir("test/version_valid"):
       if file.startswith("version_valid_author"):
-        tree = ET.parse("test/" + file)
+        tree = ET.parse("test/version_valid/" + file)
         version = Version(file)
         root = tree.getroot()
         
@@ -155,9 +156,9 @@ class VersionTest(unittest.TestCase):
         self.assertEqual(authors, version.authors)
     
   def test_invalid(self):
-    for file in os.listdir("test"):
-      if file.startswith("version_invalid"):
-        tree = ET.parse("test/" + file)
+    for file in os.listdir("test/version_invalid"):
+      if file.endswith(".xml"):
+        tree = ET.parse("test/version_invalid/" + file)
         version = Version(file)
         root = tree.getroot()
         if root.tag != 'test' or len(root) != 2 or root[0].tag != 'error':
@@ -169,9 +170,9 @@ class VersionTest(unittest.TestCase):
           version.validate()
         
   def test_params(self):
-    for file in os.listdir("test"):
+    for file in os.listdir("test/version_valid"):
       if file.startswith("version_valid_param"):
-        tree = ET.parse("test/" + file)
+        tree = ET.parse("test/version_valid/" + file)
         version = Version(file)
         root = tree.getroot()
         
@@ -232,9 +233,9 @@ class VersionTest(unittest.TestCase):
     self.assertTrue(meta.find('theta') == -1)
 
   def test_to_element(self):
-    for file in os.listdir("test"):
-      if file.startswith("version_valid"):
-        tree = ET.parse("test/" + file)
+    for file in os.listdir("test/version_valid"):
+      if file.endswith(".xml"):
+        tree = ET.parse("test/version_valid/" + file)
         version = Version(file)
         version.parse_tree(tree)
         
@@ -244,9 +245,9 @@ class VersionTest(unittest.TestCase):
         self.versions_equal(version, version2)
     
   def test_topics(self):
-    for file in os.listdir("test"):
+    for file in os.listdir("test/version_valid"):
       if file.startswith("version_valid_topic"):
-        tree = ET.parse("test/" + file)
+        tree = ET.parse("test/version_valid/" + file)
         version = Version(file)
         root = tree.getroot()
         
@@ -258,9 +259,9 @@ class VersionTest(unittest.TestCase):
         self.assertEqual(topics, version.topics)
         
   def test_types(self):
-    for file in os.listdir("test"):
+    for file in os.listdir("test/version_valid"):
       if file.startswith("version_valid_type"):
-        tree = ET.parse("test/" + file)
+        tree = ET.parse("test/version_valid/" + file)
         version = Version(file)
         root = tree.getroot()
         
@@ -272,9 +273,9 @@ class VersionTest(unittest.TestCase):
         self.assertEqual(types, version.types)
         
   def test_validate(self):
-    for file in os.listdir("test"):
+    for file in os.listdir("test/version_valid"):
       if file.startswith("version_valid"):
-        tree = ET.parse("test/" + file)
+        tree = ET.parse("test/version_valid/" + file)
         version = Version(file)
         version.parse_tree(tree)
         version.validate()
