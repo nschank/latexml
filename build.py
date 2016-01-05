@@ -107,7 +107,10 @@ def build_if(settings):
                 if settings.not_used_in and "none" in settings.not_used_in: matches_unused = False
               if not matches_used or not matches_unused:
                 continue
-                
+            if (settings.authors and not
+                [author for author in version.authors
+                    if author in settings.authors]):
+              continue
             document.versions.append(version)
             
           except ImproperXmlException:
@@ -156,6 +159,7 @@ def add_if_parser(parser):
   subparser.add_argument('-r', dest='rubrics', action='store_true', default=False, help='Builds the problems with rubrics')
   subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
   subparser.add_argument('--allowed-topics', required=False, dest='allowed_topics', nargs='+', help='If present, will restrict the allowed topics: a problem will be not be built if it uses any topic outside of the provided')
+  subparser.add_argument('--authors', required=False, dest='authors', nargs='+', help='If present, restricts to problems which were written by any of the given authors')
   subparser.add_argument('--grep', required=False, dest='grep', nargs='+', help='If present, restricts to problems which contain within the rubric, solution, or body that contain all of the given words. Words are treated separately, but case-insensitively.')
   subparser.add_argument('--not-used-in', required=False, dest='not_used_in', nargs='+', 
       help='If present, restricts to problems which were used in none of the given years')
