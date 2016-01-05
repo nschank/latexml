@@ -3,6 +3,7 @@ TARGET=documentation
 
 all: *.tex
 	@ $(BUILD) $(TARGET).tex
+	@ $(BUILD) $(TARGET).tex
 	@ rm -rf *.log *.aux
 	
 clean:

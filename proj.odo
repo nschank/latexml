@@ -9,7 +9,7 @@ S'BUILD'
 p4
 sS'text'
 p5
-S'doc should have absolute path resolution'
+S'more options'
 p6
 sS'duedate'
 p7
@@ -18,7 +18,7 @@ p8
 cdatetime
 date
 p9
-(S'\x07\xe0\x01\x04'
+(S'\x07\xdf\x0c\x1c'
 p10
 tp11
 Rp12
@@ -30,7 +30,7 @@ g3
 S'BUILD'
 p15
 sg5
-S'more options'
+S'templates'
 p16
 sg7
 Nsg8
@@ -44,15 +44,15 @@ TodoItem
 p20
 (dp21
 g3
-S'BUILD'
+S'DOC'
 p22
 sg5
-S'templates'
+S'library enumeration'
 p23
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1c'
+(S'\x07\xdf\x0c\x1e'
 p24
 tp25
 Rp26
@@ -64,12 +64,12 @@ g3
 S'DOC'
 p29
 sg5
-S'library enumeration'
+S'writing tips'
 p30
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1e'
+(S'\x07\xdf\x0c\x1c'
 p31
 tp32
 Rp33
@@ -78,16 +78,33 @@ TodoItem
 p34
 (dp35
 g3
-S'DOC'
+S'MS'
 p36
 sg5
-S'writing tips'
+S'port to windows environments'
 p37
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1c'
+(S'\x07\xe0\x01\x04'
 p38
 tp39
 Rp40
+sba(iodo_item
+TodoItem
+p41
+(dp42
+g3
+S'NAME'
+p43
+sg5
+S'document to assignment'
+p44
+sg7
+Nsg8
+g9
+(S'\x07\xe0\x01\x04'
+p45
+tp46
+Rp47
 sba.
