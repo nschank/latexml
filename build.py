@@ -4,6 +4,7 @@ from parseable import ImproperXmlException
 from problem import Problem, Document
 from subprocess import call
 from random import randint
+from config import get_problem_root
 import xml.etree.ElementTree as ET
 
 def build(document, filename, solutions=False, rubrics=False, metadata=False):
@@ -150,11 +151,7 @@ def add_doc_parser(parser):
   subparser.add_argument('-r', dest='rubrics', action='store_true', default=False, help='Builds the problems with rubrics')
   subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
     
-def add_if_parser(parser):
-  subparser = parser.add_parser('from', help='Builds all problems that satisfy the given predicates within a particular directory')
-  subparser.set_defaults(func=build_if)
-  subparser.add_argument('directory', help='The search directory containing all problems to examine')
-  subparser.add_argument('filename', metavar='O', help='The destination of the output PDF')
+def apply_predicate_arguments(subparser):
   subparser.add_argument('-m', dest='metadata', action='store_true', default=False, help='Builds the problems with attached metadata')
   subparser.add_argument('-r', dest='rubrics', action='store_true', default=False, help='Builds the problems with rubrics')
   subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
@@ -174,6 +171,19 @@ def add_if_parser(parser):
   subparser.add_argument('--written', required=False, dest='written', nargs='+', 
       help='If present, will specify a set of years that a problem\'s most recent version may have been written (to be included)')
     
+def add_from_parser(parser):
+  subparser = parser.add_parser('from', help='Builds all problems that satisfy the given predicates within a particular directory')
+  subparser.set_defaults(func=build_if)
+  subparser.add_argument('directory', help='The search directory containing all problems to examine')
+  subparser.add_argument('filename', metavar='O', help='The destination of the output PDF')
+  apply_predicate_arguments(subparser)
+  
+def add_all_parser(parser):
+  subparser = parser.add_parser('all', help='Builds all problems that satisfy the given predicates within the problem root directory')
+  subparser.set_defaults(func=build_if, directory=get_problem_root())
+  subparser.add_argument('filename', metavar='O', help='The destination of the output PDF')  
+  apply_predicate_arguments(subparser)
+    
 def add_problem_parser(parser):
   subparser = parser.add_parser('problems', help='Builds a problem or series of problems, in order')
   subparser.set_defaults(func=build_specific)
@@ -190,8 +200,9 @@ def build_args():
   parser = argparse.ArgumentParser(description='Builds PDFs from CS22 XML files')
   subparsers = parser.add_subparsers(help='How to choose which files to build')
   
+  add_all_parser(subparsers)
   add_doc_parser(subparsers)
-  add_if_parser(subparsers)
+  add_from_parser(subparsers)
   add_problem_parser(subparsers)
   
   return parser.parse_args()
