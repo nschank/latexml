@@ -30,12 +30,12 @@ g3
 S'BUILD'
 p15
 sg5
-S'by author'
+S'more options'
 p16
 sg7
 Nsg8
 g9
-(S'\x07\xe0\x01\x04'
+(S'\x07\xdf\x0c\x1c'
 p17
 tp18
 Rp19
@@ -47,7 +47,7 @@ g3
 S'BUILD'
 p22
 sg5
-S'more options'
+S'templates'
 p23
 sg7
 Nsg8
@@ -61,15 +61,15 @@ TodoItem
 p27
 (dp28
 g3
-S'BUILD'
+S'DOC'
 p29
 sg5
-S'templates'
+S'library enumeration'
 p30
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1c'
+(S'\x07\xdf\x0c\x1e'
 p31
 tp32
 Rp33
@@ -81,12 +81,12 @@ g3
 S'DOC'
 p36
 sg5
-S'library enumeration'
+S'writing tips'
 p37
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1e'
+(S'\x07\xdf\x0c\x1c'
 p38
 tp39
 Rp40
@@ -95,33 +95,16 @@ TodoItem
 p41
 (dp42
 g3
-S'DOC'
+S'NAME'
 p43
 sg5
-S'writing tips'
+S'document to assignment'
 p44
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1c'
+(S'\x07\xe0\x01\x04'
 p45
 tp46
 Rp47
-sba(iodo_item
-TodoItem
-p48
-(dp49
-g3
-S'NAME'
-p50
-sg5
-S'document to assignment'
-p51
-sg7
-Nsg8
-g9
-(S'\x07\xe0\x01\x04'
-p52
-tp53
-Rp54
 sba.
