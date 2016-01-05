@@ -11,11 +11,14 @@
     The \texttt{-s}, \texttt{-m}, and \texttt{-r} flags control whether solutions, metadata (like filename and topics), and rubrics are printed, respectively. All are optional, and they can be used together arbitrarily.
     
     An invalid problem XML will be skipped and a warning will be printed, but the build will continue.
-    
   \subsection{Building All Problems of a Type}
-    Given a directory full of problem XML files, the builder script can search all of them individually and build those that meet a set of criteria. You should run
+    The builder script can search all of the problems within the root problem directory\footnote{This is set for you in the department machines, within \texttt{/course/cs022/problems}; on your local machine, you can set it within the config file by changing the path set as the \texttt{problemroot}.} individually, building those that meet a set of criteria. You should run
+    \begin{align*}\pybuild\texttt{all }&\texttt{\textit{output[.pdf]} [CRITERIA]}\\~&\texttt{[-s] [-m] [-r] [--title ``TITLE'']}\end{align*}
+    If no criteria are given, the above command builds every problem in the problem root directory, with the four optional flags acting just as in the previous section.
+    
+    Alternatively, you can specify a different directory to search using the \texttt{from} option:
     \begin{align*}\pybuild\texttt{from }&\texttt{\textit{problems/\ \ output[.pdf]} [CRITERIA]}\\~&\texttt{[-s] [-m] [-r] [--title ``TITLE'']}\end{align*}
-    If no criteria are given, the above command builds every problem in the directory \texttt{problems/}, with the four optional flags acting just as in the previous section.
+    This would search everything within the \texttt{problems/} directory.
     
     The criteria for inclusion can be specified with any or all of the following flags, where a problem will be included only if it satisfies all specified flags.
     \begin{description}
