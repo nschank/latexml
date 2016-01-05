@@ -120,6 +120,31 @@ def build_if(settings):
   else:
     print "Error: The directory {} does not exist".format(settings.directory)
   
+def build_single(settings):
+  document = Document("")
+  document.name = "".join(settings.title)
+  #TODO
+  document.year = "1900"
+  document.due = " "
+  outname = ""
+  if settings.problem.endswith(".xml"):
+    outname = settings.problem[:-4] + ".pdf"
+  else:
+    print "Error: problem file does not have a .xml extension"
+    exit(1)
+  
+  try:
+    tree = ET.parse(settings.problem)
+    problem = Problem(settings.problem)
+    problem.parse_tree(tree, validate_versions=False)
+    version = problem.newest_version()
+    version.validate()
+    
+    document.versions.append(version)
+  except ImproperXmlException, ET.ParseError:
+    print "Warning: Could not parse {}".format(settings.problem)
+      
+  build(document, outname, settings.solutions, settings.rubrics, settings.metadata)
 
 def build_specific(settings):
   document = Document("")
@@ -194,6 +219,14 @@ def add_problem_parser(parser):
   subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
   subparser.add_argument('--title', nargs=1, required=False, default="Problem", help='Sets the title of the problem build')
 
+def add_single_parser(parser):
+  subparser = parser.add_parser('single', help='Builds a single problem XML file into a pdf of the same name')
+  subparser.set_defaults(func=build_single)
+  subparser.add_argument('problem', metavar='P', help='The problem XML file to build')
+  subparser.add_argument('-m', dest='metadata', action='store_true', default=False, help='Builds the problems with attached metadata')
+  subparser.add_argument('-r', dest='rubrics', action='store_true', default=False, help='Builds the problems with rubrics')
+  subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
+  subparser.add_argument('--title', nargs=1, required=False, default="Problem", help='Sets the title of the problem build')
   
 def build_args():
   """Parses command-line arguments using argparse and returns an object containing runtime information."""
@@ -204,6 +237,7 @@ def build_args():
   add_doc_parser(subparsers)
   add_from_parser(subparsers)
   add_problem_parser(subparsers)
+  add_single_parser(subparsers)
   
   return parser.parse_args()
 

@@ -3,6 +3,10 @@
     You can build any problem(s) into a PDF in one step by running the following command:
     \begin{align*}\pybuild\texttt{problems }&\texttt{\textit{output[.pdf]} problem1.xml [problem2.xml \dots]}\\
         ~&\texttt{[-s] [-m] [-r] [--title ``TITLE'']}\end{align*}
+        
+    If making only a single problem, you can use the shortcut:
+    \[\pybuild\texttt{single \textit{name.xml} [-s] [-m] [-r] [--title ``TITLE'']}\]
+    which simply names the output \texttt{name.pdf} (i.e. the same name as the problem file, except with .pdf instead of .xml).
     
     The build script is overwrite-safe and tolerant of multiple people building the same pdf simultaneously. In particular, it will build a randomly named temporary file and check for overwriting afterwards, allowing you to specify another name or to overwrite if necessary. The generated \texttt{.tex} file is removed, as are the logs and auxiliary files -- if you need these for some reason, let Nick know and he'll add an option to keep them. Exception: the \texttt{.tex} file is not removed if there were \LaTeX\ errors, so that you can find where the error occurred.
     
