@@ -19,3 +19,4 @@
 \contentsline {subsection}{\numberline {5.2}Building}{14}
 \contentsline {subsection}{\numberline {5.3}Finalizing}{14}
 \contentsline {section}{\numberline {6}Features Being Implemented}{15}
+\contentsline {section}{\numberline {7}\LaTeX \ Style}{16}

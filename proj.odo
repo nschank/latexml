@@ -9,7 +9,7 @@ S'BUILD'
 p4
 sS'text'
 p5
-S'all'
+S'more options'
 p6
 sS'duedate'
 p7
@@ -18,7 +18,7 @@ p8
 cdatetime
 date
 p9
-(S'\x07\xe0\x01\x04'
+(S'\x07\xdf\x0c\x1c'
 p10
 tp11
 Rp12
@@ -30,7 +30,7 @@ g3
 S'BUILD'
 p15
 sg5
-S'more options'
+S'templates'
 p16
 sg7
 Nsg8
@@ -44,10 +44,10 @@ TodoItem
 p20
 (dp21
 g3
-S'BUILD'
+S'DOC'
 p22
 sg5
-S'templates'
+S'writing tips'
 p23
 sg7
 Nsg8
@@ -61,15 +61,15 @@ TodoItem
 p27
 (dp28
 g3
-S'DOC'
+S'NAME'
 p29
 sg5
-S'library enumeration'
+S'document to assignment'
 p30
 sg7
 Nsg8
 g9
-(S'\x07\xdf\x0c\x1e'
+(S'\x07\xe0\x01\x04'
 p31
 tp32
 Rp33
@@ -77,34 +77,14 @@ sba(iodo_item
 TodoItem
 p34
 (dp35
-g3
-S'DOC'
+g5
+S'remove blurb from singles'
 p36
-sg5
-S'writing tips'
-p37
-sg7
-Nsg8
-g9
-(S'\x07\xdf\x0c\x1c'
-p38
-tp39
-Rp40
-sba(iodo_item
-TodoItem
-p41
-(dp42
-g3
-S'NAME'
-p43
-sg5
-S'document to assignment'
-p44
 sg7
 Nsg8
 g9
 (S'\x07\xe0\x01\x04'
-p45
-tp46
-Rp47
+p37
+tp38
+Rp39
 sba.

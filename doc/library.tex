@@ -1,0 +1,43 @@
+\section{\LaTeX\ Style}
+  In order to keep the formatting of \LaTeX\ consistent between problems, we have a few special macros and stylistic choices you are \textit{required} to use.
+  
+  \begin{itemize}
+    \item You should \textbf{ALWAYS} use the environments \texttt{22itemize} and \texttt{22enumerate} rather than \texttt{itemize} and \texttt{enumerate} respectively. Specifically, these environments change the spacing between items, and use a consistent lettering scheme.
+    \item When providing a hint or a note, you \textbf{MUST} use the commands \texttt{hint} and \texttt{note}, as in \[\texttt{\textbackslash hint\{Think about the pigeonhole principle.\}}\] This allows us to change how all hints and notes look without seeking them out individually.
+    \item The newline commands (e.g. \texttt{\textbackslash\textbackslash}) should \textbf{NEVER} be used to make paragraphs or for spacing. To make a new paragraph, leave a blank line between two blocks of text, as in: \begin{verbatim}
+\begin{document}
+  First paragraph.
+  
+  Second paragraph.
+\end{document}
+    \end{verbatim}
+    \item All parts to a question should end with a period (or question/exclamation mark). You'd be surprised how often people forget this!
+    \item \textbf{NEVER} use the double-dollar-sign notation (e.g. \texttt{\$\$x\$\$}); in fact, don't do it in real life either. It is error-prone and difficult to identify using i.e. regexes. Use \texttt{\textbackslash[x\textbackslash]} instead.
+    
+    (Single dollar signs are still the preferred notation for inline math.)
+  \end{itemize}
+  
+  Here is a small table of other convenience macros that are available to you. We \textbf{highly recommend} them, as they cut down on (1) useless clutter, and (2) minor typos.
+  
+  \begin{center}
+    \begin{tabular}{|c|c|}
+      \hline
+      \textbf{Symbol} & \textbf{Command} \\\hline
+      $\mathbb{N}$ & \texttt{\textbackslash N} \\\hline
+      $\mathbb{Z}$ & \texttt{\textbackslash Z} \\\hline
+      $\mathbb{R}$ & \texttt{\textbackslash R} \\\hline
+      $\mathbb{Q}$ & \texttt{\textbackslash Q} \\\hline
+      $\operatorname{E}[\ ]$ & \texttt{\textbackslash E[\ ]} \\\hline
+      $\operatorname{V}[\ ]$ & \texttt{\textbackslash V[\ ]} \\\hline
+      $\{x\;|\;x\in X\}$ & \texttt{\textbackslash setbuilder\{x\}\{x\textbackslash in\ X\}} \\\hline
+      $\mathcal{P}$ & \texttt{\textbackslash Pow} \\\hline
+      $\Pr[\ ]$ & \texttt{\textbackslash Pr[\ ]} \\\hline
+    \end{tabular}
+  \end{center}
+  
+  Note that the \texttt{setbuilder} command does not deal with multiple line equations.
+  
+  
+  
+  
+  
