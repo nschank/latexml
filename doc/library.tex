@@ -24,7 +24,9 @@
       
       \textbf{Wrong}: \texttt{3\comm{equiv} 4\comm{mod} 5} compiles to $3\equiv 4\mod 5$, has weird spacing and we wish to maintain consistency.
       
-      \textbf{Very Wrong}: \texttt{3=4 mod 5} compiles to $3=4 mod 5$ and will lead to spontaneous crying among the staff.    
+      \textbf{Very Wrong}: \texttt{3=4 mod 5} compiles to $3=4 mod 5$ and will lead to spontaneous crying among the staff.   
+    \item Keep lines under 80 characters to remain editor friendly.
+      The validator will enforce this soon!
   \end{enumerate}
   
   \subsection{22-Specific Macros}
@@ -54,6 +56,8 @@
       \item The commands \comm{left} and \comm{right} can be used with delimiters like \texttt{\{\}}, \texttt{()}, and \texttt{[]} to make them grow with their contents. So, for instance, \texttt{[\comm{binom}\{n\}\{r\}]} looks like \[[\binom nr]\] while \texttt{\comm{left}[\comm{binom}\{n\}\{r\}\comm{right}]} looks like \[\left[\binom nr\right]\]
       
       The matching command \comm{middle} can be used with the pipe character $|$ to produce effective set builder notation (and that's exactly how \comm{setbuilder} does it!)
+      \item Trying to write implies statements or iff statements? You are looking for \comm{Rightarrow} ($\Rightarrow$) and \comm{Leftrightarrow} ($\Leftrightarrow$).
+      \item Be careful with XML special characters \&, $<$, and $>$! See the section on special characters to avoid confusing XML parse errors. (Thankfully, XML color coding should make these errors relatively easy to spot.)
     \end{itemize}
     
   \subsection{Adding to This List}

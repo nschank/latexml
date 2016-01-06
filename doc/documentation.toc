@@ -22,4 +22,4 @@
 \contentsline {section}{\numberline {7}\LaTeX \ Style}{17}
 \contentsline {subsection}{\numberline {7.1}22-Specific Macros}{18}
 \contentsline {subsection}{\numberline {7.2}\LaTeX \ Tips}{18}
-\contentsline {subsection}{\numberline {7.3}Adding to This List}{18}
+\contentsline {subsection}{\numberline {7.3}Adding to This List}{19}
