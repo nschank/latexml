@@ -1,22 +1,25 @@
-\contentsline {section}{\numberline {1}Installation}{2}
-\contentsline {subsection}{\numberline {1.1}Requests and Complaints}{2}
-\contentsline {subsection}{\numberline {1.2}Installation on Home Computers}{2}
-\contentsline {section}{\numberline {2}Problem Files}{4}
-\contentsline {subsection}{\numberline {2.1}Problem XML Specification}{4}
-\contentsline {subsection}{\numberline {2.2}Topics}{6}
-\contentsline {subsection}{\numberline {2.3}Types}{7}
-\contentsline {subsection}{\numberline {2.4}Usage}{8}
-\contentsline {section}{\numberline {3}The \textit {Edit} Tool}{9}
-\contentsline {subsection}{\numberline {3.1}Creating a New Problem}{9}
-\contentsline {subsection}{\numberline {3.2}Creating a New Version}{9}
-\contentsline {subsection}{\numberline {3.3}Validating a Problem File}{10}
-\contentsline {subsection}{\numberline {3.4}Editing Topics and Types}{10}
-\contentsline {section}{\numberline {4}The \textit {Build} Tool}{11}
-\contentsline {subsection}{\numberline {4.1}Building Specific Problems}{11}
-\contentsline {subsection}{\numberline {4.2}Building All Problems of a Type}{11}
-\contentsline {section}{\numberline {5}Assignment Files}{13}
-\contentsline {subsection}{\numberline {5.1}Assignment XML Specification}{13}
-\contentsline {subsection}{\numberline {5.2}Building}{14}
-\contentsline {subsection}{\numberline {5.3}Finalizing}{14}
-\contentsline {section}{\numberline {6}Features Being Implemented}{15}
-\contentsline {section}{\numberline {7}\LaTeX \ Style}{16}
+\contentsline {section}{\numberline {1}Installation}{3}
+\contentsline {subsection}{\numberline {1.1}Requests and Complaints}{3}
+\contentsline {subsection}{\numberline {1.2}Installation on Home Computers}{3}
+\contentsline {section}{\numberline {2}Problem Files}{5}
+\contentsline {subsection}{\numberline {2.1}Problem XML Specification}{5}
+\contentsline {subsection}{\numberline {2.2}Topics}{7}
+\contentsline {subsection}{\numberline {2.3}Types}{8}
+\contentsline {subsection}{\numberline {2.4}Usage}{9}
+\contentsline {section}{\numberline {3}The \textit {Edit} Tool}{10}
+\contentsline {subsection}{\numberline {3.1}Creating a New Problem}{10}
+\contentsline {subsection}{\numberline {3.2}Creating a New Version}{10}
+\contentsline {subsection}{\numberline {3.3}Validating a Problem File}{11}
+\contentsline {subsection}{\numberline {3.4}Editing Topics and Types}{11}
+\contentsline {section}{\numberline {4}The \textit {Build} Tool}{12}
+\contentsline {subsection}{\numberline {4.1}Building Specific Problems}{12}
+\contentsline {subsection}{\numberline {4.2}Building All Problems of a Type}{12}
+\contentsline {section}{\numberline {5}Assignment Files}{14}
+\contentsline {subsection}{\numberline {5.1}Assignment XML Specification}{14}
+\contentsline {subsection}{\numberline {5.2}Building}{15}
+\contentsline {subsection}{\numberline {5.3}Finalizing}{15}
+\contentsline {section}{\numberline {6}Features Being Implemented}{16}
+\contentsline {section}{\numberline {7}\LaTeX \ Style}{17}
+\contentsline {subsection}{\numberline {7.1}22-Specific Macros}{18}
+\contentsline {subsection}{\numberline {7.2}\LaTeX \ Tips}{18}
+\contentsline {subsection}{\numberline {7.3}Adding to This List}{18}
