@@ -75,12 +75,12 @@ def build_if(settings):
                     if topic not in settings.allowed_topics]):
               continue
             if (settings.required_topics and 
-                [topic for topic in version.topics 
-                    if topic not in settings.required_topics]):
+                [topic for topic in  settings.required_topics
+                    if topic not in version.topics]):
               continue
             if (settings.required_types and 
-                [type for type in version.types 
-                    if type not in settings.required_types]):
+                [type for type in settings.required_types 
+                    if type not in version.types]):
               continue
             if (settings.written and version.year not in settings.written):
               continue
