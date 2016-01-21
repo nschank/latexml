@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 from os import getenv
 from parseable import XmlParseable, ImproperXmlException
 import string
+from copy import copy
 
 class ConfigurationError(Exception):
   pass
@@ -38,12 +39,12 @@ class BuildConfiguration(XmlParseable):
   def __parse_topics(self, attributes, body):
     self.xml_assert(not attributes, "topics tag should have no attributes")
     self.xml_assert(not self.topics, "duplicate topics tag")
-    self.topics = frozenset(string.split(body))
+    self.topics = string.split(body)
   
   def __parse_types(self, attributes, body):
     self.xml_assert(not attributes, "types tag should have no attributes")
     self.xml_assert(not self.types, "duplicate types tag")
-    self.types = frozenset(string.split(body))
+    self.types = string.split(body)
     
   __parsers = {
     'blurb':__parse_blurb,
@@ -101,7 +102,7 @@ def get_problem_root():
   return get_configuration().problemroot
   
 def get_topics():
-  return get_configuration().topics
+  return copy(get_configuration().topics)
   
 def get_types():
-  return get_configuration().types
+  return copy(get_configuration().types)

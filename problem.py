@@ -8,6 +8,8 @@ from config import get_topics, get_types, get_blurb, get_inclusions, get_problem
   
 def split_add(before, raw):
   """Used by any fields which can be whitespace separated"""
+  if raw is None:
+    return before
   return before + map(lambda x: string.strip(x), string.split(raw))
       
 class Version(XmlParseable):

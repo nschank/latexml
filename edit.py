@@ -220,7 +220,7 @@ def validate(settings):
     problem = Problem(settings.filename)
     problem.parse_tree(tree)
   except ImproperXmlException as e:
-    print "{}\nRerun validation".format(e.strerror)
+    print "{}\nRerun validation".format(e.args[0])
     exit(1)
   newest = problem.newest_version()
   if "\\newcommand" in newest.body or "\\newcommand" in newest.solution or "\\newcommand" in newest.rubric:
