@@ -46,7 +46,7 @@ def build_doc(settings):
     tree = ET.parse(settings.document)
     document.parse_tree(tree)
     build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
-  except ImproperXmlException, ET.ParseError:
+  except (ImproperXmlException, ET.ParseError):
     print "Error: Could not parse {}".format(settings.document)
     
   
@@ -114,7 +114,7 @@ def build_if(settings):
               continue
             document.versions.append(version)
             
-          except ImproperXmlException, ET.ParseError:
+          except (ImproperXmlException, ET.ParseError):
             pass
     build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
   else:
@@ -141,7 +141,7 @@ def build_single(settings):
     version.validate()
     
     document.versions.append(version)
-  except ImproperXmlException, ET.ParseError:
+  except (ImproperXmlException, ET.ParseError):
     print "Warning: Could not parse {}".format(settings.problem)
       
   build(document, outname, settings.solutions, settings.rubrics, settings.metadata)
@@ -162,7 +162,7 @@ def build_specific(settings):
       version.validate()
       
       document.versions.append(version)
-    except ImproperXmlException, ET.ParseError:
+    except (ImproperXmlException, ET.ParseError):
       print "Warning: Could not parse {}".format(settings.filename)
       
   build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
