@@ -3,6 +3,7 @@ import unittest
 from config import BuildConfiguration
 from parseable import ImproperXmlException
 from problem import Version, ImproperXmlException, Problem, Document
+from build import satisfies
 import os
 import string
 
@@ -295,6 +296,50 @@ class VersionTest(unittest.TestCase):
         version = Version(file)
         version.parse_tree(tree)
         version.validate()
+        
+class DummyObject():
+  def __getattr__(self, name):
+    return False
+        
+class BuildPredicateTest(unittest.TestCase):
+  def test_empty(self):
+    version = DummyObject()
+    settings = DummyObject()
+    
+    self.assertTrue(satisfies(version, settings))
+    
+  def test_allowed_topics(self):
+    version = DummyObject()
+    settings = DummyObject()
+    version.topics = ['set_theory', 'number_theory']
+    
+    settings.allowed_topics = ['set_theory', 'graph_theory', 'number_theory']
+    self.assertTrue(satisfies(version, settings))
+    
+    settings.allowed_topics = ['set_theory']
+    self.assertFalse(satisfies(version, settings))
+    
+  def test_required_topics(self):
+    version = DummyObject()
+    settings = DummyObject()
+    version.topics = ['set_theory']
+    
+    # Matches exactly
+    settings.required_topics = ['set_theory']
+    self.assertTrue(satisfies(version, settings))
+    
+    # One required topic, but not the other
+    settings.required_topics = ['set_theory', 'graph_theory']
+    self.assertTrue(satisfies(version, settings))
+    
+    # One required topic matches, one real topic not present
+    version.topics = ['set_theory', 'number_theory']
+    self.assertTrue(satisfies(version, settings))
+    
+    version.topics = ['number_theory']
+    self.assertFalse(satisfies(version, settings))
+    
+    
     
 if __name__ == '__main__':
   unittest.main()

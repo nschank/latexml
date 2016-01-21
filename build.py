@@ -7,6 +7,52 @@ from random import randint
 from config import get_problem_root
 import xml.etree.ElementTree as ET
 
+def satisfies(version, settings):
+  if (settings.allowed_topics and 
+      [topic for topic in version.topics 
+          if topic not in settings.allowed_topics]):
+    return False
+  if (settings.required_topics and not
+      [topic for topic in version.topics
+          if topic in settings.required_topics]):
+    return False
+  if (settings.required_types and not
+      [type for type in version.types
+          if type in settings.required_types]):
+    return False
+  if (settings.written and version.year not in settings.written):
+    return False
+  if settings.todo or settings.grep:
+    lower_sol = version.solution.lower()
+    lower_rub = version.rubric.lower()
+    if (settings.todo and lower_sol.find("todo") == -1 
+        and lower_rub.find("todo") == -1):
+      return False
+    if settings.grep:
+      skip = False
+      search = version.body.lower() + lower_sol + lower_rub
+      for word in settings.grep:
+        if search.find(word) == -1:
+          return False
+  if settings.used_in or settings.not_used_in:
+    matches_used = not settings.used_in
+    matches_unused = True
+    for actual in problem.used_in:
+      if settings.used_in and actual.year in settings.used_in:
+        matches_used = True
+      if settings.not_used_in and actual.year in settings.not_used_in:
+        matches_unused = False
+    if not problem.used_in:
+      if settings.used_in and "none" in settings.used_in: matches_used = True
+      if settings.not_used_in and "none" in settings.not_used_in: matches_unused = False
+    if not matches_used or not matches_unused:
+      return False
+  if (settings.authors and not
+      [author for author in version.authors
+          if author in settings.authors]):
+    return False
+  return True
+
 def build(document, filename, solutions=False, rubrics=False, metadata=False):
   if filename.endswith(".pdf"):
     filename = filename[:-4]
@@ -70,53 +116,8 @@ def build_if(settings):
             version = problem.newest_version()
             version.validate()
             
-            if (settings.allowed_topics and 
-                [topic for topic in version.topics 
-                    if topic not in settings.allowed_topics]):
-              continue
-            if (settings.required_topics and not
-                [topic for topic in version.topics
-                    if topic in settings.required_topics]):
-              continue
-            if (settings.required_types and not
-                [type for type in version.types
-                    if type in settings.required_types]):
-              continue
-            if (settings.written and version.year not in settings.written):
-              continue
-            if settings.todo or settings.grep:
-              lower_sol = version.solution.lower()
-              lower_rub = version.rubric.lower()
-              if (settings.todo and lower_sol.find("todo") == -1 
-                  and lower_rub.find("todo") == -1):
-                continue
-              if settings.grep:
-                skip = False
-                search = version.body.lower() + lower_sol + lower_rub
-                for word in settings.grep:
-                  if search.find(word) == -1:
-                    skip = True
-                    break
-                if skip:
-                  continue
-            if settings.used_in or settings.not_used_in:
-              matches_used = not settings.used_in
-              matches_unused = True
-              for actual in problem.used_in:
-                if settings.used_in and actual.year in settings.used_in:
-                  matches_used = True
-                if settings.not_used_in and actual.year in settings.not_used_in:
-                  matches_unused = False
-              if not problem.used_in:
-                if settings.used_in and "none" in settings.used_in: matches_used = True
-                if settings.not_used_in and "none" in settings.not_used_in: matches_unused = False
-              if not matches_used or not matches_unused:
-                continue
-            if (settings.authors and not
-                [author for author in version.authors
-                    if author in settings.authors]):
-              continue
-            document.versions.append(version)
+            if satisfies(version, settings):
+              document.versions.append(version)
             
           except (ImproperXmlException, ET.ParseError):
             pass
@@ -249,5 +250,5 @@ def main():
   settings = build_args()
   settings.func(settings)
   
-  
-main()
+if __name__ == '__main__':
+  main()
