@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from os import getenv
+from os import getenv, getlogin
 from parseable import XmlParseable, ImproperXmlException
 import string
 from copy import copy
@@ -10,11 +10,17 @@ class ConfigurationError(Exception):
 class BuildConfiguration(XmlParseable):
   def __init__(self, filename=None):
     self.filename = filename
+    self.author = None
     self.topics = []
     self.types = []
     self.blurb = None
     self.include = []
     self.problemroot = None
+    
+  def __parse_author(self, attributes, body):
+    self.xml_assert(not attributes, "author tag should have no attributes")
+    self.xml_assert(self.author is None, "duplicate author tag")
+    self.author = body
     
   def __parse_blurb(self, attributes, body):
     self.xml_assert(not attributes, "blurb tag should have no attributes")
@@ -47,6 +53,7 @@ class BuildConfiguration(XmlParseable):
     self.types = string.split(body)
     
   __parsers = {
+    'author':__parse_author,
     'blurb':__parse_blurb,
     'include':__parse_include,
     'problemroot':__parse_problemroot,
@@ -94,6 +101,12 @@ def get_configuration():
   
 def get_blurb():
   return get_configuration().blurb
+  
+def get_default_author():
+  if get_configuration().author is None:
+    return getlogin()
+  else:
+    return get_configuration().author
   
 def get_inclusions():
   return ''.join(get_configuration().include)

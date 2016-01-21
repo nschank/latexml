@@ -1,10 +1,9 @@
 import xml.etree.ElementTree as ET
 import string
-from os import getlogin
 from os.path import exists, isabs, join
 from datetime import date
 from parseable import XmlParseable, ImproperXmlException
-from config import get_topics, get_types, get_blurb, get_inclusions, get_problem_root
+from config import get_topics, get_types, get_blurb, get_inclusions, get_problem_root, get_default_author
   
 def split_add(before, raw):
   """Used by any fields which can be whitespace separated"""
@@ -37,7 +36,7 @@ class Version(XmlParseable):
     self.rubric = None
     
   def add_defaults(self):
-    self.authors = [getlogin()]
+    self.authors = [get_default_author()]
     self.year = str(date.today().year)
     
   def pretty_print(self, solution=False, rubric=False, metadata=False):
