@@ -114,7 +114,7 @@ def build_if(settings):
               continue
             document.versions.append(version)
             
-          except ImproperXmlException:
+          except ImproperXmlException, ET.ParseError:
             pass
     build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
   else:
