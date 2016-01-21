@@ -74,13 +74,13 @@ def build_if(settings):
                 [topic for topic in version.topics 
                     if topic not in settings.allowed_topics]):
               continue
-            if (settings.required_topics and 
-                [topic for topic in  settings.required_topics
-                    if topic not in version.topics]):
+            if (settings.required_topics and not
+                [topic for topic in version.topics
+                    if topic in settings.required_topics]):
               continue
-            if (settings.required_types and 
-                [type for type in settings.required_types 
-                    if type not in version.types]):
+            if (settings.required_types and not
+                [type for type in version.types
+                    if type in settings.required_types]):
               continue
             if (settings.written and version.year not in settings.written):
               continue
@@ -91,10 +91,14 @@ def build_if(settings):
                   and lower_rub.find("todo") == -1):
                 continue
               if settings.grep:
+                skip = False
                 search = version.body.lower() + lower_sol + lower_rub
                 for word in settings.grep:
                   if search.find(word) == -1:
-                    continue
+                    skip = True
+                    break
+                if skip:
+                  continue
             if settings.used_in or settings.not_used_in:
               matches_used = not settings.used_in
               matches_unused = True
