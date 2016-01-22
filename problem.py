@@ -220,12 +220,13 @@ class Document(XmlParseable):
   Internal representation of a Document, which contains an ordered list of Versions to print as well
   as metadata used to create headers or other LaTeX things.
   """
-  def __init__(self, filename=None):
+  def __init__(self, filename=None, blurb=get_blurb()):
     self.year = None
     self.due = None
     self.name = None
     self.filename = filename
     self.versions = []
+    self.blurb = blurb
     
   def build(self, solutions=False, rubrics=False, metadata=False):
     return self._header() + self._document(self._problems(solutions, rubrics, metadata))
@@ -272,7 +273,7 @@ class Document(XmlParseable):
   \\begin{center}
     {\\huge \\textbf{""" + self.name + """}}\n
     {\\large \\textit{Due: """ + self.due + """}}
-  \\end{center}\n\n""" + get_blurb() + "\n\n" + body + "\\end{document}"
+  \\end{center}\n\n""" + self.blurb + "\n\n" + body + "\\end{document}"
   
   def _header(self):
     dependencies = self._additional_dependencies()

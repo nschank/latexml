@@ -1,5 +1,6 @@
 import argparse
 import os
+import stat
 import xml.etree.ElementTree as ET
 from problem import Problem, Version, UsedIn, Document
 from parseable import ImproperXmlException
@@ -169,6 +170,12 @@ def create_new(settings):
       f.write(ET.tostring(root))
   except OSError:
     print "Error: File '{}' already exists.".format(settings.filename)
+    return
+  try:
+    print "New file created.\nSetting permissions..."
+    os.chmod(settings.filename, stat.S_IRWXU | stat.S_IRWXG)
+  except OSError:
+    print "Permissions not successfully fixed, please run chmod 660"
     
 def edit(settings):
   """
@@ -284,4 +291,5 @@ def main():
   settings.func(settings)
   
   
-main()
+if __name__ == '__main__':
+  main()

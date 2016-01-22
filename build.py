@@ -105,7 +105,8 @@ def build_if(settings):
   document.name = "".join(settings.title)
   # TODO:
   document.year = "1901"
-  document.due = " "
+  document.due = "Never"
+  document.blurb = ""
   
   if os.path.isdir(settings.directory):
     for dirpath, dirnames, filenames in os.walk(settings.directory):
@@ -133,7 +134,8 @@ def build_single(settings):
   document.name = "".join(settings.title)
   #TODO
   document.year = "1900"
-  document.due = " "
+  document.due = "Never"
+  document.blurb = ""
   outname = ""
   if settings.problem.endswith(".xml"):
     outname = settings.problem[:-4] + ".pdf"
