@@ -65,7 +65,7 @@ def build(document, filename, solutions=False, rubrics=False, metadata=False):
   if document.versions:
     tempfilename = filename + ".tmp" + str(randint(0,100000))
     with open(tempfilename + ".tex", "w") as f:
-      f.write(document.build(solutions, rubrics, metadata))
+      f.write(document.build(solutions, rubrics, metadata).encode('UTF-8'))
     code = call(["pdflatex", tempfilename + ".tex", "-quiet"])
     os.remove(tempfilename + ".aux")
     os.remove(tempfilename + ".log")
