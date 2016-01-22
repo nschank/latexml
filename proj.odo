@@ -92,12 +92,12 @@ TodoItem
 p40
 (dp41
 g5
-S'predicate tests'
+S'remove blurb from singles'
 p42
 sg7
 Nsg8
 g9
-(S'\x07\xe0\x01\x16'
+(S'\x07\xe0\x01\x04'
 p43
 tp44
 Rp45
@@ -106,12 +106,12 @@ TodoItem
 p46
 (dp47
 g5
-S'remove blurb from singles'
+S'save during process?'
 p48
 sg7
 Nsg8
 g9
-(S'\x07\xe0\x01\x04'
+(S'\x07\xe0\x01\x16'
 p49
 tp50
 Rp51
@@ -120,7 +120,7 @@ TodoItem
 p52
 (dp53
 g5
-S'save during process?'
+S'setminus'
 p54
 sg7
 Nsg8
@@ -129,18 +129,4 @@ g9
 p55
 tp56
 Rp57
-sba(iodo_item
-TodoItem
-p58
-(dp59
-g5
-S'setminus'
-p60
-sg7
-Nsg8
-g9
-(S'\x07\xe0\x01\x16'
-p61
-tp62
-Rp63
 sba.

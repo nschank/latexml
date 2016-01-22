@@ -462,7 +462,22 @@ class BuildPredicateTest(unittest.TestCase):
     self.assertTrue(satisfies(version, settings, [usedin_1, usedin_2]))
     self.assertFalse(satisfies(version, settings, [usedin_2, usedin_3]))
     
+  def test_authors(self):
+    version = DummyObject()
+    settings = DummyObject()
     
+    settings.authors = ["a", "b", "c"]
+    version.authors = []
+    self.assertFalse(satisfies(version, settings, []))
+    
+    version.authors = ["d"]
+    self.assertFalse(satisfies(version, settings, []))
+    
+    version.authors = ["a", "d"]
+    self.assertTrue(satisfies(version, settings, []))
+    
+    version.authors = ["a", "b"]
+    self.assertTrue(satisfies(version, settings, []))
     
 if __name__ == '__main__':
   unittest.main()
