@@ -7,7 +7,7 @@ from random import randint
 from config import get_problem_root
 import xml.etree.ElementTree as ET
 
-def satisfies(version, settings):
+def satisfies(version, settings, used_ins):
   if (settings.allowed_topics and 
       [topic for topic in version.topics 
           if topic not in settings.allowed_topics]):
@@ -29,22 +29,26 @@ def satisfies(version, settings):
         and lower_rub.find("todo") == -1):
       return False
     if settings.grep:
-      search = version.body.lower() + lower_sol + lower_rub
+      lower_body = version.body.lower()
       for word in settings.grep:
-        if search.find(word) == -1:
+        word = word.lower()
+        if (lower_sol.find(word) == -1 and 
+            lower_rub.find(word) == -1 and 
+            lower_body.find(word) == -1):
           return False
   if settings.used_in or settings.not_used_in:
-    matches_used = not settings.used_in
-    matches_unused = True
-    for actual in problem.used_in:
+    matches_used = False
+    for actual in used_ins:
       if settings.used_in and actual.year in settings.used_in:
         matches_used = True
       if settings.not_used_in and actual.year in settings.not_used_in:
-        matches_unused = False
-    if not problem.used_in:
-      if settings.used_in and "none" in settings.used_in: matches_used = True
-      if settings.not_used_in and "none" in settings.not_used_in: matches_unused = False
-    if not matches_used or not matches_unused:
+        return False
+    if not used_ins:
+      if settings.used_in and "none" in settings.used_in:
+        matches_used = True
+      if settings.not_used_in and "none" in settings.not_used_in: 
+        return False
+    if settings.used_in and not matches_used:
       return False
   if (settings.authors and not
       [author for author in version.authors
@@ -115,7 +119,7 @@ def build_if(settings):
             version = problem.newest_version()
             version.validate()
             
-            if satisfies(version, settings):
+            if satisfies(version, settings, problem.used_in):
               document.versions.append(version)
             
           except (ImproperXmlException, ET.ParseError):

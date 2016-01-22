@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import unittest
 from config import BuildConfiguration
 from parseable import ImproperXmlException
-from problem import Version, ImproperXmlException, Problem, Document
+from problem import Version, ImproperXmlException, Problem, Document, UsedIn
 from build import satisfies
 import os
 import string
@@ -306,7 +306,7 @@ class BuildPredicateTest(unittest.TestCase):
     version = DummyObject()
     settings = DummyObject()
     
-    self.assertTrue(satisfies(version, settings))
+    self.assertTrue(satisfies(version, settings, []))
     
   def test_allowed_topics(self):
     version = DummyObject()
@@ -314,10 +314,10 @@ class BuildPredicateTest(unittest.TestCase):
     version.topics = ['set_theory', 'number_theory']
     
     settings.allowed_topics = ['set_theory', 'graph_theory', 'number_theory']
-    self.assertTrue(satisfies(version, settings))
+    self.assertTrue(satisfies(version, settings, []))
     
     settings.allowed_topics = ['set_theory']
-    self.assertFalse(satisfies(version, settings))
+    self.assertFalse(satisfies(version, settings, []))
     
   def test_required_topics(self):
     version = DummyObject()
@@ -326,19 +326,19 @@ class BuildPredicateTest(unittest.TestCase):
     
     # Matches exactly
     settings.required_topics = ['set_theory']
-    self.assertTrue(satisfies(version, settings))
+    self.assertTrue(satisfies(version, settings, []))
     
     # One required topic, but not the other
     settings.required_topics = ['set_theory', 'graph_theory']
-    self.assertTrue(satisfies(version, settings))
+    self.assertTrue(satisfies(version, settings, []))
     
     # One required topic matches, one real topic not present
     version.topics = ['set_theory', 'number_theory']
-    self.assertTrue(satisfies(version, settings))
+    self.assertTrue(satisfies(version, settings, []))
     
     # No match - not included
     version.topics = ['number_theory']
-    self.assertFalse(satisfies(version, settings))
+    self.assertFalse(satisfies(version, settings, []))
     
   def test_required_types(self):
     version = DummyObject()
@@ -347,19 +347,19 @@ class BuildPredicateTest(unittest.TestCase):
     
     # Matches exactly
     settings.required_types = ['a']
-    self.assertTrue(satisfies(version, settings))
+    self.assertTrue(satisfies(version, settings, []))
     
     # One required type, but not the other
     settings.required_types = ['a', 'b']
-    self.assertTrue(satisfies(version, settings))
+    self.assertTrue(satisfies(version, settings, []))
     
     # One required type matches, one real type not present
     version.types = ['b', 'c']
-    self.assertTrue(satisfies(version, settings))
+    self.assertTrue(satisfies(version, settings, []))
     
     # No match - not included
     version.types = ['c']
-    self.assertFalse(satisfies(version, settings))
+    self.assertFalse(satisfies(version, settings, []))
     
   def test_written(self):
     version = DummyObject()
@@ -367,13 +367,13 @@ class BuildPredicateTest(unittest.TestCase):
     
     version.year = "1994"
     settings.written = ["1994"]
-    self.assertTrue(satisfies(version, settings))
+    self.assertTrue(satisfies(version, settings, []))
     
     settings.written = ["1994", "1995"]
-    self.assertTrue(satisfies(version, settings))
+    self.assertTrue(satisfies(version, settings, []))
     
     settings.written = ["1995"]
-    self.assertFalse(satisfies(version, settings))
+    self.assertFalse(satisfies(version, settings, []))
     
   def test_todo(self):
     version = DummyObject()
@@ -384,19 +384,83 @@ class BuildPredicateTest(unittest.TestCase):
     version.solution = ""
     version.rubric = ""
     
-    self.assertFalse(satisfies(version, settings))
+    self.assertFalse(satisfies(version, settings, []))
     
     version.body = "todo"
-    self.assertFalse(satisfies(version, settings))
+    self.assertFalse(satisfies(version, settings, []))
     
     version.solution = "todo"
-    self.assertTrue(satisfies(version, settings))
+    self.assertTrue(satisfies(version, settings, []))
     
     version.solution = ""
     version.rubric = "TODO"
-    self.assertTrue(satisfies(version, settings))
+    self.assertTrue(satisfies(version, settings, []))
     
+  def test_grep(self):
+    version = DummyObject()
+    settings = DummyObject()
     
+    settings.grep = ["alpha", "BETA"]
+    version.body = ""
+    version.solution = ""
+    version.rubric = ""
+    
+    self.assertFalse(satisfies(version, settings, []))
+    
+    version.body = "alpha"
+    self.assertFalse(satisfies(version, settings, []))
+    
+    version.solution = "beta"
+    self.assertTrue(satisfies(version, settings, []))
+    
+    version.body = ""
+    version.solution = "alpha beta"
+    self.assertTrue(satisfies(version, settings, []))
+    
+    version.solution = ""
+    version.rubric = "ALPHA BETA"
+    self.assertTrue(satisfies(version, settings, []))
+    
+    version.body = "alph"
+    version.solution = "a beta"
+    version.rubric = ""
+    self.assertFalse(satisfies(version, settings, []))
+    
+  def test_used_in(self):
+    version = DummyObject()
+    settings = DummyObject()
+    usedin_1 = UsedIn("1994", "Homework 1")
+    usedin_2 = UsedIn("1995", "Homework 2")
+    usedin_3 = UsedIn("1996", "Homework 3")
+    
+    settings.used_in = ["1994"]
+    self.assertFalse(satisfies(version, settings, []))
+    self.assertTrue(satisfies(version, settings, [usedin_1]))
+    self.assertTrue(satisfies(version, settings, [usedin_1, usedin_2]))
+    self.assertFalse(satisfies(version, settings, [usedin_2]))
+    
+    settings.used_in = ["1994", "1995"]
+    self.assertFalse(satisfies(version, settings, []))
+    self.assertTrue(satisfies(version, settings, [usedin_1]))
+    self.assertFalse(satisfies(version, settings, [usedin_3]))
+    self.assertTrue(satisfies(version, settings, [usedin_1, usedin_2]))
+    self.assertTrue(satisfies(version, settings, [usedin_2, usedin_3]))
+    
+    settings.used_in = ["1994", "1995"]
+    settings.not_used_in = ["1996"]
+    self.assertFalse(satisfies(version, settings, []))
+    self.assertTrue(satisfies(version, settings, [usedin_1]))
+    self.assertFalse(satisfies(version, settings, [usedin_3]))
+    self.assertTrue(satisfies(version, settings, [usedin_1, usedin_2]))
+    self.assertFalse(satisfies(version, settings, [usedin_2, usedin_3]))
+    
+    settings.used_in = False
+    settings.not_used_in = ["1996"]
+    self.assertTrue(satisfies(version, settings, []))
+    self.assertTrue(satisfies(version, settings, [usedin_1]))
+    self.assertFalse(satisfies(version, settings, [usedin_3]))
+    self.assertTrue(satisfies(version, settings, [usedin_1, usedin_2]))
+    self.assertFalse(satisfies(version, settings, [usedin_2, usedin_3]))
     
     
     
