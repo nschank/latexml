@@ -336,8 +336,67 @@ class BuildPredicateTest(unittest.TestCase):
     version.topics = ['set_theory', 'number_theory']
     self.assertTrue(satisfies(version, settings))
     
+    # No match - not included
     version.topics = ['number_theory']
     self.assertFalse(satisfies(version, settings))
+    
+  def test_required_types(self):
+    version = DummyObject()
+    settings = DummyObject()
+    version.types = ['a']
+    
+    # Matches exactly
+    settings.required_types = ['a']
+    self.assertTrue(satisfies(version, settings))
+    
+    # One required type, but not the other
+    settings.required_types = ['a', 'b']
+    self.assertTrue(satisfies(version, settings))
+    
+    # One required type matches, one real type not present
+    version.types = ['b', 'c']
+    self.assertTrue(satisfies(version, settings))
+    
+    # No match - not included
+    version.types = ['c']
+    self.assertFalse(satisfies(version, settings))
+    
+  def test_written(self):
+    version = DummyObject()
+    settings = DummyObject()
+    
+    version.year = "1994"
+    settings.written = ["1994"]
+    self.assertTrue(satisfies(version, settings))
+    
+    settings.written = ["1994", "1995"]
+    self.assertTrue(satisfies(version, settings))
+    
+    settings.written = ["1995"]
+    self.assertFalse(satisfies(version, settings))
+    
+  def test_todo(self):
+    version = DummyObject()
+    settings = DummyObject()
+    
+    settings.todo = True
+    version.body = ""
+    version.solution = ""
+    version.rubric = ""
+    
+    self.assertFalse(satisfies(version, settings))
+    
+    version.body = "todo"
+    self.assertFalse(satisfies(version, settings))
+    
+    version.solution = "todo"
+    self.assertTrue(satisfies(version, settings))
+    
+    version.solution = ""
+    version.rubric = "TODO"
+    self.assertTrue(satisfies(version, settings))
+    
+    
     
     
     

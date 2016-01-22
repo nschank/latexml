@@ -29,7 +29,6 @@ def satisfies(version, settings):
         and lower_rub.find("todo") == -1):
       return False
     if settings.grep:
-      skip = False
       search = version.body.lower() + lower_sol + lower_rub
       for word in settings.grep:
         if search.find(word) == -1:
