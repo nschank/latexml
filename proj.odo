@@ -109,12 +109,12 @@ TodoItem
 p47
 (dp48
 g5
-S'remove blurb from singles'
+S'poll permissions'
 p49
 sg7
 Nsg8
 g9
-(S'\x07\xe0\x01\x04'
+(S'\x07\xe0\x01\x17'
 p50
 tp51
 Rp52
@@ -123,12 +123,12 @@ TodoItem
 p53
 (dp54
 g5
-S'save during process?'
+S'remove blurb from singles'
 p55
 sg7
 Nsg8
 g9
-(S'\x07\xe0\x01\x16'
+(S'\x07\xe0\x01\x04'
 p56
 tp57
 Rp58
@@ -137,7 +137,7 @@ TodoItem
 p59
 (dp60
 g5
-S'setminus'
+S'save during process?'
 p61
 sg7
 Nsg8
@@ -146,4 +146,18 @@ g9
 p62
 tp63
 Rp64
+sba(iodo_item
+TodoItem
+p65
+(dp66
+g5
+S'setminus'
+p67
+sg7
+Nsg8
+g9
+(S'\x07\xe0\x01\x16'
+p68
+tp69
+Rp70
 sba.

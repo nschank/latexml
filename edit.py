@@ -9,6 +9,36 @@ from config import get_topics, get_types
 from copy import deepcopy
 from datetime import date
 
+CLEAR_COLOR = "\033[0;0m"
+BLACK = 0
+RED = 1
+GREEN = 2
+YELLOW = 3
+BLUE = 4
+MAGENTA = 5
+CYAN = 6
+WHITE = 7
+
+def color_code(color, foreground=True, bold=False):
+  ret = "\033["
+  if foreground:
+    ret = ret + "3" + str(color)
+  elif bold:
+    ret = ret + "10" + str(color)
+  else:
+    ret = ret + "4" + str(color)
+  if bold and foreground:
+    ret = ret + ";1"
+  elif foreground:
+    ret = ret + ";22"
+  return ret + "m"
+  
+def print_error(message):
+  print color_code(RED, bold=True) + "Error: " + CLEAR_COLOR + message
+  
+def print_warning(message):
+  print color_code(YELLOW) + "Warning: " + CLEAR_COLOR + message
+  
 stylistic_errors = {
   re.compile(r"HINT|Hint: |\\text(?:bf|it){\s*[Hh]int:?\s*}:?"):r"Use the \hint command instead.",
   re.compile(r"Note: |\\text(?:bf|it){\s*[Nn]ote:?\s*}:?"):r"Use the \note command instead.",
@@ -95,7 +125,8 @@ def branch(settings):
   try:
     tree = ET.parse(settings.filename)
   except Exception:
-    print "Error: Could not parse {}".format(settings.filename)
+    print_error("Could not parse '{}'".format(settings.filename))
+    print "Are you sure it exists?"
     exit(1)
     
   try:
@@ -103,7 +134,8 @@ def branch(settings):
     problem.parse_tree(tree)
     next_id = problem.next_id()
   except ImproperXmlException:
-    print "Error: {} has invalid problem XML. Try `validate'".format(settings.filename)
+    print_error("{} has invalid problem XML.".format(settings.filename))
+    print "Try running `validate' to help find possible causes."
     exit(1)
     
   version = deepcopy(problem.newest_version())
@@ -141,7 +173,8 @@ def finalize(settings):
     tree = ET.parse(settings.document)
     document.parse_tree(tree)
   except ImproperXmlException, ET.ParseError:
-    print "Error: Could not parse {}".format(settings.document)
+    print_error("Could not parse '{}'".format(settings.document))
+    print "Are you sure it exists?"
     exit(1)
     
   for version in document.versions:
@@ -183,13 +216,13 @@ def create_new(settings):
       indent(root)
       f.write(ET.tostring(root))
   except OSError:
-    print "Error: File '{}' already exists.".format(settings.filename)
-    return
+    print_error("File '{}' already exists.".format(settings.filename))
+    exit(1)
   try:
     print "New file created.\nSetting permissions..."
     os.chmod(settings.filename, stat.S_IRWXU | stat.S_IRWXG)
   except OSError:
-    print "Permissions not successfully fixed, please run chmod 660"
+    print_error("Permissions not successfully fixed, please run chmod 660")
     
 def edit(settings):
   """
@@ -198,7 +231,8 @@ def edit(settings):
   try:
     tree = ET.parse(settings.filename)
   except Exception:
-    print "Error: Could not parse {}".format(settings.filename)
+    print_error("Could not parse '{}'".format(settings.filename))
+    print "Are you sure it exists?"
     exit(1)
     
   try:
@@ -206,7 +240,8 @@ def edit(settings):
     problem.parse_tree(tree, validate_versions=False)
     version = problem.newest_version()
   except ImproperXmlException:
-    print "Error: {} has invalid problem XML. Try `validate'".format(settings.filename)
+    print_error("{} has invalid problem XML.".format(settings.filename))
+    print "Try running `validate' to help find possible causes."
     exit(1)
     
   if settings.remove_todo:
@@ -231,7 +266,7 @@ def validate(settings):
   TODO: INCOMPLETE
   """
   if not settings.filename.endswith(".xml"):
-    print "Error: {} must have a .xml extension to interoperate with build tool".format(settings.filename)
+    print_error("{} must have a .xml extension to interoperate with build tool".format(settings.filename))
     
   
   invalid_lt = re.compile("<(?!/?(problem|usedin|version|authors?|year|topics?|types?|param|deps?|dependency|dependencies|body|solution|rubric))")
