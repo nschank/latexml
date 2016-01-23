@@ -60,3 +60,4 @@ problems/
 *.pdf
 proj.odo
 config
+include/

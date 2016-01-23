@@ -7,6 +7,7 @@ from subprocess import call
 from random import randint
 from config import get_problem_root
 import xml.etree.ElementTree as ET
+from color import print_warning, print_error
 
 def satisfies(version, settings, used_ins):
   if (settings.allowed_topics and 
@@ -62,7 +63,7 @@ def build(document, filename, solutions=False, rubrics=False, metadata=False):
     filename = filename[:-4]
     assert filename
   else:
-    print "Warning: Output will be named {}.pdf".format(filename)
+    print_warning("Output will be named '{}.pdf'".format(filename))
   if document.versions:
     tempfilename = filename + ".tmp" + str(randint(0,100000))
     with open(tempfilename + ".tex", "w") as f:
@@ -72,13 +73,15 @@ def build(document, filename, solutions=False, rubrics=False, metadata=False):
     os.remove(tempfilename + ".log")
     if code:
       os.rename(tempfilename + ".tex", filename + ".tex")
-      print "\n\nError: pdflatex reported an error."
-      print "Temporary LaTeX file {} not deleted so that it can be manually inspected, if desired.".format(filename + ".tex")
+      print "\n\n"
+      print_error("pdflatex reported an error.")
+      print "Temporary LaTeX file '{}' not deleted so that it can be manually inspected, if desired.".format(filename + ".tex")
       os.remove(tempfilename + ".pdf")
       exit(1)
     os.remove(tempfilename + ".tex")
     while os.path.exists(filename + ".pdf"):
-      print "\nWarning: {} already exists.".format(filename + ".pdf")
+      print "\n"
+      print_warning("'{}' already exists.".format(filename + ".pdf"))
       response = raw_input("Type a new name or a blank line to replace file: ")
       if not response: break
       elif response.endswith(".pdf"):
@@ -88,7 +91,8 @@ def build(document, filename, solutions=False, rubrics=False, metadata=False):
         filename = response
     os.rename(tempfilename + ".pdf", filename + ".pdf")
   else:
-    print "Error: No problems were added to the build successfully"
+    print_error("No problems were added to the build successfully")
+    print "This could mean no problems were found, no problems matched the criteria, or no problems could be accessed."
 
 def build_doc(settings):
   document = Document(settings.document)
@@ -97,7 +101,7 @@ def build_doc(settings):
     document.parse_tree(tree)
     build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
   except (ImproperXmlException, ET.ParseError):
-    print "Error: Could not parse {}".format(settings.document)
+    print_error("Could not parse {}".format(settings.document))
     
   
     
@@ -131,7 +135,7 @@ def build_if(settings):
             if e.errno != errno.EACCES: raise
     build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
   else:
-    print "Error: The directory {} does not exist".format(settings.directory)
+    print_error("The directory '{}' does not exist".format(settings.directory))
   
 def build_single(settings):
   document = Document("")
@@ -143,8 +147,9 @@ def build_single(settings):
   outname = ""
   if settings.problem.endswith(".xml"):
     outname = settings.problem[:-4] + ".pdf"
+    assert outname != ".pdf"
   else:
-    print "Error: problem file does not have a .xml extension"
+    print_error("Problem file does not have a .xml extension")
     exit(1)
   
   try:
@@ -156,7 +161,8 @@ def build_single(settings):
     
     document.versions.append(version)
   except (ImproperXmlException, ET.ParseError):
-    print "Warning: Could not parse {}".format(settings.problem)
+    print_warning("Could not parse '{}'".format(settings.problem))
+    print "Run '22edit validate' to check for common problems."
       
   build(document, outname, settings.solutions, settings.rubrics, settings.metadata)
 
@@ -177,7 +183,7 @@ def build_specific(settings):
       
       document.versions.append(version)
     except (ImproperXmlException, ET.ParseError):
-      print "Warning: Could not parse {}".format(settings.filename)
+      print_warning("Could not parse {}".format(settings.filename))
       
   build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
     

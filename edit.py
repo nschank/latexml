@@ -8,37 +8,8 @@ from parseable import ImproperXmlException
 from config import get_topics, get_types
 from copy import deepcopy
 from datetime import date
+from color import *
 
-CLEAR_COLOR = "\033[0;0m"
-BLACK = 0
-RED = 1
-GREEN = 2
-YELLOW = 3
-BLUE = 4
-MAGENTA = 5
-CYAN = 6
-WHITE = 7
-
-def color_code(color, foreground=True, bold=False):
-  ret = "\033["
-  if foreground:
-    ret = ret + "3" + str(color)
-  elif bold:
-    ret = ret + "10" + str(color)
-  else:
-    ret = ret + "4" + str(color)
-  if bold and foreground:
-    ret = ret + ";1"
-  elif foreground:
-    ret = ret + ";22"
-  return ret + "m"
-  
-def print_error(message):
-  print color_code(RED, bold=True) + "Error: " + CLEAR_COLOR + message
-  
-def print_warning(message):
-  print color_code(YELLOW, bold=True) + "Warning: " + CLEAR_COLOR + message
-  
 stylistic_errors = {
   re.compile(r"HINT|Hint: |\\text(?:bf|it){\s*[Hh]int:?\s*}:?"):r"Use the \hint command instead.",
   re.compile(r"Note: |\\text(?:bf|it){\s*[Nn]ote:?\s*}:?"):r"Use the \note command instead.",
