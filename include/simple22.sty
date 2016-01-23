@@ -11,6 +11,7 @@
 \usepackage{framed}
 \usepackage{mdframed}
 \usepackage{cancel}
+\usepackage{mathtools}
 
 %Page formatting
 \usepackage[letterpaper,voffset=-.5in,bmargin=3cm,footskip=1cm]{geometry}
@@ -30,6 +31,9 @@
 \newcommand\E{\operatorname{E}}
 \newcommand\V{\operatorname{V}}
 \newcommand\Pow{\ensuremath{\operatorname{\mathcal{P}}}}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 % 22 style
 \newcommand\hint[1]{\textbf{Hint}: #1}

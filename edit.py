@@ -9,6 +9,19 @@ from config import get_topics, get_types
 from copy import deepcopy
 from datetime import date
 
+stylistic_errors = {
+  re.compile(r"HINT|Hint: |\\text(?:bf|it){\s*[Hh]int:?\s*}:?"):r"Use the \hint command instead.",
+  re.compile(r"Note: |\\text(?:bf|it){\s*[Nn]ote:?\s*}:?"):r"Use the \note command instead.",
+  re.compile(r"\\(?:small|med|big)skip"):r"Use two newlines to separate paragraphs.",
+  re.compile(r"\$\$"):r"Use \[x\] instead of $$x$$ to produce an equation.",
+  re.compile(r"\\(?:bmod|pod|mod)(?![A-Za-z])"):r"Always use \pmod.",
+  re.compile(r"\\mathbb(?: N|\{N\})"):r"Use \N instead.",
+  re.compile(r"\\mathbb(?: Z|\{Z\})"):r"Use \Z instead.",
+  re.compile(r"\\mathbb(?: R|\{R\})"):r"Use \R instead.",
+  re.compile(r"\\mathbb(?: Q|\{Q\})"):r"Use \Q instead.",
+  re.compile(r"\\mathcal(?: P|\{P\})"):r"Use \Pow instead."
+}
+
 def indent(elem, level=0):
   """
   Edits an XML tree so that it indents nicely when written.
@@ -271,6 +284,14 @@ def validate(settings):
     print "Warning: Unknown author"
   if "unknown" == newest.year.lower():
     print "Warning: Unknown year" 
+    
+  for search_term, msg in stylistic_errors.iteritems():
+    for search_space in [newest.body, newest.solution, newest.rubric]:
+      results = re.search(search_term, search_space)
+      if results:
+        print "Error: Found problematic text \"{}\"".format(results.group(0))
+        print msg   
+        exit(1)
   
   print "\nLooks good to me!"
   sol = "TODO" in newest.solution
