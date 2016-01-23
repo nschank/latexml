@@ -27,6 +27,9 @@
     The criteria for inclusion can be specified with any or all of the following flags, where a problem will be included only if it satisfies all specified flags.
     \begin{description}
       \item[\texttt{--allowed-topics}] After this flag, include one or more topic names, separated by spaces. A problem will be included only if its topics are a subset of this list. \textbf{Common use case}: List all topics that the students have learned so far, and you will never include problems that they are not qualified to answer.
+      \item[\texttt{--authors}] After this flag, include one or more 
+          logins separated by whitespace. A problem will be included only if
+          it shares at least one author with this list.
       \item[\texttt{--grep}] After this flag, include one or more search terms separated by whitespace. A problem will be included only if each search term is present in either the body, solution, or rubric. The search is case insensitive, but note that it is searching the raw \LaTeX\ so is sensitive to formatting and whitespace.
       \item[\texttt{--not-used-in}] If present, only includes problems that were not used in any of the years given. Use `none' to only include problems that have been used in at least one homework.
       \item[\texttt{--required-topics}] After this flag, include one or more topic names, separated by spaces. A problem will be included only if it has at least one required topic. Note that it does not need to possess \textit{all} required topics. \textbf{Common use case}: List the topics that the homework should focus on to get a good set of tentative problems for a homework.

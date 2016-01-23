@@ -3,33 +3,36 @@
   
   \subsection{Problem XML Specification}
     Here is a sample problem, for the sake of explanation:
+{
+  \newcommand\TB{\hspace*{1em}}
     \begin{mdframed}
-      \begin{lstlisting}[language=XML,columns=fullflexible,breaklines=true]
-<problem>
-  <usedin year="2015">Homework 5</usedin>
-  <usedin year="2014" private="true">Midterm 1</usedin>
-  <version id="2">
-    <author>cjk</author>
-    <year>2016</year>
-    <topics>number_theory graph_theory</topics>
-    <types>proof induction</types>
-    <param name="modulus">3</param>
-    <dependency>tikz</dependency>
-    <body>
-      The modulus is \modulus.
-    </body>
-    <solution>
-      TODO
-    </solution>
-    <rubric>
-      TODO
-    </rubric>
-  </version>
-  <version id="1">
-    ...
-  </version>
+      \texttt{
+<problem>\\
+\TB<usedin year=}``\textit{2015}''\texttt{>}Homework 5\texttt{</usedin>\\
+\TB<usedin year=}``\textit{2014}''\texttt{>}Midterm 1\texttt{</usedin>\\
+\TB<version id=}``\textit{2}''\texttt{>\\
+\TB\TB<author>}cjk\texttt{</author>\\
+\TB\TB<year>}2016\texttt{</year>\\
+\TB\TB<topics>}number\_theory graph\_theory\texttt{</topics>\\
+\TB\TB<types>}proof induction\texttt{</types>\\
+\TB\TB<param name=}``\textit{modulus}''\texttt{>}3\texttt{</param>\\
+\TB\TB<dependency>}tikz\texttt{</dependency>\\
+\TB\TB<body>}\\
+\TB\TB\TB The modulus is \textbf{\textbackslash modulus}.\\
+\TB\TB\texttt{</body>\\
+\TB\TB<solution>}\\
+\TB\TB\TB Solution to problem goes 
+  \textbf{\textbackslash textit}\texttt{\{}\textit{here}\texttt{\}}\\
+\TB\TB\texttt{</solution>\\
+\TB\TB<rubric>\\
+\TB\TB\TB}Problem rubric goes here\texttt{\\
+\TB\TB</rubric>\\
+\TB</version>\\
+\TB<version id=}``\textit{1}''\texttt{>\\
+\TB\TB...\\
+\TB</version>\\
 </problem>
-      \end{lstlisting}
+}
     \end{mdframed}
     
     \textbf{A problem XML file must have the extension `.xml' or it will not be incorporated into PDF builds.}

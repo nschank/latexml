@@ -1,0 +1,39 @@
+\section{Command Cheat Sheet}
+  \begin{center}
+    \begin{tabular}{|p{7.5cm}|p{7.5cm}|}
+    \hline
+      \textbf{Command} & \textbf{Result} \\\hline
+      \texttt{\pytool new problem.xml -i} & 
+        Create a new problem file called \texttt{problem.xml}, and
+        specify its topics and types using the \texttt{edit} tool \\\hline
+      \texttt{\pytool edit problem.xml} &
+        An interactive tool for changing the topics or types of a problem 
+        \\\hline
+      \texttt{\pytool branch problem.xml -c} &
+        Adds a new version to the problem, copied from the previous version.
+        Omit the \texttt{-c} to add an empty version. \\\hline
+      \texttt{\pytool validate problem.xml} & 
+        Finds common mistakes and ensures
+        a file conforms to the style guide. All problems you write should
+        successfully validate before you put them into the problem folder.
+        \\\hline
+      \texttt{\pybuild single problem.xml -rms} &
+        Renders a single problem (with its metadata, rubric, and solution) into
+        \texttt{problem.pdf} \\\hline
+      \texttt{\pybuild all --required-topics logic counting -rms} &
+        Renders all problems in the problem root that have either logic or
+        counting as one of their topics. \\\hline
+      \texttt{\pybuild all --authors \`{ }whoami\`{ }} &
+        Renders all problems in the problem root that you helped write. 
+        \\\hline
+      \texttt{\pybuild all --authors \`{ }whoami\`{ } --todo -rms} &
+        Renders all problems in the problem root that you wrote, and that still
+        need a rubric or a solution. \\\hline
+      \texttt{\pybuild all --grep foo bar -rms} &
+        Renders all problems in the problem root which contain the text
+        `foo' and the text `bar' (case insensitive). \\\hline
+      \texttt{\pybuild all --written 2016} &
+        Renders all problems in the problem root which were written this year. 
+        \\\hline
+    \end{tabular}
+  \end{center}

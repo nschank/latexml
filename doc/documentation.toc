@@ -23,3 +23,4 @@
 \contentsline {subsection}{\numberline {7.1}22-Specific Macros}{18}
 \contentsline {subsection}{\numberline {7.2}\LaTeX \ Tips}{18}
 \contentsline {subsection}{\numberline {7.3}Adding to This List}{19}
+\contentsline {section}{\numberline {8}Command Cheat Sheet}{20}

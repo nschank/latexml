@@ -1,29 +1,61 @@
 \section{Installation}
-  To use \LaTeX ML, you must be using some version of Python 2, and must have \texttt{pdflatex} installed on your system. The following Python packages are also required:
+  To use \LaTeX ML, you must be using some version of Python 2, and must have 
+  \texttt{pdflatex} installed on your system. The following Python packages are 
+  also required:
   
-  \begin{itemize}
+  \begin{itemize}\itemsep0pt
     \item \texttt{argparse}
     \item \texttt{xml}
   \end{itemize}
   
-  The environment variable \texttt{LATEXML\_CONFIG} must be set to the location of a valid configuration XML file in order to run \LaTeX ML. If you are a CS22 TA (in the \texttt{cs022ta} group) using a department machine, this should be done for you -- talk to an HTA if an error appears referring to \texttt{LATEXML\_CONFIG}.
+  The environment variable \texttt{LATEXML\_CONFIG} must be set to the location 
+  of a valid configuration XML file in order to run \LaTeX ML. If you are a CS22
+  TA (in the \texttt{cs022ta} group) using a department machine, this should be
+  done for you -- talk to an HTA if an error appears referring to 
+  \texttt{LATEXML\_CONFIG}.
   
-  If you are on your home computer, the next few sections will help you set up your configuration file correctly. Note that \LaTeX ML doesn't currently port well to Windows unless you are using Cygwin or another Unix-like environment -- Nick will try to figure out how to do this soon!
+  If you are on your home computer, the next few sections will help you set up 
+  your configuration file correctly.
   
   \subsection{Requests and Complaints}
-    Please tell Nick the moment something doesn't work, or something is harder than it should be. This is meant to simplify your life significantly: if there is a particular tool you think might help you write things more efficiently, Nick would love to at least hear about it (or tell you why it's impossible, that's fun too). If something is confusing or buggy, also say so -- I can't fix something if I don't know it's broken!
+    Please tell Nick the moment something doesn't work, or something is harder
+    than it should be. This is meant to simplify your life significantly: if
+    there is a particular feature that would help you write things more 
+    efficiently, Nick would love to at least hear about it (or tell you 
+    why it's impossible, that's fun too). If something is confusing or 
+    buggy, also say so -- I can't fix something if I don't know it's broken!
     
-    Also feel free, if you are good with Python, to submit a pull request in git.
+    Also feel free, if you are good with Python, to submit a pull request 
+    in git.
     
   \subsection{Installation on Home Computers}  
     \newcommand\mytilde{\raise.17ex\hbox{$\scriptstyle\sim$}}
     \newcommand\ttquote{\texttt{\char`\"}}
   
-    First, open a terminal (Linux or Mac) or Cygwin (Windows - currently do not know another option, sorry!). Create a new folder where \LaTeX ML will be installed (\texttt{mkdir \mytilde/latexml}) and switch into it (\texttt{cd \mytilde/latexml}). Download \LaTeX ML using git by running \[\texttt{git clone https://www.github.com/nschank/latexml}\]
+    First, open a terminal (Linux or Mac) or Cygwin (Windows - currently do not
+    know another option, sorry!). Create a new folder where \LaTeX ML will 
+    be installed (\texttt{mkdir \mytilde/latexml}) and switch into it (
+    \texttt{cd \mytilde/latexml}). Download \LaTeX ML using git by running 
+    \[\texttt{git clone https://www.github.com/nschank/latexml}\]
     
-    Open your bashrc file (\texttt{\mytilde/.bashrc}) and add the line: \[\texttt{export LATEXML\_CONFIG=\ttquote /home/\textit{login}/latexml/config/config.xml\ttquote}\] We also recommend adding aliases to the tools by adding the lines \[\texttt{alias 22build=\ttquote python /home/\textit{login}/latexml/build.py\ttquote}\]\[\texttt{alias 22edit=\ttquote python /home/\textit{login}/latexml/edit.py\ttquote}\]
+    Open your .bashrc file (\texttt{\mytilde/.bashrc})
+    \footnote{In some systems, this is .bash\_profile.} 
+    and add the line: 
+    \[\texttt{export LATEXML\_CONFIG=\ttquote /home/\textit{login}/latexml/
+    config/config.xml\ttquote}\] We also recommend adding aliases to the 
+    tools by adding the lines 
+    \[\texttt{alias 22build=\ttquote python /home/\textit{login}/latexml/build.py\ttquote}\]
+    \[\texttt{alias 22edit=\ttquote python /home/\textit{login}/latexml/edit.py\ttquote}\]
     
-    Now open the config.xml file in \texttt{\mytilde/latexml/config}. Change the \texttt{include} tag to contain the path \[\texttt{/home/\textit{login}/latexml/include/simple22.sty}\] This is the location of the header file inserted into the top of built documents. The other tags should not be changed; if you ever need to build an assignment xml file locally, you may need to change the \texttt{problemroot} to a folder of your preference, but that seems unlikely.
+    Now open the config.xml file in \texttt{\mytilde/latexml/config}. 
+    Change the contents of the \texttt{include} tag to contain the path 
+    \[\texttt{/home/\textit{login}/latexml/include/simple22.sty}\] 
+    This is the location of 
+    the header file inserted sinto the top of built documents. You may optionally
+    add a directory of your preference as the \texttt{problemroot} -- this
+    is where \texttt{\pybuild all} and \texttt{\pybuild doc} search, but
+    it is not necessary for single problems or for editing.
     
-    You should now run the tests (\texttt{python tests.py}) to make sure that everything is running smoothly.
+    You should now run the tests (\texttt{python tests.py}) to make sure that 
+    everything is running smoothly.
     
