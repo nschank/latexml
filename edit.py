@@ -222,6 +222,7 @@ def validate(settings):
     
   
   invalid_lt = re.compile("<(?!/?(problem|usedin|version|authors?|year|topics?|types?|param|deps?|dependency|dependencies|body|solution|rubric))")
+  invalid_amp = re.compile("&(?!\w{1,10};)")
 
   # Some more manual checking  
   with open(settings.filename) as f:
@@ -234,6 +235,13 @@ def validate(settings):
       if problem_lt:
         print "Invalid < character on line {} at character {}".format(num+1,
             problem_lt.start())
+        print "A literal < can be escaped using \"&lt;\" instead."
+        exit(1)
+      problem_amp = re.search(invalid_amp, line)
+      if problem_amp:
+        print "Invalid raw & character on line {} at character {}".format(num+1,
+            problem_amp.start())
+        print "A literal & can be escaped by using \"&amp;\" instead."
         exit(1)
       
   try:
