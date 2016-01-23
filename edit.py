@@ -223,7 +223,8 @@ def validate(settings):
   
   invalid_lt = re.compile("<(?!/?(problem|usedin|version|authors?|year|topics?|types?|param|deps?|dependency|dependencies|body|solution|rubric))")
   invalid_amp = re.compile("&(?!\w{1,10};)")
-
+  invalid_char = re.compile(r"[^\x00-\x7f]")
+  
   # Some more manual checking  
   with open(settings.filename) as f:
     for num, line in enumerate(f):
@@ -242,6 +243,10 @@ def validate(settings):
         print "Invalid raw & character on line {} at character {}".format(num+1,
             problem_amp.start())
         print "A literal & can be escaped by using \"&amp;\" instead."
+        exit(1)
+      problem_char = re.search(invalid_char, line)
+      if problem_char:
+        print "Error: Invalid non-ASCII character on line {} at character {}".format(num+1, problem_char.start())
         exit(1)
       
   try:
