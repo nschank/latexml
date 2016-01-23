@@ -246,13 +246,14 @@ def validate(settings):
   invalid_amp = re.compile("&(?!\w{1,10};)")
   invalid_char = re.compile(r"[^\x00-\x7f]")
   
+  too_long = False
+  
   # Some more manual checking  
   with open(settings.filename) as f:
     for num, line in enumerate(f):
       if len(line) > 80:
-        print_error("Line {} too long ({} characters)".format(num+1, len(line)))
-        print "For editor friendliness, all lines must be less than 80 characters"
-        exit(1)
+        print_warning("Line {} too long ({} characters)".format(num+1, len(line)))
+        too_long = True
       problem_lt = re.search(invalid_lt, line)
       if problem_lt:
         print_error("Invalid < character on line {} at character {}".format(num+1, problem_lt.start()))
@@ -282,9 +283,9 @@ def validate(settings):
   newest = problem.newest_version()
   
   if "unknown" in map(str.lower, newest.authors):
-    print "Warning: Unknown author"
+    print_warning("Unknown author")
   if "unknown" == newest.year.lower():
-    print "Warning: Unknown year" 
+    print_warning("Unknown year") 
     
   for search_term, msg in stylistic_errors.iteritems():
     for search_space in [newest.body, newest.solution, newest.rubric]:
@@ -294,6 +295,9 @@ def validate(settings):
         print msg   
         exit(1)
   
+  if too_long:
+    print_error("For editor friendliness, all lines must be less than 80 characters")
+    exit(1)
   print color_code(GREEN, bold=True) + "\nLooks good to me!" + CLEAR_COLOR
   sol = "TODO" in newest.solution
   rub = "TODO" in newest.rubric
