@@ -1,5 +1,6 @@
 import argparse
 import os
+import errno
 from parseable import ImproperXmlException
 from problem import Problem, Document
 from subprocess import call
@@ -125,6 +126,9 @@ def build_if(settings):
             
           except (ImproperXmlException, ET.ParseError):
             pass
+          except IOError as e:
+            # Permission errors can be safely skipped
+            if e.errno != errno.EACCES: raise
     build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
   else:
     print "Error: The directory {} does not exist".format(settings.directory)
