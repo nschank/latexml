@@ -37,7 +37,7 @@ def print_error(message):
   print color_code(RED, bold=True) + "Error: " + CLEAR_COLOR + message
   
 def print_warning(message):
-  print color_code(YELLOW) + "Warning: " + CLEAR_COLOR + message
+  print color_code(YELLOW, bold=True) + "Warning: " + CLEAR_COLOR + message
   
 stylistic_errors = {
   re.compile(r"HINT|Hint: |\\text(?:bf|it){\s*[Hh]int:?\s*}:?"):r"Use the \hint command instead.",
@@ -49,7 +49,9 @@ stylistic_errors = {
   re.compile(r"\\mathbb(?: Z|\{Z\})"):r"Use \Z instead.",
   re.compile(r"\\mathbb(?: R|\{R\})"):r"Use \R instead.",
   re.compile(r"\\mathbb(?: Q|\{Q\})"):r"Use \Q instead.",
-  re.compile(r"\\mathcal(?: P|\{P\})"):r"Use \Pow instead."
+  re.compile(r"\\mathcal(?: P|\{P\})"):r"Use \Pow instead.",
+  re.compile(r"\\newcommand(?![A-Za-z])"):r"Use a <param> tag instead.",
+  re.compile(r"\\(?:usepackage|require)(?![A-Za-z])"):r"Use a <dependency> tag instead."
 }
 
 def indent(elem, level=0):
@@ -76,45 +78,45 @@ def interactive_select(space, current):
   their updated selection among space. Requires that the selection be non-empty.
   """
   print "Type an element name, an element index, or an unambiguous prefix to add to your selection."
-  print "Type 'list' to see the list of valid selections/indices."
-  print "Type 'clear' to clear selection."
+  print "Type '" + color_code(MAGENTA) + "list" + CLEAR_COLOR +"' to see the list of valid selections/indices."
+  print "Type '" + color_code(MAGENTA) + "clear" + CLEAR_COLOR +"' to clear selection."
   print "Enter an empty line when done.\n"
         
   done = False
   while not done:
-    print "\nCurrent selection: ", (current if current else "None")
-    tentative = raw_input("Selection or Command: ")
+    print color_code(BLACK, bold=True), "\nCurrent selection" + CLEAR_COLOR + ":", (current if current else "None")
+    tentative = raw_input(color_code(YELLOW) + "Selection or Command" + CLEAR_COLOR + ": ")
     matches = [el for el in space if el.startswith(tentative)]
     try: index = int(tentative)
     except ValueError: index = None
     if tentative == 'list':
       for i,el in enumerate(space):
-        print "\t", i, el
+        print "\t", color_code(BLUE, bold=True), i, CLEAR_COLOR, el
       print "\n"
     elif tentative == 'clear':
       current = []
     elif tentative == '':
       if current:
-        print "\nFinal selection: ", current, "\n\n"
+        print color_code(GREEN), "\nFinal selection" + CLEAR_COLOR + ":", current, "\n\n"
         done = True
       else:
-        print "Error: Must select at least one"
+        print_error("Must select at least one")
     elif len(matches) > 1:
-      print "Error: Multiple matches found for `{}' ({})".format(tentative, matches)
+      print_error("Multiple matches found for `{}' ({})".format(tentative, matches))
     elif len(matches):
       if matches[0] in current:
-        print "Warning: {} was already selected".format(matches[0])
+        print_warning("{} was already selected".format(matches[0]))
       else:
         current.append(matches[0])
     elif index is not None:
       if index < 0 or index >= len(space):
-        print "Error: Invalid index {}".format(index)
+        print_error("Invalid index {}".format(index))
       elif space[index] in current:
-        print "Warning: {} was already selected".format(space[index])
+        print_warning("{} was already selected".format(space[index]))
       else:
         current.append(space[index])
     else:
-      print "Error: Unknown token: {}".format(tentative)
+      print_error("Unknown token: {}".format(tentative))
           
   return current
   
@@ -155,9 +157,9 @@ def branch(settings):
     version.topics = []
     version.types = []
   elif settings.action == 1:
-    print "SELECT TOPICS\n-------------"
+    print color_code(CYAN), "SELECT TOPICS\n-------------", CLEAR_COLOR
     version.topics = interactive_select(get_topics(), version.topics)
-    print "SELECT TYPES\n-------------"
+    print color_code(CYAN), "SELECT TYPES\n-------------", CLEAR_COLOR
     version.types = interactive_select(get_types(), version.types)
   else:
     assert settings.action == 2
@@ -207,9 +209,9 @@ def create_new(settings):
       version.rubric = "\n      TODO\n    "
       
       if settings.interactive:
-        print "SELECT TOPICS\n-------------"
+        print color_code(CYAN), "SELECT TYPES\n-------------", CLEAR_COLOR
         version.topics = interactive_select(get_topics(), [])
-        print "SELECT TYPES\n-------------"
+        print color_code(CYAN), "SELECT TYPES\n-------------", CLEAR_COLOR
         version.types = interactive_select(get_types(), [])
       
       root = problem.to_element()
@@ -250,9 +252,9 @@ def edit(settings):
     if "todo" in version.types:
       version.types.remove("todo")
     
-  print "SELECT TOPICS\n-------------"
+  print color_code(CYAN), "SELECT TYPES\n-------------", CLEAR_COLOR
   version.topics = interactive_select(get_topics(), version.topics)
-  print "SELECT TYPES\n-------------"
+  print color_code(CYAN), "SELECT TYPES\n-------------", CLEAR_COLOR
   version.types = interactive_select(get_types(), version.types)
     
   root = problem.to_element()
@@ -277,44 +279,37 @@ def validate(settings):
   with open(settings.filename) as f:
     for num, line in enumerate(f):
       if len(line) > 80:
-        print "Line {} too long ({} characters)".format(num+1, len(line))
+        print_error("Line {} too long ({} characters)".format(num+1, len(line)))
         print "For editor friendliness, all lines must be less than 80 characters"
         exit(1)
       problem_lt = re.search(invalid_lt, line)
       if problem_lt:
-        print "Invalid < character on line {} at character {}".format(num+1,
-            problem_lt.start())
+        print_error("Invalid < character on line {} at character {}".format(num+1, problem_lt.start()))
         print "A literal < can be escaped using \"&lt;\" instead."
         exit(1)
       problem_amp = re.search(invalid_amp, line)
       if problem_amp:
-        print "Invalid raw & character on line {} at character {}".format(num+1,
-            problem_amp.start())
+        print_error("Invalid raw & character on line {} at character {}".format(num+1, problem_amp.start()))
         print "A literal & can be escaped by using \"&amp;\" instead."
         exit(1)
       problem_char = re.search(invalid_char, line)
       if problem_char:
-        print "Error: Invalid non-ASCII character on line {} at character {}".format(num+1, problem_char.start())
+        print_error("Invalid non-ASCII character on line {} at character {}".format(num+1, problem_char.start()))
         exit(1)
       
   try:
     tree = ET.parse(settings.filename)
   except Exception:
-    print "Error: XML in {} could not be parsed.".format(settings.filename)
+    print_error("XML in {} could not be parsed.".format(settings.filename))
     exit(1)
   try:
     problem = Problem(settings.filename)
     problem.parse_tree(tree)
   except ImproperXmlException as e:
-    print "{}\nRerun validation".format(e.args[0])
+    print_error(e.args[0])
     exit(1)
   newest = problem.newest_version()
-  if "\\newcommand" in newest.body or "\\newcommand" in newest.solution or "\\newcommand" in newest.rubric:
-    print "Should not be using `\\newcommand' within the body, solution, or rubric of a problem XML. Use <param> instead."
-    exit(1)
-  if "\\usepackage" in newest.body or "\\usepackage" in newest.solution or "\\usepackage" in newest.rubric:
-    print "Should not be using `\\usepackage' within the body, solution, or rubric of a problem XML. Use <dependency> instead."
-    exit(1)
+  
   if "unknown" in map(str.lower, newest.authors):
     print "Warning: Unknown author"
   if "unknown" == newest.year.lower():
@@ -324,15 +319,15 @@ def validate(settings):
     for search_space in [newest.body, newest.solution, newest.rubric]:
       results = re.search(search_term, search_space)
       if results:
-        print "Error: Found problematic text \"{}\"".format(results.group(0))
+        print_error("Found problematic text \"{}\"".format(results.group(0)))
         print msg   
         exit(1)
   
-  print "\nLooks good to me!"
+  print color_code(GREEN, bold=True) + "\nLooks good to me!" + CLEAR_COLOR
   sol = "TODO" in newest.solution
   rub = "TODO" in newest.rubric
   if sol or rub:
-    print "Make sure to write a " + ("solution" if sol else "") + (" and " if sol and rub else "") + ("rubric" if rub else "") 
+    print color_code(CYAN) + "Make sure to write a " + ("solution" if sol else "") + (" and " if sol and rub else "") + ("rubric" if rub else "") +CLEAR_COLOR
 
 def add_branch_parser(parser):
   subparser = parser.add_parser('branch', help='Adds a new version to an XML file')
