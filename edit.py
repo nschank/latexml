@@ -1,5 +1,6 @@
 import argparse
 import os
+import re
 import stat
 import xml.etree.ElementTree as ET
 from problem import Problem, Version, UsedIn, Document
@@ -218,6 +219,23 @@ def validate(settings):
   """
   if not settings.filename.endswith(".xml"):
     print "Error: {} must have a .xml extension to interoperate with build tool".format(settings.filename)
+    
+  
+  invalid_lt = re.compile("<(?!/?(problem|usedin|version|authors?|year|topics?|types?|param|deps?|dependency|dependencies|body|solution|rubric))")
+
+  # Some more manual checking  
+  with open(settings.filename) as f:
+    for num, line in enumerate(f):
+      if len(line) > 80:
+        print "Line {} too long ({} characters)".format(num+1, len(line))
+        print "For editor friendliness, all lines must be less than 80 characters"
+        exit(1)
+      problem_lt = re.search(invalid_lt, line)
+      if problem_lt:
+        print "Invalid < character on line {} at character {}".format(num+1,
+            problem_lt.start())
+        exit(1)
+      
   try:
     tree = ET.parse(settings.filename)
   except Exception:
@@ -236,7 +254,12 @@ def validate(settings):
   if "\\usepackage" in newest.body or "\\usepackage" in newest.solution or "\\usepackage" in newest.rubric:
     print "Should not be using `\\usepackage' within the body, solution, or rubric of a problem XML. Use <dependency> instead."
     exit(1)
-  print "Looks good to me!"
+  if "unknown" in map(str.lower, newest.authors):
+    print "Warning: Unknown author"
+  if "unknown" == newest.year.lower():
+    print "Warning: Unknown year" 
+  
+  print "\nLooks good to me!"
   sol = "TODO" in newest.solution
   rub = "TODO" in newest.rubric
   if sol or rub:
