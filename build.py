@@ -65,7 +65,7 @@ def build(document, filename, solutions=False, rubrics=False, metadata=False):
       assert filename
     else:
       print_warning("Output will be named '{}.pdf'".format(filename))
-    tempfilename = ".tmp22" + filename + str(randint(0,100000))
+    tempfilename = filename + ".22tmp." + str(randint(0,100000))
     with open(tempfilename + ".tex", "w") as f:
       f.write(document.build(solutions, rubrics, metadata).encode('UTF-8'))
     code = call(["pdflatex", tempfilename + ".tex", "-quiet"])

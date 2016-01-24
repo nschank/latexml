@@ -36,7 +36,7 @@ def builds(version):
   document.blurb = ""
   
   document.versions.append(version)
-  tempfilename = ".tmp22build-" + str(os.getpid()) + str(randint(0,10000000))
+  tempfilename = str(os.getpid()) + ".22tmp" + str(randint(0,10000000))
   with open(tempfilename + ".tex", "w") as f:
     f.write(document.build(True, True, False).encode('UTF-8'))
   code = call(["pdflatex", tempfilename + ".tex", "-draftmode", "-quiet"])
