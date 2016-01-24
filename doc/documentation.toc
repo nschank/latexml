@@ -9,18 +9,18 @@
 \contentsline {section}{\numberline {3}The \textit {Edit} Tool}{10}
 \contentsline {subsection}{\numberline {3.1}Creating a New Problem}{10}
 \contentsline {subsection}{\numberline {3.2}Creating a New Version}{10}
-\contentsline {subsection}{\numberline {3.3}Validating a Problem File}{11}
-\contentsline {subsection}{\numberline {3.4}Editing Topics and Types}{11}
+\contentsline {subsection}{\numberline {3.3}Editing Topics and Types}{11}
+\contentsline {subsection}{\numberline {3.4}Validating a Problem File}{11}
 \contentsline {section}{\numberline {4}The \textit {Build} Tool}{12}
 \contentsline {subsection}{\numberline {4.1}Building Specific Problems}{12}
 \contentsline {subsection}{\numberline {4.2}Building All Problems of a Type}{12}
-\contentsline {section}{\numberline {5}Assignment Files}{14}
-\contentsline {subsection}{\numberline {5.1}Assignment XML Specification}{14}
-\contentsline {subsection}{\numberline {5.2}Building}{15}
-\contentsline {subsection}{\numberline {5.3}Finalizing}{15}
-\contentsline {section}{\numberline {6}Features Being Implemented}{16}
-\contentsline {section}{\numberline {7}\LaTeX \ Style}{17}
-\contentsline {subsection}{\numberline {7.1}22-Specific Macros}{18}
-\contentsline {subsection}{\numberline {7.2}\LaTeX \ Tips}{18}
-\contentsline {subsection}{\numberline {7.3}Adding to This List}{19}
-\contentsline {section}{\numberline {8}Command Cheat Sheet}{20}
+\contentsline {section}{\numberline {5}Assignment Files}{15}
+\contentsline {subsection}{\numberline {5.1}Assignment XML Specification}{15}
+\contentsline {subsection}{\numberline {5.2}Building}{16}
+\contentsline {subsection}{\numberline {5.3}Finalizing}{16}
+\contentsline {section}{\numberline {6}Features Being Implemented}{17}
+\contentsline {section}{\numberline {7}\LaTeX \ Style}{18}
+\contentsline {subsection}{\numberline {7.1}22-Specific Macros}{19}
+\contentsline {subsection}{\numberline {7.2}\LaTeX \ Tips}{19}
+\contentsline {subsection}{\numberline {7.3}Adding to This List}{20}
+\contentsline {section}{\numberline {8}Command Cheat Sheet}{21}

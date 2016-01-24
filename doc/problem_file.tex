@@ -1,5 +1,6 @@
 \section{Problem Files}
-  To write a problem using \LaTeX ML, you must first understand the basics of the XML encoding being used.
+  To write a problem using \LaTeX ML, you must first understand the basics 
+  of the XML encoding being used.
   
   \subsection{Problem XML Specification}
     Here is a sample problem, for the sake of explanation:
@@ -34,48 +35,100 @@
 </problem>
 }
     \end{mdframed}
+}
+    \textbf{A problem XML file must have the extension `.xml' or it will 
+    not be incorporated into PDF builds.}
     
-    \textbf{A problem XML file must have the extension `.xml' or it will not be incorporated into PDF builds.}
+    \textbf{A Problem XML file MUST have root tag \texttt{problem}, which 
+    is made up of one or more child \texttt{version}s.} Loosely speaking, 
+    two `versions' should be part of the same `problem' if having the 
+    solution to one would make writing the other's solution trivial. For 
+    example: adding a part to, theming, or changing the numbers in a 
+    previous year's problem would call for a new version of the problem. 
+    If several different problems are combined into one, that is generally 
+    a new problem (rather than a version of any of them).
     
-    \textbf{A Problem XML file MUST have root tag \texttt{problem}, which is made up of one or more child \texttt{version}s.} Loosely speaking, two `versions' should be part of the same `problem' if having the solution to one would make writing the other's solution trivial. For example: adding a part to, theming, or changing the numbers in a previous year's problem would call for a new version of the problem. If several different problems are combined into one, that is generally a new problem (rather than a version of any of them).
+    \textbf{Each version MUST have exactly one year} (in a \texttt{<year>} 
+    tag), which may be ``Unknown''. This is the year that the version was 
+    written.
     
-    \textbf{Each version MUST have exactly one year} (in a \texttt{<year>} tag), which may be ``Unknown''. This is the year that the version was written.
-    
-    \textbf{Each version MUST have at least one author, at least one topic, and at least one type.} Each of these tags accepts a whitespace separated list of items; thus,
+    \textbf{Each version MUST have at least one author, at least one 
+    topic, and at least one type.} Each of these tags accepts a whitespace 
+    separated list of items; thus,
     \begin{center}
-      \texttt{<authors>cjk nschank\ \ \ kl47</authors>}
+      \texttt{<authors>}cjk nschank\ \ \ kl47\texttt{</authors>}
     \end{center}
-    would be parsed as three authors: cjk, nschank, and kl47. Additional instances of a tag will append to the list, so e.g. multiple \texttt{<author>} tags within a version are allowed.
+    would be parsed as three authors: cjk, nschank, and kl47. Additional 
+    instances of a tag will append to the list, so e.g. multiple 
+    \texttt{<author>} tags within a version are allowed.
     
-    Each of these fields accepts both the singular and plural of their tagname, purely for convenience. Thus...
+    Each of these fields accepts both the singular and plural of their 
+    tagname, purely for convenience. Thus...
     \begin{description}\itemsep0pt
       \item[Authors] \texttt{<author>} or \texttt{<authors>}
       \item[Topic] \texttt{<topic>} or \texttt{<topics>}
       \item[Type] \texttt{<type>} or \texttt{<types>}
     \end{description}
     
-    Note that, while either tagname is accepted, the beginning and ending tags must match.
+    Note that, while either tagname is accepted, the beginning and ending 
+    tags must match.
     
-    See the next section for an explanation of acceptable values for topic and type.
+    See the next section for an explanation of acceptable values for topic 
+    and type.
     
-    \textbf{Each version MUST have a body, a solution, and a rubric.} Each of these fields should be filled with arbitrary \LaTeX; whatever you would have put between \texttt{\textbackslash begin\{document\}} and \texttt{\textbackslash end\{document\}} goes here. It is expected that, if a solution or rubric is not complete, the four letters ``TODO'' (case insensitive) should appear somewhere within their text. This allows the \LaTeX ML tools to keep track of any problems that need attention.
+    \textbf{Each version MUST have a body, a solution, and a rubric.} 
+    Each of these fields may be filled with arbitrary \LaTeX; whatever you 
+    would have put between \texttt{\textbackslash begin\{document\}} and 
+    \texttt{\textbackslash end\{document\}} goes here. It is expected 
+    that, if a solution or rubric is not complete, the four letters ``TODO'' 
+    (case insensitive) should appear somewhere within their text. This 
+    allows the \LaTeX ML tools to keep track of any problems that need 
+    attention. (See the command cheat sheet for an example of how you can use
+    this feature.)
     
-    As an important note, the characters \&, $<$, and $>$ are special characters within XML. In order for the problem to be parsed, you MUST escape them with the XML sequences \texttt{\&amp;}, \texttt{\&lt;}, and \texttt{\&gt;} respectively. They will be unescaped before being parsed as \LaTeX, so should be treated identically to their corresponding characters (e.g. tables will contain many instances of ``\texttt{\&amp;}'').
+    As an important note, the characters \&\ and $<$ are special 
+    characters within XML. In order for the problem to be parsed, you MUST 
+    escape them with the XML sequences \texttt{\&amp;}, \texttt{\&lt;}, 
+    and \texttt{\&gt;} respectively. They will be unescaped before being 
+    parsed as \LaTeX, so should be treated identically to their 
+    corresponding characters (e.g. tables will contain many instances of ``
+    \texttt{\&amp;}'').
     
-    \textbf{Each version MUST have an \texttt{id} attribute, unique within the problem, set to a positive integer, such that the newest version has the highest ID.}
+    \textbf{Each version MUST have an \texttt{id} attribute, unique within 
+    the problem, set to a positive integer, such that the newest version 
+    has the highest ID.}
     
-    A version MAY have zero or more \texttt{param} or, equivalently, \texttt{parameter} tags, which MUST have a name attribute. This is equivalent to temporarily creating a command \texttt{\textbackslash name} which produces the value given in the tag's field. In the provided example, the command ``\texttt{\textbackslash modulus}'' will evaluate to 3. This field is intended for use within problems that can be easily changed without needing to create a new version. As an example, the name of a person or object within a problem should be refactored into a parameter, so that the problem can be changed easily.
+    A version MAY have zero or more \texttt{param} or, equivalently, 
+    \texttt{parameter} tags, which MUST have a \textit{name} attribute. This is 
+    equivalent to temporarily creating a command \texttt{\textbackslash 
+    name} which produces the value given in the tag's field. In the 
+    provided example, the command ``\texttt{\textbackslash modulus}'' will 
+    evaluate to 3. This field is intended for use within problems that can 
+    be easily changed without needing to create a new version. As an 
+    example, the name of a person or object within a problem should be 
+    refactored into a parameter, so that the problem can be changed more easily.
     
-    A version MAY have zero or more \texttt{dependency} (also allowed: \texttt{dep}, \texttt{deps}, \texttt{dependencies}) tags, each of which should be a whitespace-separated list of packages which are required in order to build the problem. \texttt{tikz} is the most commonly included by far. These dependencies will by dynamically imported when building an assignment including this problem.
+    A version MAY have zero or more \texttt{dependency} (also allowed: 
+    \texttt{dep}, \texttt{deps}, \texttt{dependencies}) tags, each of 
+    which should be a whitespace-separated list of packages which are 
+    required in order to build the problem. \texttt{tikz} is the most 
+    commonly included by far. These dependencies will by dynamically 
+    imported when building an assignment including this problem.
     
     \texttt{usedin} tags should never be created or edited by hand.
   
   \subsection{Topics}
-    A \textbf{topic} is a unit of the class which a question is attempting to focus on. A problem-version may have multiple topics (we encourage it!), and the topics should be kept specific but not overly so. Any unrecognized topic within a topic list is considered a fatal error.
+    A \textbf{topic} is a unit of the class which a question is attempting 
+    to focus on. A problem-version may have multiple topics (we encourage 
+    it!), and the topics should be kept specific but not overly so. Any 
+    unrecognized topic within a topic list is considered a fatal error.
     
     Allowed topics are:
     \begin{itemize}\itemsep0pt
-      \item basic\footnote{The `basic' topic should be included on anything that could go on the first homework, before we have really introduced any definitions. As an example, \textit{Prove that $\sqrt 2$ is irrational} would be in the basic topic.}
+      \item basic\footnote{The `basic' topic should be included on 
+      anything that could go on the first homework, before we have really 
+      introduced any definitions. As an example, \textit{Prove that $\sqrt 
+      2$ is irrational} would be in the basic topic.}
       \item big\_o
       \item bijections
       \item circuits
@@ -89,50 +142,104 @@
       \item probability
       \item relations
       \item set\_theory
-      \item todo\footnote{If the topics field of a version should be looked at later (e.g. you are unsure about one and want to return to it), \textit{always} include todo as a topic.}
+      \item todo\footnote{If the topics field of a version should be 
+      looked at later (e.g. you are unsure about one and want to return to 
+      it), \textit{always} include todo as a topic.}
     \end{itemize}
     
-    If ever confused about what topic(s) a problem covers, consider that the topics field is meant to be organizational. Keep two questions in mind:
+    If ever confused about what topic(s) a problem covers, consider that 
+    the topics field is meant to be organizational. Keep two questions in mind:
     
     \begin{enumerate}[1.]\itemsep0pt
-      \item If Carly were making the final exam, and wanted to include a question on this topic, would she want to see this problem? If so, include the topic!
-      \item Does the question mention or incorporate a topic, even if the question doesn't seem to be ``about'' that topic? For instance, does this graph theory question define a relation? Is this probability question asking about circuits? Always include \textit{both} topics -- we like to include questions that bring together multiple units, so that students can find connections and recall old definitions.
+      \item If Carly were making the final exam, and wanted to include a 
+      question on this topic, would she want to see this problem? If so, 
+      include the topic!
+      \item Does the question mention or incorporate a topic, even if the 
+      question doesn't seem to be ``about'' that topic? For instance, does 
+      this graph theory question define a relation? Is this probability 
+      question asking about circuits? Always include \textit{both} topics 
+      -- we like to include questions that bring together multiple units, 
+      so that students can find connections and recall old definitions.
     \end{enumerate}
   
   \subsection{Types}
-    A \textbf{type} is a characteristic of the question itself, and is equivalent to a `tag' in many other contexts. (The name `type' is used to differentiate from an XML tag.) Like topics, questions can (and usually do) have multiple types. Any unknown type is a fatal error.
+    A \textbf{type} is a characteristic of the question itself, and is 
+    equivalent to a `tag' in many other contexts. (The name `type' is used 
+    to differentiate from an XML tag.) Like topics, questions can (and 
+    usually do) have multiple types. Any unknown type is a fatal error.
     
     The acceptable types (and their meanings):
     \begin{description}
-      \item[computation] Any part of the question requires numerical computation \textit{with little justification}, or asks for an explicit instance of something.
+      \item[computation] Any part of the question requires numerical 
+      computation \textit{with little justification}, or asks for an 
+      explicit instance of something.
       
-      \textit{Examples}: Encrypt this using RSA; determine the size of this set; provide a coloring of this graph; use Chinese Remainder Theorem; show these logical statements are equivalent using set algebra.
+        \textit{Examples}: Encrypt this using RSA; determine the size of 
+        this set; provide a coloring of this graph; use Chinese Remainder 
+        Theorem; show these logical statements are equivalent using set 
+        algebra.
       
-      \textit{Non-example}: Convert these logical expressions to English (see \textbf{notation}); counting questions (these usually require justification)
-      \item[core] This question is an extremely common question that is definitely simple to Google, but also very important to the class. Some subset of these questions are proven in class every year.
+        \textit{Non-example}: Convert these logical expressions to English 
+        (see \textbf{notation}); counting questions (these usually require 
+        justification)
+      \item[core] This question is an extremely common question that is 
+      definitely simple to Google, but also very important to the class. 
+      Some subset of these questions are proven in class every year.
       
-      \textit{Examples}: Prove the infinitude of primes; prove that $\mod$ is an equivalence relation; prove that there are an equal number of odd- and even-cardinality subsets of any set.
-      \item[contradiction] Any part of the question explicitly asks for a proof by contradiction, or it is the only feasible way to solve the problem.
-      \item[contrapositive] Any part of the question is a proof by contrapositive.
-      \item[direct] Any part of the question explicitly asks for a direct proof, or it is the only feasible way to solve the problem.
-      \item[element\_method] Any part of the question asks for a proof that two sets are equal. (It does not need to say `element method' explicitly)
+        \textit{Examples}: Prove the infinitude of primes; prove that 
+        $\mod$ is an equivalence relation; prove that there are an equal 
+        number of odd- and even-cardinality subsets of any set.
+      \item[contradiction] Any part of the question explicitly asks for a 
+      proof by contradiction, or it is the only feasible way to solve the 
+      problem.
+      \item[contrapositive] Any part of the question is a proof by 
+      contrapositive.
+      \item[direct] Any part of the question explicitly asks for a direct 
+      proof, or it is the only feasible way to solve the problem.
+      \item[element\_method] Any part of the question asks for a proof 
+      that two sets are equal. (It does not need to say `element method' 
+      explicitly.)
       \item[induction] Any part of the question is a proof by induction.
-      \item[large] This question has multiple ($>3$) \textit{small} parts \textit{that build upon each other}, generally while getting progressively harder. If you think your question is hard or long, but it does not satisfy the previous sentence, you should fix that.
+      \item[large] This question has multiple ($>3$) \textit{small} parts 
+      \textit{that build upon each other}, generally while getting 
+      progressively harder. If you think your question is hard or long, 
+      but it does not satisfy the previous sentence, you should fix that.
       
-      As a general note, the first part of a `large' problem should be very easy (often just a computation question meant to ease the student in). See a later section on writing good problems.
-      \item[needs\_work] If you come across a problem that you think needs to be looked at again or rewritten, add the `needs\_work' type so that someone can come look at it. 
-      \item[notation] This question is meant to help the student practice notation.
+      As a general note, the first part of a `large' problem should be 
+      very easy (often just a computation question meant to ease the 
+      student in). See a later section on writing good problems.
+      \item[needs\_work] If you come across a problem that you think needs 
+      to be looked at again or rewritten, add the `needs\_work' type so 
+      that someone can come look at it. 
+      \item[notation] This question is meant to help the student practice 
+      notation.
       
-      \textit{Example}: Put this into set-builder notation.
-      \item[piece] This question is very short, and could probably be incorporated into another problem. This type is a bit subtle: in general, a `piece' is a question that has one or two parts (usually short proofs) that are not all that interesting by themselves. They are called `pieces' because, when trying to come up with interesting problems, we can use several of them as inspiration to build a `large' problem with many small parts.
+        \textit{Example}: Put this into set-builder notation.
+      \item[piece] This question is very short, and could probably be 
+      incorporated into another problem. This type is a bit subtle: in 
+      general, a `piece' is a question that has one or two parts (usually 
+      short proofs) that are not all that interesting by themselves. They 
+      are called `pieces' because, when trying to come up with interesting 
+      problems, we can use several of them as inspiration to build a `
+      large' problem with many small parts.
       
-      \textit{Example}: ``Given a set of 52 distinct integers, show that there must be 2 whose sum or difference is divisible by 100.'' Easy and not very interesting, but could be used very well as a lead-in to a question about a more general property of divisibility and pigeonhole.
+        \textit{Example}: ``Given a set of 52 distinct integers, show that 
+        there must be 2 whose sum or difference is divisible by 100.'' 
+        Easy and not very interesting, but could be used very well as a 
+        lead-in to a question about a more general property of 
+        divisibility and pigeonhole.
       \item[proof] Any part of the question asks for a non-trivial proof. 
-      \item[repetitive] A question which asks you to do the same thing to several different examples.
+      \item[repetitive] A question which asks you to do the same thing to 
+      several different examples.
       
-      \textit{Example}: For each of the following relations, state whether they are injective, surjective, or both; turn the following logical expressions into circuits.
-      \item[todo] If the types field of a version should be looked at later (e.g. you are unsure about one and want to return to it), \textit{always} include todo as a type.
+        \textit{Example}: For each of the following relations, state 
+        whether they are injective, surjective, or both; turn the 
+        following logical expressions into circuits.
+      \item[todo] If the types field of a version should be looked at 
+      later (e.g. you are unsure about one and want to return to it), 
+      \textit{always} include todo as a type.
     \end{description}
     
   \subsection{Usage}
-    Look at the next section for a summary of tools to help you create and edit problem files. The section following that looks at how to build problem files into PDFs.
+    The next two sections cover how to effectively edit and render problem 
+    files.

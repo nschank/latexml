@@ -2,35 +2,65 @@
 \newcommand\comm[1]{\texttt{\textbackslash #1}}
 
 \section{\LaTeX\ Style}
-  In order to keep the formatting of \LaTeX\ consistent between problems, we have a few special macros and stylistic choices you are \textit{required} to use.
+  In order to keep the formatting of \LaTeX\ consistent between problems, we 
+  have a few special macros and stylistic choices you are \textit{required}
+  to use.
   
   \begin{enumerate}
-    \item You should \textbf{ALWAYS} use the environments \texttt{22itemize} and \texttt{22enumerate} rather than \texttt{itemize} and \texttt{enumerate} respectively. Specifically, these environments change the spacing between items, and use a consistent lettering scheme.
-    \item When providing a hint or a note, you \textbf{MUST} use the commands \texttt{hint} and \texttt{note}, as in \[\texttt{\textbackslash hint\{Think about the pigeonhole principle.\}}\] This allows us to change how all hints and notes look without seeking them out individually.
-    \item The newline commands (e.g. \texttt{\textbackslash\textbackslash}) should \textbf{NEVER} be used to make paragraphs or for spacing. To make a new paragraph, leave a blank line between two blocks of text, as in: \begin{verbatim}
+    \item You should \textbf{ALWAYS} use the environments \texttt{22itemize} 
+      and \texttt{22enumerate} rather than \texttt{itemize} and 
+      \texttt{enumerate} respectively. Specifically, these environments 
+      change the spacing between items, and use a consistent lettering scheme.
+    \item When providing a hint or a note, you \textbf{MUST} use the 
+      commands \texttt{hint} and \texttt{note}, as in 
+      \[\texttt{\textbackslash hint\{Think about the pigeonhole principle.\}}\] 
+      This allows us to change how all hints and notes look without seeking 
+      them out individually.
+    \item The newline commands (e.g. \texttt{\textbackslash\textbackslash}) 
+      should \textbf{NEVER} be used to make paragraphs or for spacing of text. 
+      To make a new paragraph, leave a blank line between two blocks of text, 
+      as in: 
+      \begin{verbatim}
 \begin{document}
   First paragraph.
   
   Second paragraph.
 \end{document}
-    \end{verbatim}
-    \item All parts to a question should end with a period (or question/exclamation mark). You'd be surprised how often people forget this!
-    \item \textbf{NEVER} use the double-dollar-sign notation (e.g. \texttt{\$\$x\$\$}); in fact, don't do it in real life either. It is error-prone and difficult to identify using i.e. regexes. Use \texttt{\textbackslash[x\textbackslash]} instead.
+      \end{verbatim}
+      
+      This does \textit{not} apply to tables or other such environments; you
+      should use \texttt{\textbackslash\textbackslash} as you normally would.
+    \item All parts to a question should end with a period 
+      (or question/exclamation mark). You'd be surprised how often people 
+      forget this!
+    \item \textbf{NEVER} use the double-dollar-sign notation 
+      (e.g. \texttt{\$\$x\$\$}); in fact, don't do it in real life either. 
+      It is error-prone and difficult to identify using i.e. regexes. Use 
+      \texttt{\textbackslash[x\textbackslash]} instead.
     
-    (Single dollar signs are still the preferred notation for inline math.)
+      (Single dollar signs are still the preferred notation for inline math.)
     \item \textbf{ALWAYS} use \comm{pmod} to write things in mod notation. 
       
-      \textbf{Example}: \texttt{3\comm{equiv} 4\comm{pmod} 5} compiles to $3\equiv 4\pmod 5$.
+      \textbf{Example}: \texttt{3\comm{equiv} 4\comm{pmod} 5} compiles to 
+        $3\equiv 4\pmod 5$.
       
-      \textbf{Wrong}: \texttt{3\comm{equiv} 4\comm{mod} 5} compiles to $3\equiv 4\mod 5$, has weird spacing and we wish to maintain consistency.
+      \textbf{Wrong}: \texttt{3\comm{equiv} 4\comm{mod} 5} compiles to 
+        $3\equiv 4\mod 5$, has weird spacing and we wish to maintain 
+        consistency.
       
-      \textbf{Very Wrong}: \texttt{3=4 mod 5} compiles to $3=4 mod 5$ and will lead to spontaneous crying among the staff.   
+      \textbf{Very Wrong}: \texttt{3=4 mod 5} compiles to $3=4 mod 5$ and 
+        will lead to spontaneous crying among the staff.   
     \item Keep lines under 80 characters to remain editor friendly.
-      The validator will enforce this soon!
+      The validator enforces this too!
+    \item Use \comm{setminus} to write the `backslash' used in set algebra;
+      the text backslash character does not provide the right spacing, and is 
+      less readable in the \LaTeX.
   \end{enumerate}
   
   \subsection{22-Specific Macros}
-    Here is a small table of other convenience macros that are available to you. We \textbf{highly recommend} them, as they cut down on (1) useless clutter, and (2) minor typos.
+    Here is a small table of other convenience macros that are available to you.
+    We \textbf{highly recommend} them, as they cut down on (1) useless 
+    clutter, and (2) minor typos.
     
     \begin{center}
       \begin{tabular}{|c|c|}
@@ -48,7 +78,8 @@
       \end{tabular}
     \end{center}
     
-    Note that the \texttt{setbuilder} command does not deal with multiple line equations.
+    Note that the \texttt{setbuilder} command does not deal with multiple 
+    line equations.
   
   \subsection{\LaTeX\ Tips}
     Here are some tips to writing \LaTeX\ more effectively. 
@@ -61,7 +92,9 @@
     \end{itemize}
     
   \subsection{Adding to This List}
-    Contact Nick and offer more tips or stylistic decisions, if you think they are important! We are very willing to add useful commands into our built-in macros.
+    Contact Nick and offer more tips or stylistic decisions, if you think 
+    they are important! We are very willing to add useful commands into our 
+    built-in macros.
   
   
 }

@@ -1,33 +1,63 @@
 \section{Assignment Files}
-  We don't release problems by themselves - we release assignments! \LaTeX ML uses a different specification to specify assignments and the problems within them, which simplify the process of building the same set of problems repeatedly.
+  We don't release problems by themselves -- we release assignments! \LaTeX ML 
+  uses a different specification to specify assignments and the problems 
+  within them, which simplify the process of building the same set of 
+  problems repeatedly.
   
-  Assignments are designed in such a way that they may be \textit{finalized}. Finalization is meant to signify that an assignment has been released -- or, more accurately, that an assignment's solutions have been released. When finalized, the assignment updates all of its contained problems with a \texttt{usedin} tag, allowing later years to know how long it has been since a problem was used. It also reifies the version attribute of all problems, so that if a problem is later given a new version, the old homework will not be changed.
+  Assignments are designed in such a way that they may be \textit{finalized}. 
+  Finalization is meant to signify that an assignment has been released -- 
+  or, more accurately, that an assignment's solutions have been released. 
+  When finalized, the assignment updates all of its contained problems with 
+  a \texttt{usedin} tag, allowing later years to know how long it has been 
+  since a problem was used. It also reifies the version attribute of all 
+  problems, so that if a problem is later given a new version, the old 
+  homework will not be changed.
   
+{
+\newcommand\TB{\hspace*{1em}}
+
   \subsection{Assignment XML Specification}
     \begin{mdframed}
-      \begin{lstlisting}[language=XML,columns=fullflexible,breaklines=true]
-<assignment>
-  <name>Homework 4</name>
-  <year>2016</year>
-  <due>Tuesday, January 85, 2016</due>
-  <problem>problems/problem1.xml</problem>
-  <problem>problems/problem2.xml</problem>
-  <problem version="4">problems/problem1.xml</problem>
-</assignment>
-      \end{lstlisting}
+\texttt{
+<assignment>\\
+\TB<name>}Homework 4\texttt{</name>\\
+\TB<year>}2016\texttt{</year>\\
+\TB<due>}Tuesday, January 85, 2016\texttt{</due>\\
+\TB<problem>}problems/problem1.xml\texttt{</problem>\\
+\TB<problem>}problems/problem2.xml\texttt{</problem>\\
+\TB<problem version=}``\textit{4}''\texttt{>}problems/problem1.xml\texttt{</problem>\\
+</assignment>}
     \end{mdframed}
     
-    \textbf{Note}: The assignment XML specification is still in progress, in the hopes of providing more flexibility in the near future. Thus, any document files not kept in the 22 course folder are not guaranteed to be forward-compatible - Nick will fix any document files kept in the correct location.
+}
     
-    All assignments MUST have be given a name (equivalently, a \textit{title}) in a \texttt{name} (equiv. \texttt{title}) tag. The name is used as the header of the built document, in a very large font.
+    \textbf{Note}: The assignment XML specification is still in progress, in 
+    the hopes of providing more flexibility in the near future. Thus, any 
+    document files not kept in the 22 course folder are not guaranteed to be 
+    forward-compatible - Nick will fix any document files kept in the 
+    correct location.
     
-    All assignments MUST have the year that the assignment was made. This year should be accurate--when an assignment is finalized, this is the year the problem will be marked as \texttt{usedin}.
+    All assignments MUST have be given a name (equivalently, a \textit{title})
+    in a \texttt{name} (equiv. \texttt{title}) tag. The name is used as the 
+    header of the built document, in a very large font.
     
-    All assignments MUST have a due date, which will be used in the header and the introduction of the document exactly as written. 
+    All assignments MUST have the year that the assignment was made. This 
+    year should be accurate--when an assignment is finalized, this is the 
+    year the problem will be marked as \texttt{usedin}.
     
-    All assignments MUST have at least one \texttt{problem}, and an unlimited number (with repeats allowed). These problems will be added in the same order as they are in the XML file, with repetition intact. The \texttt{\textit{version}} attribute can be used to mark which version of the problem is desired. If none is provided, the most recent is automatically used.
+    All assignments MUST have a due date, which will be used in the header 
+    and the introduction of the document exactly as written. 
     
-    The text of a problem tag should be the filepath of an existing, validated problem XML file. (If it is invalid or does exist, the assignment build will fail.)
+    All assignments MUST have at least one \texttt{problem}, and an 
+    unlimited number (with repeats allowed). These problems will be added in 
+    the same order as they are in the XML file, with repetition intact. The 
+    \texttt{\textit{version}} attribute can be used to mark which version of 
+    the problem is desired. If none is provided, the most recent is 
+    automatically used.
+    
+    The text of a problem tag should be the filepath of an existing, 
+    validated problem XML file. (If it is invalid or does exist, the 
+    assignment build will fail.)
     
   \subsection{Building}
     You can build an assignment XML with the build tool as follows: 
@@ -36,7 +66,9 @@
       ~&\texttt{[-s] [-m] [-r]}
     \end{align*}
     
-    The \texttt{-s}, \texttt{-m}, and \texttt{-r} flags control whether solutions, metadata (like filename and topics), and rubrics are printed, respectively. All are optional, and they can be used together arbitrarily.
+    The \texttt{-s}, \texttt{-m}, and \texttt{-r} flags control whether 
+    solutions, metadata (like filename and topics), and rubrics are printed, 
+    respectively. All are optional, and they can be used together independently.
     
   \subsection{Finalizing}
     Finalizing an assignment is simple, and has no options:

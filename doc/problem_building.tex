@@ -1,40 +1,110 @@
 \section{The \textit{Build} Tool}
   \subsection{Building Specific Problems}
-    You can build any problem(s) into a PDF in one step by running the following command:
+    You can build any problem(s) into a PDF in one step by running the 
+    following command:
     \begin{align*}\pybuild\texttt{problems }&\texttt{\textit{output[.pdf]} problem1.xml [problem2.xml \dots]}\\
         ~&\texttt{[-s] [-m] [-r] [--title ``TITLE'']}\end{align*}
         
     If making only a single problem, you can use the shortcut:
     \[\pybuild\texttt{single \textit{name.xml} [-s] [-m] [-r] [--title ``TITLE'']}\]
-    which simply names the output \texttt{name.pdf} (i.e. the same name as the problem file, except with .pdf instead of .xml).
+    which simply names the output \texttt{name.pdf} (i.e. the same name as 
+    the problem file, except with .pdf instead of .xml).
     
-    The build script is overwrite-safe and tolerant of multiple people building the same pdf simultaneously. In particular, it will build a randomly named temporary file and check for overwriting afterwards, allowing you to specify another name or to overwrite if necessary. The generated \texttt{.tex} file is removed, as are the logs and auxiliary files -- if you need these for some reason, let Nick know and he'll add an option to keep them. Exception: the \texttt{.tex} file is not removed if there were \LaTeX\ errors, so that you can find where the error occurred.
+    The build script is overwrite-safe and tolerant of multiple people 
+    building the same pdf simultaneously. In particular, it will build a 
+    randomly named temporary file and check for overwriting afterwards, 
+    allowing you to specify another name or to overwrite if necessary. The 
+    generated \texttt{.tex} file is removed, as are the logs and auxiliary 
+    files -- if you need these for some reason, let Nick know and he'll 
+    add an option to keep them. Exception: the \texttt{.tex} file is not 
+    removed if there were \LaTeX\ errors, so that you can find where the 
+    error occurred.\footnote{As a quick tip: use the \texttt{-m} flag to 
+    more easily find what files contain \LaTeX\ errors.}
     
-    The most recent version (by highest ID) of each problem will be built in order, with repetition if requested. The header on top is temporary and will be removed in a later version of the builder. To change the title of the output, use the \texttt{--title} flag (which takes one argument, so may need quotes).
+    The most recent version (by highest ID) of each problem will be built 
+    in order, with repetition if requested. To change the 
+    title of the output, use the \texttt{--title} flag (which takes one 
+    argument, so may need quotes).
     
-    The \texttt{-s}, \texttt{-m}, and \texttt{-r} flags control whether solutions, metadata (like filename and topics), and rubrics are printed, respectively. All are optional, and they can be used together arbitrarily.
+    The \texttt{-s}, \texttt{-m}, and \texttt{-r} flags control whether 
+    solutions, metadata (like filename and topics), and rubrics are 
+    printed, respectively. All are optional, and they can be used together 
+    independently.
     
-    An invalid problem XML will be skipped and a warning will be printed, but the build will continue.
+    An invalid problem XML will be skipped and a warning will be printed, 
+    but the build will continue.
   \subsection{Building All Problems of a Type}
-    The builder script can search all of the problems within the root problem directory\footnote{This is set for you in the department machines, within \texttt{/course/cs022/problems}; on your local machine, you can set it within the config file by changing the path set as the \texttt{problemroot}.} individually, building those that meet a set of criteria. You should run
+    The builder script can search all of the problems within the root 
+    problem directory
+    \footnote{This is set for you in the department machines, within 
+    \texttt{/course/cs022/problems}; on your local machine, you can set it 
+    within the config file by changing the path set as the 
+    \texttt{problemroot}.} 
+    individually, building those that meet a set of criteria. You should run
     \begin{align*}\pybuild\texttt{all }&\texttt{\textit{output[.pdf]} [CRITERIA]}\\~&\texttt{[-s] [-m] [-r] [--title ``TITLE'']}\end{align*}
-    If no criteria are given, the above command builds every problem in the problem root directory, with the four optional flags acting just as in the previous section.
+    If no criteria are given, the above command builds every problem in 
+    the problem root directory, with the four optional flags acting just 
+    as in the previous section.
     
-    Alternatively, you can specify a different directory to search using the \texttt{from} option:
+    Alternatively, you can specify a different directory to search using 
+    the \texttt{from} option:
     \begin{align*}\pybuild\texttt{from }&\texttt{\textit{problems/\ \ output[.pdf]} [CRITERIA]}\\~&\texttt{[-s] [-m] [-r] [--title ``TITLE'']}\end{align*}
     This would search everything within the \texttt{problems/} directory.
     
-    The criteria for inclusion can be specified with any or all of the following flags, where a problem will be included only if it satisfies all specified flags.
+    The criteria for inclusion can be specified with any or all of the 
+    following flags, where a problem will be included only if it satisfies 
+    all specified flags.
     \begin{description}
-      \item[\texttt{--allowed-topics}] After this flag, include one or more topic names, separated by spaces. A problem will be included only if its topics are a subset of this list. \textbf{Common use case}: List all topics that the students have learned so far, and you will never include problems that they are not qualified to answer.
-      \item[\texttt{--authors}] After this flag, include one or more 
-          logins separated by whitespace. A problem will be included only if
-          it shares at least one author with this list.
-      \item[\texttt{--grep}] After this flag, include one or more search terms separated by whitespace. A problem will be included only if each search term is present in either the body, solution, or rubric. The search is case insensitive, but note that it is searching the raw \LaTeX\ so is sensitive to formatting and whitespace.
-      \item[\texttt{--not-used-in}] If present, only includes problems that were not used in any of the years given. Use `none' to only include problems that have been used in at least one homework.
-      \item[\texttt{--required-topics}] After this flag, include one or more topic names, separated by spaces. A problem will be included only if it has at least one required topic. Note that it does not need to possess \textit{all} required topics. \textbf{Common use case}: List the topics that the homework should focus on to get a good set of tentative problems for a homework.
-      \item[\texttt{--required-types}] After this flag, include one or more topic names, separated by spaces. A problem will be included only if it has at least one required type. Note that it does not need to possess \textit{all} required types. \textbf{Common use cases}: Finding (for instance) an inductive proof on a particular topic; listing all `pieces' related to a topic, to get inspiration; finding things that need work.
-      \item[\texttt{--todo}] If present, only includes problems that have ``TODO'' in their solution or rubric. Meant to make it easier to find problems still being worked on.
-      \item[\texttt{--used-in}] If present, only includes problems that were used in any of the years given. Use `none' to include problems that have never been used. 
-      \item[\texttt{--written}] If present, only includes problems that were written in any of the years given.
+      \item[\texttt{--allowed-topics}] 
+        After this flag, include one or more topic names, separated by 
+        spaces. A problem will be included only if its topics are a subset 
+        of this list. 
+      
+        \textbf{Common use case}: List all topics that the students have 
+        learned so far, and you will never include problems that they are 
+        not qualified to answer.
+      \item[\texttt{--authors}] 
+        After this flag, include one or more 
+        logins separated by whitespace. A problem will be included only if
+        it shares at least one author with this list.
+      \item[\texttt{--grep}] 
+        After this flag, include one or more search 
+        terms separated by whitespace. A problem will be included only if 
+        each search term is present in either the body, solution, or rubric. 
+        The search is case-insensitive, but note that it is searching the 
+        raw \LaTeX, so it \textit{is} sensitive to formatting and whitespace.
+      \item[\texttt{--not-used-in}] 
+        If present, only includes problems that 
+        were not used in any of the years given. Use `none' to only 
+        include problems that have been used in at least one homework.
+      \item[\texttt{--required-topics}] 
+        After this flag, include one or more 
+        topic names, separated by spaces. A problem will be included only 
+        if it has at least one required topic. Note that it does not need 
+        to possess \textit{all} required topics. 
+      
+        \textbf{Common use case}: List the topics that the homework should 
+        focus on to get a good set of tentative problems for a homework.
+      \item[\texttt{--required-types}] 
+        After this flag, include one or more type
+        names, separated by spaces. A problem will be included only if it has 
+        at least one required type. Note that it does not need to possess 
+        \textit{all} required types. 
+        
+        \textbf{Common use cases}: Finding (for instance) an inductive proof 
+        on a particular topic; listing all `pieces' related to a topic, to get
+        inspiration; finding things that need work.
+      \item[\texttt{--todo}] 
+        Standalone flag (i.e. does not take any arguments). If present, only 
+        includes problems that have ``TODO'' in their 
+        solution or rubric. Meant to make it easier to find problems still 
+        being worked on.
+      \item[\texttt{--used-in}] 
+        After this flag, include one or more years separated by whitespace.
+        If present, only includes problems that were used in any of the years 
+        given. Use `none' to include problems that have never been used. 
+      \item[\texttt{--written}] 
+        After this flag, include one or more years separated by whitespace. 
+        If present, only includes problems that were written in any of the 
+        years given.
     \end{description}
