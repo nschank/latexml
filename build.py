@@ -185,73 +185,97 @@ def build_specific(settings):
     except (ImproperXmlException, ET.ParseError):
       print_warning("Could not parse {}".format(settings.filename))
       
-  build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
+  build(document, settings.filename, settings.solutions, 
+      settings.rubrics, settings.metadata)
+    
+def add_common_flags(subparser, title=True):
+  subparser.add_argument('-m', dest='metadata', action='store_true', 
+      default=False, help='Builds the problems with attached metadata')
+  subparser.add_argument('-r', dest='rubrics', action='store_true', 
+      default=False, help='Builds the problems with rubrics')
+  subparser.add_argument('-s', dest='solutions', action='store_true', 
+      default=False, help='Builds the problems with solutions')
+  if title:
+    subparser.add_argument('--title', nargs=1, required=False, 
+        default="Problem", help='Sets the title of the problem build')
     
 def add_doc_parser(parser):
-  subparser = parser.add_parser('doc', help='Builds a particular document XML file into a pdf')
+  subparser = parser.add_parser('doc', 
+      help='Builds a particular assignment XML file into a pdf')
   subparser.set_defaults(func=build_doc)
-  subparser.add_argument('document', metavar='D', help='The document XML file to build')
-  subparser.add_argument('filename', metavar='O', help='The destination of the output PDF')
-  subparser.add_argument('-m', dest='metadata', action='store_true', default=False, help='Builds the problems with attached metadata')
-  subparser.add_argument('-r', dest='rubrics', action='store_true', default=False, help='Builds the problems with rubrics')
-  subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
+  subparser.add_argument('document', metavar='D', 
+      help='The assignment XML file to build')
+  subparser.add_argument('filename', metavar='O', 
+      help='The destination of the rendered PDF')
+  add_common_flags(subparser, title=False)
     
-def apply_predicate_arguments(subparser):
-  subparser.add_argument('-m', dest='metadata', action='store_true', default=False, help='Builds the problems with attached metadata')
-  subparser.add_argument('-r', dest='rubrics', action='store_true', default=False, help='Builds the problems with rubrics')
-  subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
-  subparser.add_argument('--allowed-topics', required=False, dest='allowed_topics', nargs='+', help='If present, will restrict the allowed topics: a problem will be not be built if it uses any topic outside of the provided')
-  subparser.add_argument('--authors', required=False, dest='authors', nargs='+', help='If present, restricts to problems which were written by any of the given authors')
-  subparser.add_argument('--grep', required=False, dest='grep', nargs='+', help='If present, restricts to problems which contain within the rubric, solution, or body that contain all of the given words. Words are treated separately, but case-insensitively.')
-  subparser.add_argument('--not-used-in', required=False, dest='not_used_in', nargs='+', 
-      help='If present, restricts to problems which were used in none of the given years')
-  subparser.add_argument('--required-topics', required=False, dest='required_topics', nargs='+', 
+def add_predicate_flags(subparser):
+  subparser.add_argument('--allowed-topics', required=False, 
+      dest='allowed_topics', nargs='+', 
+      help='If present, will restrict the allowed topics: a problem will not be built if it uses any topic outside of the provided')
+  subparser.add_argument('--authors', required=False, dest='authors', 
+      nargs='+', help='If present, restricts to problems which were written by any of the given authors')
+  subparser.add_argument('--grep', required=False, dest='grep', nargs='+', 
+      help='If present, restricts to problems which contain within the rubric, solution, or body that contain all of the given words. Words are treated separately, but case-insensitively.')
+  subparser.add_argument('--not-used-in', required=False, dest='not_used_in', 
+      nargs='+', help='If present, restricts to problems which were used in none of the given years')
+  subparser.add_argument('--required-topics', required=False, 
+      dest='required_topics', nargs='+', 
       help='If present, will specify the required topics: a problem will be built only if it uses at least one of the provided')
-  subparser.add_argument('--required-types', required=False, dest='required_types', nargs='+', 
+  subparser.add_argument('--required-types', required=False, 
+      dest='required_types', nargs='+', 
       help='If present, will specify the required types: a problem will be built only if it uses at least one of the provided')
-  subparser.add_argument('--title', nargs=1, required=False, default="Problem", help='Sets the title of the problem build')
-  subparser.add_argument('--todo', dest='todo', action='store_true', default=False, help='If present, restricts to problems that have "todo" in their solution or rubric.')
-  subparser.add_argument('--used-in', required=False, dest='used_in', nargs='+', 
-      help='If present, restricts to problems which were used in any of the given years')
-  subparser.add_argument('--written', required=False, dest='written', nargs='+', 
-      help='If present, will specify a set of years that a problem\'s most recent version may have been written (to be included)')
+  subparser.add_argument('--todo', dest='todo', action='store_true', 
+      default=False, help='If present, restricts to problems that have "todo" in their solution or rubric.')
+  subparser.add_argument('--used-in', required=False, dest='used_in', 
+      nargs='+', help='If present, restricts to problems which were used in any of the given years')
+  subparser.add_argument('--written', required=False, dest='written', 
+      nargs='+', help='If present, will specify a set of years that a problem\'s most recent version may have been written (to be included)')
     
 def add_from_parser(parser):
-  subparser = parser.add_parser('from', help='Builds all problems that satisfy the given predicates within a particular directory')
+  subparser = parser.add_parser('from', 
+      help='Builds all problems that satisfy the given predicates within a particular directory')
   subparser.set_defaults(func=build_if)
-  subparser.add_argument('directory', help='The search directory containing all problems to examine')
-  subparser.add_argument('filename', metavar='O', help='The destination of the output PDF')
-  apply_predicate_arguments(subparser)
+  subparser.add_argument('directory', 
+      help='The search directory containing all problems to examine')
+  subparser.add_argument('filename', metavar='O', 
+      help='The destination of the rendered PDF')
+  add_common_flags(subparser)
+  add_predicate_flags(subparser)
   
 def add_all_parser(parser):
-  subparser = parser.add_parser('all', help='Builds all problems that satisfy the given predicates within the problem root directory')
+  subparser = parser.add_parser('all', 
+      help='Builds all problems that satisfy the given predicates within the problem root directory')
   subparser.set_defaults(func=build_if, directory=get_problem_root())
-  subparser.add_argument('filename', metavar='O', help='The destination of the output PDF')  
-  apply_predicate_arguments(subparser)
+  subparser.add_argument('filename', metavar='O', 
+      help='The destination of the output PDF')
+  add_common_flags(subparser)
+  add_predicate_flags(subparser)
     
 def add_problem_parser(parser):
-  subparser = parser.add_parser('problems', help='Builds a problem or series of problems, in order')
+  subparser = parser.add_parser('problems', 
+      help='Builds a problem or series of problems, in order')
   subparser.set_defaults(func=build_specific)
-  subparser.add_argument('filename', metavar='O', help='The destination of the output PDF')
-  subparser.add_argument('problems', metavar='P', nargs='+', help='The locations of the problems to build')
-  subparser.add_argument('-m', dest='metadata', action='store_true', default=False, help='Builds the problems with attached metadata')
-  subparser.add_argument('-r', dest='rubrics', action='store_true', default=False, help='Builds the problems with rubrics')
-  subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
-  subparser.add_argument('--title', nargs=1, required=False, default="Problem", help='Sets the title of the problem build')
+  subparser.add_argument('filename', metavar='O', 
+      help='The destination of the rendered PDF')
+  subparser.add_argument('problems', metavar='P', nargs='+', 
+      help='The locations of the problems to build')
+  add_common_flags(subparser)
 
 def add_single_parser(parser):
-  subparser = parser.add_parser('single', help='Builds a single problem XML file into a pdf of the same name')
+  subparser = parser.add_parser('single', 
+      help='Builds a single problem XML file into a pdf of the same name')
   subparser.set_defaults(func=build_single)
-  subparser.add_argument('problem', metavar='P', help='The problem XML file to build')
-  subparser.add_argument('-m', dest='metadata', action='store_true', default=False, help='Builds the problems with attached metadata')
-  subparser.add_argument('-r', dest='rubrics', action='store_true', default=False, help='Builds the problems with rubrics')
-  subparser.add_argument('-s', dest='solutions', action='store_true', default=False, help='Builds the problems with solutions')
-  subparser.add_argument('--title', nargs=1, required=False, default="Problem", help='Sets the title of the problem build')
+  subparser.add_argument('problem', metavar='P', 
+      help='The problem XML file to build')
+  add_common_flags(subparser)
   
 def build_args():
-  """Parses command-line arguments using argparse and returns an object containing runtime information."""
-  parser = argparse.ArgumentParser(description='Builds PDFs from CS22 XML files')
-  subparsers = parser.add_subparsers(help='How to choose which files to build')
+  """Parses command-line arguments using argparse and returns an 
+  object containing runtime information."""
+  parser = argparse.ArgumentParser(description='Builds PDFs from LaTeXML files')
+  subparsers = parser.add_subparsers(
+      help='Different methods of rendering problems')
   
   add_all_parser(subparsers)
   add_doc_parser(subparsers)
