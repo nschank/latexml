@@ -13,6 +13,8 @@ from color import *
 from subprocess import call
 from random import randint
 from pdfbuilder import can_build
+from grp import getgrgid
+from sys import platform
 
 stylistic_errors = {
   re.compile(r"HINT|Hint: |\\text(?:bf|it){\s*[Hh]int:?\s*}:?"):r"Use the \hint command instead.",
@@ -246,6 +248,18 @@ def validate(settings):
     print_error("{} must have a .xml extension to interoperate with build tool".format(settings.filename))
     exit(1)
   
+  if platform in ["linux", "linux2"]:    
+    stat_info = os.stat(settings.filename)
+    gid = stat_info.st_gid
+    mode = stat_info.st_mode & 0777
+    group = getgrgid(gid)[0]
+    if group != "cs022ta":
+      print_error("Wrong group, you MUST run `chgrp cs022ta {}'".format(settings.filename))
+      failed = True
+    if mode ^ 0660 != 0000:
+      print_error("Wrong permissions, you MUST run `chmod 660 {}'".format(settings.filename))
+      failed = True
+  
   invalid_lt = re.compile("<(?!/?(problem|usedin|version|authors?|year|topics?|types?|param|deps?|dependency|dependencies|body|solution|rubric))")
   invalid_amp = re.compile("&(?!\w{1,10};)")
   invalid_char = re.compile(r"[^\x00-\x7f]")
@@ -349,6 +363,7 @@ def validate(settings):
   elif not built_rub and todo_rub:
     print color("Rubric LaTeX does not compile and needs to be finished",
         color_code(RED))
+        
 
 def add_branch_parser(parser):
   subparser = parser.add_parser('branch', help='Adds a new version to an XML file')
