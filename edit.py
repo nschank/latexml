@@ -40,7 +40,7 @@ def builds(version):
   with open(tempfilename + ".tex", "w") as f:
     f.write(document.build(True, True, False).encode('UTF-8'))
   code = call(["pdflatex", tempfilename + ".tex", "-draftmode", "-quiet"])
-  for extension in [".log", ".aux"]:
+  for extension in [".log", ".aux", ".pdf"]:
     try: os.remove(tempfilename + extension)
     except Exception: 
       print_warning("Could not remove temporary file '{}'".format(tempfilename + extension))
