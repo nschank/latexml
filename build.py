@@ -8,6 +8,7 @@ from random import randint
 from config import get_problem_root
 import xml.etree.ElementTree as ET
 from color import *
+from pdfbuilder import temp_file_remove
 
 def satisfies(version, settings, used_ins):
   if (settings.allowed_topics and 
@@ -68,19 +69,25 @@ def build(document, filename, solutions=False, rubrics=False, metadata=False):
     tempfilename = filename + ".22tmp." + str(randint(0,100000))
     with open(tempfilename + ".tex", "w") as f:
       f.write(document.build(solutions, rubrics, metadata).encode('UTF-8'))
-    code = call(["pdflatex", tempfilename + ".tex", "-quiet"])
-    os.remove(tempfilename + ".aux")
-    os.remove(tempfilename + ".log")
+    try:
+      code = call(["pdflatex", tempfilename + ".tex", "-quiet"])
+    except OSError as e:
+      temp_file_remove(tempfilename + ".tex")
+      if e.errno == errno.ENOENT:
+        print_error("pdflatex not found, is it installed?")
+        exit(1)
+      else: 
+        raise
+    temp_file_remove(tempfilename + ".aux")
+    temp_file_remove(tempfilename + ".log")
     if code:
       os.rename(tempfilename + ".tex", filename + ".tex")
-      print "\n\n"
       print_error("pdflatex reported an error.")
       print "Temporary LaTeX file '{}' not deleted so that it can be manually inspected, if desired.".format(filename + ".tex")
-      os.remove(tempfilename + ".pdf")
+      temp_file_remove(tempfilename + ".pdf")
       exit(1)
-    os.remove(tempfilename + ".tex")
+    temp_file_remove(tempfilename + ".tex")
     while os.path.exists(filename + ".pdf"):
-      print "\n"
       print_warning("'{}' already exists.".format(filename + ".pdf"))
       response = raw_input("Type a new name or a blank line to replace file: ")
       if not response: break

@@ -1,4 +1,5 @@
 import argparse
+import errno
 import os
 import re
 import stat
@@ -11,6 +12,7 @@ from datetime import date
 from color import *
 from subprocess import call
 from random import randint
+from pdfbuilder import can_build
 
 stylistic_errors = {
   re.compile(r"HINT|Hint: |\\text(?:bf|it){\s*[Hh]int:?\s*}:?"):r"Use the \hint command instead.",
@@ -26,40 +28,6 @@ stylistic_errors = {
   re.compile(r"\\newcommand(?![A-Za-z])"):r"Use a <param> tag instead.",
   re.compile(r"\\(?:usepackage|require)(?![A-Za-z])"):r"Use a <dependency> tag instead."
 }
-
-def builds(version):
-  document = Document("")
-  document.name = "Temp"
-  #TODO
-  document.year = "1900"
-  document.due = "Never"
-  document.blurb = ""
-  
-  document.versions.append(version)
-  tempfilename = str(os.getpid()) + ".22tmp" + str(randint(0,10000000))
-  with open(tempfilename + ".tex", "w") as f:
-    f.write(document.build(True, True, False).encode('UTF-8'))
-  code = call(["pdflatex", tempfilename + ".tex", "-draftmode", "-quiet"])
-  for extension in [".log", ".aux", ".pdf"]:
-    try: os.remove(tempfilename + extension)
-    except Exception: 
-      print_warning("Could not remove temporary file '{}'".format(tempfilename + extension))
-  if code:
-    try: 
-      assert version.filename[-4:] == '.xml'
-      savefilename = version.filename[:-4] + ".validator.tex"
-      os.rename(tempfilename + ".tex", savefilename)
-    except Exception:
-      print_warning("Could not rename rendered tex file '{}'".format(tempfilename + ".tex"))
-      print "Temporary LaTeX file '{}' not deleted so that it can be manually inspected, if desired.".format(tempfilename + ".tex")
-    else:
-      print "Temporary LaTeX file '{}' not deleted so that it can be manually inspected, if desired.".format(savefilename)
-  else:
-    try: os.remove(tempfilename + ".tex")
-    except Exception: 
-      print_warning("Could not remove temporary file '{}'".format(tempfilename + ".tex"))
-  return not code
-  
 
 def indent(elem, level=0):
   """
@@ -337,25 +305,50 @@ def validate(settings):
             color_code(YELLOW, foreground=False) + color_code(BLACK))
         failed = True
   
-  built = builds(newest)
-  if failed and not built:
-    print color("\nValidation Failed, and there were LaTeX errors",
-        color_code(RED))
-    exit(1)
-  elif failed:
-    print color("\nValidation Failed, but LaTeX built successfully",
-        color_code(RED, bold=True))
-    exit(1)    
-  elif not built:
-    print color("\nValidation Succeeded, but there were LaTeX errors", 
-        color_code(RED, bold=True)) 
-    exit(1)
+  if failed:
+    print color("\nValidation failure", color_code(RED))
+  else:
+    print color("\nValidation success", color_code(GREEN))
+  
+  test_document = Document("Validation Render")
+  test_document.name = "Temp"
+  test_document.year = "1900"
+  test_document.due = "Never"
+  test_document.blurb = ""
+  test_document.versions.append(newest)
+  
+  if can_build(test_document.build(False, False, metadata=False)):
+    print color("Body LaTeX compiles", color_code(GREEN))
+  else:
+    print color("Body LaTeX does not compile", color_code(RED))
     
-  print color_code(GREEN) + "Looks good to me!" + CLEAR_COLOR
-  sol = "TODO" in newest.solution
-  rub = "TODO" in newest.rubric
-  if sol or rub:
-    print color_code(BLACK, bold=True) + "Make sure to write a " + ("solution" if sol else "") + (" and " if sol and rub else "") + ("rubric" if rub else "") +CLEAR_COLOR
+  newest.body = newest.solution
+  built_sol = can_build(test_document.build(False, False, metadata=False))
+  todo_sol = "TODO" in newest.solution
+  if built_sol and not todo_sol:
+    print color("Solution LaTeX compiles", color_code(GREEN))
+  elif built_sol and todo_sol:
+    print color("Solution LaTeX compiles but need to be finished", 
+        color_code(YELLOW))
+  elif not built_sol and not todo_sol:
+    print color("Solution LaTeX does not compile", color_code(RED, bold=True))
+  elif not built_sol and todo_sol:
+    print color("Solution LaTeX does not compile and needs to be finished",
+        color_code(RED))
+  
+  newest.body = newest.rubric
+  built_rub = can_build(test_document.build(False, False, metadata=False))
+  todo_rub = "TODO" in newest.rubric
+  if built_rub and not todo_rub:
+    print color("Rubric LaTeX compiles", color_code(GREEN))
+  elif built_rub and todo_rub:
+    print color("Rubric LaTeX compiles but need to be finished", 
+        color_code(YELLOW))
+  elif not built_rub and not todo_rub:
+    print color("Rubric LaTeX does not compile", color_code(RED, bold=True))
+  elif not built_rub and todo_rub:
+    print color("Rubric LaTeX does not compile and needs to be finished",
+        color_code(RED))
 
 def add_branch_parser(parser):
   subparser = parser.add_parser('branch', help='Adds a new version to an XML file')
