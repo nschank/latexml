@@ -36,9 +36,9 @@ def builds(version):
   document.blurb = ""
   
   document.versions.append(version)
-  tempfilename = ".tmp.22build-" + str(os.getpid()) + str(randint(0,10000000))
+  tempfilename = ".tmp22build-" + str(os.getpid()) + str(randint(0,10000000))
   with open(tempfilename + ".tex", "w") as f:
-    f.write(document.build(True, True, True).encode('UTF-8'))
+    f.write(document.build(True, True, False).encode('UTF-8'))
   code = call(["pdflatex", tempfilename + ".tex", "-draftmode", "-quiet"])
   for extension in [".log", ".aux"]:
     try: os.remove(tempfilename + extension)
@@ -337,12 +337,18 @@ def validate(settings):
             color_code(YELLOW, foreground=False) + color_code(BLACK))
         failed = True
   
-  if failed:
-    print color("\nValidation Failed", color_code(RED))
+  built = builds(newest)
+  if failed and not built:
+    print color("\nValidation Failed, and there were LaTeX errors",
+        color_code(RED))
     exit(1)
-  elif not builds(newest):
-    print color("\nValidation Succeeded, but with LaTeX errors", 
-        color_code(RED)) 
+  elif failed:
+    print color("\nValidation Failed, but LaTeX built successfully",
+        color_code(RED, bold=True))
+    exit(1)    
+  elif not built:
+    print color("\nValidation Succeeded, but there were LaTeX errors", 
+        color_code(RED, bold=True)) 
     exit(1)
     
   print color_code(GREEN) + "Looks good to me!" + CLEAR_COLOR
