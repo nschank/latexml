@@ -240,69 +240,75 @@ def validate(settings):
   """
   if not settings.filename.endswith(".xml"):
     print_error("{} must have a .xml extension to interoperate with build tool".format(settings.filename))
+    exit(1)
     
   
   invalid_lt = re.compile("<(?!/?(problem|usedin|version|authors?|year|topics?|types?|param|deps?|dependency|dependencies|body|solution|rubric))")
   invalid_amp = re.compile("&(?!\w{1,10};)")
   invalid_char = re.compile(r"[^\x00-\x7f]")
   
-  too_long = False
+  failed = False
   
   # Some more manual checking  
   with open(settings.filename) as f:
     for num, line in enumerate(f):
       if len(line) > 80:
-        print_warning("Line {} too long ({} characters)".format(num+1, len(line)))
-        too_long = True
+        print_warning("Line {} longer than 80 characters (has {})".format(num+1, len(line)))
+        failed = True
       problem_lt = re.search(invalid_lt, line)
       if problem_lt:
         print_error("Invalid < character on line {} at character {}".format(num+1, problem_lt.start()))
-        print "A literal < can be escaped using \"&lt;\" instead."
-        exit(1)
+        print color("\tA literal < can be escaped using \"&lt;\" instead.", 
+            color_code(YELLOW, foreground=False) + color_code(BLACK))
+        failed = True
       problem_amp = re.search(invalid_amp, line)
       if problem_amp:
         print_error("Invalid raw & character on line {} at character {}".format(num+1, problem_amp.start()))
-        print "A literal & can be escaped by using \"&amp;\" instead."
-        exit(1)
+        print color("\tA literal & can be escaped by using \"&amp;\" instead.", 
+            color_code(YELLOW, foreground=False) + color_code(BLACK))
+        failed = True
       problem_char = re.search(invalid_char, line)
       if problem_char:
         print_error("Invalid non-ASCII character on line {} at character {}".format(num+1, problem_char.start()))
-        exit(1)
+        failed = True
       
   try:
     tree = ET.parse(settings.filename)
   except Exception:
     print_error("XML in {} could not be parsed.".format(settings.filename))
+    print color("\nPlease rerun validation once XML is fixed", color_code(CYAN))
     exit(1)
   try:
     problem = Problem(settings.filename)
     problem.parse_tree(tree)
+    # TODO: don't strict-validate versions
   except ImproperXmlException as e:
     print_error(e.args[0])
+    print oolor("\nPlease rerun validation after fixing", color_code(CYAN))
     exit(1)
   newest = problem.newest_version()
   
   if "unknown" in map(str.lower, newest.authors):
-    print_warning("Unknown author")
+    print_warning("Unknown author\n")
   if "unknown" == newest.year.lower():
-    print_warning("Unknown year") 
+    print_warning("Unknown year\n") 
     
   for search_term, msg in stylistic_errors.iteritems():
     for search_space in [newest.body, newest.solution, newest.rubric]:
       results = re.search(search_term, search_space)
       if results:
         print_error("Found problematic text \"{}\"".format(results.group(0)))
-        print msg   
-        exit(1)
+        print color("\t" + msg, color_code(YELLOW, foreground=False) + color_code(BLACK))
+        failed = True
   
-  if too_long:
-    print_error("For editor friendliness, all lines must be less than 80 characters")
+  if failed:
+    print color("\nValidation Failed", color_code(RED))
     exit(1)
-  print color_code(GREEN, bold=True) + "\nLooks good to me!" + CLEAR_COLOR
+  print color_code(GREEN) + "Looks good to me!" + CLEAR_COLOR
   sol = "TODO" in newest.solution
   rub = "TODO" in newest.rubric
   if sol or rub:
-    print color_code(CYAN) + "Make sure to write a " + ("solution" if sol else "") + (" and " if sol and rub else "") + ("rubric" if rub else "") +CLEAR_COLOR
+    print color_code(BLACK, bold=True) + "Make sure to write a " + ("solution" if sol else "") + (" and " if sol and rub else "") + ("rubric" if rub else "") +CLEAR_COLOR
 
 def add_branch_parser(parser):
   subparser = parser.add_parser('branch', help='Adds a new version to an XML file')

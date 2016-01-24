@@ -175,6 +175,7 @@ def build_single(settings):
     version.validate()
     
     document.versions.append(version)
+    #TODO
   except (ImproperXmlException, ET.ParseError):
     print_warning("Could not parse '{}'".format(settings.problem))
     print "Run '22edit validate' to check for common problems."
