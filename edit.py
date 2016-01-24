@@ -9,6 +9,8 @@ from config import get_topics, get_types
 from copy import deepcopy
 from datetime import date
 from color import *
+from subprocess import call
+from random import randint
 
 stylistic_errors = {
   re.compile(r"HINT|Hint: |\\text(?:bf|it){\s*[Hh]int:?\s*}:?"):r"Use the \hint command instead.",
@@ -24,6 +26,40 @@ stylistic_errors = {
   re.compile(r"\\newcommand(?![A-Za-z])"):r"Use a <param> tag instead.",
   re.compile(r"\\(?:usepackage|require)(?![A-Za-z])"):r"Use a <dependency> tag instead."
 }
+
+def builds(version):
+  document = Document("")
+  document.name = "Temp"
+  #TODO
+  document.year = "1900"
+  document.due = "Never"
+  document.blurb = ""
+  
+  document.versions.append(version)
+  tempfilename = ".tmp.22build-" + str(os.getpid()) + str(randint(0,10000000))
+  with open(tempfilename + ".tex", "w") as f:
+    f.write(document.build(True, True, True).encode('UTF-8'))
+  code = call(["pdflatex", tempfilename + ".tex", "-draftmode", "-quiet"])
+  for extension in [".log", ".aux"]:
+    try: os.remove(tempfilename + extension)
+    except Exception: 
+      print_warning("Could not remove temporary file '{}'".format(tempfilename + extension))
+  if code:
+    try: 
+      assert version.filename[-4:] == '.xml'
+      savefilename = version.filename[:-4] + ".validator.tex"
+      os.rename(tempfilename + ".tex", savefilename)
+    except Exception:
+      print_warning("Could not rename rendered tex file '{}'".format(tempfilename + ".tex"))
+      print "Temporary LaTeX file '{}' not deleted so that it can be manually inspected, if desired.".format(tempfilename + ".tex")
+    else:
+      print "Temporary LaTeX file '{}' not deleted so that it can be manually inspected, if desired.".format(savefilename)
+  else:
+    try: os.remove(tempfilename + ".tex")
+    except Exception: 
+      print_warning("Could not remove temporary file '{}'".format(tempfilename + ".tex"))
+  return not code
+  
 
 def indent(elem, level=0):
   """
@@ -241,7 +277,6 @@ def validate(settings):
   if not settings.filename.endswith(".xml"):
     print_error("{} must have a .xml extension to interoperate with build tool".format(settings.filename))
     exit(1)
-    
   
   invalid_lt = re.compile("<(?!/?(problem|usedin|version|authors?|year|topics?|types?|param|deps?|dependency|dependencies|body|solution|rubric))")
   invalid_amp = re.compile("&(?!\w{1,10};)")
@@ -284,7 +319,7 @@ def validate(settings):
     # TODO: don't strict-validate versions
   except ImproperXmlException as e:
     print_error(e.args[0])
-    print oolor("\nPlease rerun validation after fixing", color_code(CYAN))
+    print color("\nPlease rerun validation after fixing", color_code(CYAN))
     exit(1)
   newest = problem.newest_version()
   
@@ -298,12 +333,18 @@ def validate(settings):
       results = re.search(search_term, search_space)
       if results:
         print_error("Found problematic text \"{}\"".format(results.group(0)))
-        print color("\t" + msg, color_code(YELLOW, foreground=False) + color_code(BLACK))
+        print color("\t" + msg, 
+            color_code(YELLOW, foreground=False) + color_code(BLACK))
         failed = True
   
   if failed:
     print color("\nValidation Failed", color_code(RED))
     exit(1)
+  elif not builds(newest):
+    print color("\nValidation Succeeded, but with LaTeX errors", 
+        color_code(RED)) 
+    exit(1)
+    
   print color_code(GREEN) + "Looks good to me!" + CLEAR_COLOR
   sol = "TODO" in newest.solution
   rub = "TODO" in newest.rubric
