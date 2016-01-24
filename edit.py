@@ -3,6 +3,7 @@ import errno
 import os
 import re
 import stat
+import string
 import xml.etree.ElementTree as ET
 from problem import Problem, Version, UsedIn, Document
 from parseable import ImproperXmlException
@@ -248,6 +249,8 @@ def validate(settings):
     print_error("{} must have a .xml extension to interoperate with build tool".format(settings.filename))
     exit(1)
   
+  failed = False
+  
   if platform in ["linux", "linux2"]:    
     stat_info = os.stat(settings.filename)
     gid = stat_info.st_gid
@@ -264,13 +267,11 @@ def validate(settings):
   invalid_amp = re.compile("&(?!\w{1,10};)")
   invalid_char = re.compile(r"[^\x00-\x7f]")
   
-  failed = False
-  
   # Some more manual checking  
   with open(settings.filename) as f:
     for num, line in enumerate(f):
-      if len(line) > 80:
-        print_warning("Line {} longer than 80 characters (has {})".format(num+1, len(line)))
+      if len(string.rstrip(line)) > 80:
+        print_warning("Line {} longer than 80 characters (has {})".format(num+1, len(string.rstrip(line))))
         failed = True
       problem_lt = re.search(invalid_lt, line)
       if problem_lt:
