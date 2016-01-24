@@ -3,10 +3,11 @@
     You can build any problem(s) into a PDF in one step by running the 
     following command:
     \begin{align*}\pybuild\texttt{problems }&\texttt{\textit{output[.pdf]} problem1.xml [problem2.xml \dots]}\\
-        ~&\texttt{[-s] [-m] [-r] [--title ``TITLE'']}\end{align*}
+        ~&\texttt{[-s] [-m] [-r] [--title ``TITLE''] [--verbose]}\end{align*}
         
     If making only a single problem, you can use the shortcut:
-    \[\pybuild\texttt{single \textit{name.xml} [-s] [-m] [-r] [--title ``TITLE'']}\]
+    \[\pybuild\texttt{single \textit{name.xml} 
+        [-s] [-m] [-r] [--title ``TITLE''] [--verbose]}\]
     which simply names the output \texttt{name.pdf} (i.e. the same name as 
     the problem file, except with .pdf instead of .xml).
     
@@ -31,24 +32,30 @@
     printed, respectively. All are optional, and they can be used together 
     independently.
     
-    An invalid problem XML will be skipped and a warning will be printed, 
-    but the build will continue.
+    An invalid problem XML will be skipped silently, but the build will
+    continue. Use the \texttt{--verbose} flag to have the tool print out 
+    what files are being added or skipped and why.
   \subsection{Building All Problems of a Type}
-    The builder script can search all of the problems within the root 
-    problem directory
-    \footnote{This is set for you in the department machines, within 
+    The builder script can search all of the problems within the root problem 
+    directory\footnote{This is set for you in the department machines, within 
     \texttt{/course/cs022/problems}; on your local machine, you can set it 
     within the config file by changing the path set as the 
     \texttt{problemroot}.} 
     individually, building those that meet a set of criteria. You should run
-    \begin{align*}\pybuild\texttt{all }&\texttt{\textit{output[.pdf]} [CRITERIA]}\\~&\texttt{[-s] [-m] [-r] [--title ``TITLE'']}\end{align*}
+    \begin{align*}
+      \pybuild\texttt{all }&\texttt{\textit{output[.pdf]} [CRITERIA]}\\
+      ~&\texttt{[-s] [-m] [-r] [--title ``TITLE''] [--verbose]}
+    \end{align*}
     If no criteria are given, the above command builds every problem in 
     the problem root directory, with the four optional flags acting just 
     as in the previous section.
     
     Alternatively, you can specify a different directory to search using 
     the \texttt{from} option:
-    \begin{align*}\pybuild\texttt{from }&\texttt{\textit{problems/\ \ output[.pdf]} [CRITERIA]}\\~&\texttt{[-s] [-m] [-r] [--title ``TITLE'']}\end{align*}
+    \begin{align*}
+      \pybuild\texttt{from }&\texttt{\textit{problems/\ \ output[.pdf]} [CRITERIA]}\\
+      ~&\texttt{[-s] [-m] [-r] [--title ``TITLE''] [--verbose]}
+    \end{align*}
     This would search everything within the \texttt{problems/} directory.
     
     The criteria for inclusion can be specified with any or all of the 

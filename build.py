@@ -7,7 +7,7 @@ from subprocess import call
 from random import randint
 from config import get_problem_root
 import xml.etree.ElementTree as ET
-from color import print_warning, print_error
+from color import *
 
 def satisfies(version, settings, used_ins):
   if (settings.allowed_topics and 
@@ -59,12 +59,12 @@ def satisfies(version, settings, used_ins):
   return True
 
 def build(document, filename, solutions=False, rubrics=False, metadata=False):
-  if filename.endswith(".pdf"):
-    filename = filename[:-4]
-    assert filename
-  else:
-    print_warning("Output will be named '{}.pdf'".format(filename))
   if document.versions:
+    if filename.endswith(".pdf"):
+      filename = filename[:-4]
+      assert filename
+    else:
+      print_warning("Output will be named '{}.pdf'".format(filename))
     tempfilename = filename + ".tmp" + str(randint(0,100000))
     with open(tempfilename + ".tex", "w") as f:
       f.write(document.build(solutions, rubrics, metadata).encode('UTF-8'))
@@ -91,15 +91,15 @@ def build(document, filename, solutions=False, rubrics=False, metadata=False):
         filename = response
     os.rename(tempfilename + ".pdf", filename + ".pdf")
   else:
-    print_error("No problems were added to the build successfully")
-    print "This could mean no problems were found, no problems matched the criteria, or no problems could be accessed."
+    print_error("No problems were added to the build successfully.")
 
 def build_doc(settings):
   document = Document(settings.document)
   try:
     tree = ET.parse(settings.document)
     document.parse_tree(tree)
-    build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
+    build(document, settings.filename, settings.solutions, 
+        settings.rubrics, settings.metadata)
   except (ImproperXmlException, ET.ParseError):
     print_error("Could not parse {}".format(settings.document))
     
@@ -127,13 +127,28 @@ def build_if(settings):
             
             if satisfies(version, settings, problem.used_in):
               document.versions.append(version)
-            
-          except (ImproperXmlException, ET.ParseError):
-            pass
+              if settings.verbose:
+                print color("Added: ", color_code(GREEN)), filename
+            elif settings.verbose:
+              print color("Skipped (Predicate): ", color_code(CYAN)), filename
+          except ImproperXmlException:
+            if settings.verbose:
+              print color("Error (Validation): ", color_code(YELLOW)), filename
+          except ET.ParseError:
+            if settings.verbose:
+              print color("Error (XML Parsing): ", color_code(RED, bold=True)), filename
           except IOError as e:
             # Permission errors can be safely skipped
-            if e.errno != errno.EACCES: raise
-    build(document, settings.filename, settings.solutions, settings.rubrics, settings.metadata)
+            if e.errno != errno.EACCES: 
+              print color("Error (IO): ", color_code(RED)), filename
+              raise # TODO
+            elif settings.verbose:
+              print color("Error (Permissions): ", color_code(MAGENTA)), filename
+          except Exception:
+            print_error(filename)
+            raise
+    build(document, settings.filename, settings.solutions, settings.rubrics,
+        settings.metadata)
   else:
     print_error("The directory '{}' does not exist".format(settings.directory))
   
@@ -198,6 +213,11 @@ def add_common_flags(subparser, title=True):
   if title:
     subparser.add_argument('--title', nargs=1, required=False, 
         default="Problem", help='Sets the title of the problem build')
+
+def add_verbose_flag(subparser):
+  subparser.add_argument('--verbose', '-v', action='store_true',
+      dest='verbose', default=False,
+      help='Prints a verbose description of the files being considered')
     
 def add_doc_parser(parser):
   subparser = parser.add_parser('doc', 
@@ -242,6 +262,7 @@ def add_from_parser(parser):
       help='The destination of the rendered PDF')
   add_common_flags(subparser)
   add_predicate_flags(subparser)
+  add_verbose_flag(subparser)
   
 def add_all_parser(parser):
   subparser = parser.add_parser('all', 
@@ -251,7 +272,8 @@ def add_all_parser(parser):
       help='The destination of the output PDF')
   add_common_flags(subparser)
   add_predicate_flags(subparser)
-    
+  add_verbose_flag(subparser)
+
 def add_problem_parser(parser):
   subparser = parser.add_parser('problems', 
       help='Builds a problem or series of problems, in order')
