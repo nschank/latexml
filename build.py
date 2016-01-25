@@ -8,7 +8,7 @@ from random import randint
 from config import get_problem_root
 import xml.etree.ElementTree as ET
 from color import *
-from pdfbuilder import temp_file_remove
+from pdfbuilder import build, temp_file_remove
 
 def satisfies(version, settings, used_ins):
   if (settings.allowed_topics and 
@@ -59,44 +59,16 @@ def satisfies(version, settings, used_ins):
     return False
   return True
 
-def build(document, filename, solutions=False, rubrics=False, metadata=False):
+def build_wrapper(document, filename, solutions=False, 
+    rubrics=False, metadata=False):
   if document.versions:
     if filename.endswith(".pdf"):
       filename = filename[:-4]
       assert filename
     else:
       print_warning("Output will be named '{}.pdf'".format(filename))
-    tempfilename = filename + ".22tmp." + str(randint(0,100000))
-    with open(tempfilename + ".tex", "w") as f:
-      f.write(document.build(solutions, rubrics, metadata).encode('UTF-8'))
-    try:
-      code = call(["pdflatex", tempfilename + ".tex", "-quiet"])
-    except OSError as e:
-      temp_file_remove(tempfilename + ".tex")
-      if e.errno == errno.ENOENT:
-        print_error("pdflatex not found, is it installed?")
-        exit(1)
-      else: 
-        raise
-    temp_file_remove(tempfilename + ".aux")
-    temp_file_remove(tempfilename + ".log")
-    if code:
-      os.rename(tempfilename + ".tex", filename + ".tex")
-      print_error("pdflatex reported an error.")
-      print "Temporary LaTeX file '{}' not deleted so that it can be manually inspected, if desired.".format(filename + ".tex")
-      temp_file_remove(tempfilename + ".pdf")
-      exit(1)
-    temp_file_remove(tempfilename + ".tex")
-    while os.path.exists(filename + ".pdf"):
-      print_warning("'{}' already exists.".format(filename + ".pdf"))
-      response = raw_input("Type a new name or a blank line to replace file: ")
-      if not response: break
-      elif response.endswith(".pdf"):
-        filename = response[:-4]
-        assert filename
-      else:
-        filename = response
-    os.rename(tempfilename + ".pdf", filename + ".pdf")
+    build(document.build(solutions, rubrics, metadata),
+      filename)
   else:
     print_error("No problems were added to the build successfully.")
 
@@ -105,12 +77,10 @@ def build_doc(settings):
   try:
     tree = ET.parse(settings.document)
     document.parse_tree(tree)
-    build(document, settings.filename, settings.solutions, 
+    build_wrapper(document, settings.filename, settings.solutions, 
         settings.rubrics, settings.metadata)
   except (ImproperXmlException, ET.ParseError):
     print_error("Could not parse {}".format(settings.document))
-    
-  
     
 def build_if(settings):
   document = Document()
@@ -154,8 +124,8 @@ def build_if(settings):
           except Exception:
             print_error(filename)
             raise
-    build(document, settings.filename, settings.solutions, settings.rubrics,
-        settings.metadata)
+    build_wrapper(document, settings.filename, settings.solutions, 
+        settings.rubrics, settings.metadata)
   else:
     print_error("The directory '{}' does not exist".format(settings.directory))
   
@@ -182,12 +152,13 @@ def build_single(settings):
     version.validate()
     
     document.versions.append(version)
-    #TODO
+    
+    build_wrapper(document, outname, settings.solutions, 
+        settings.rubrics, settings.metadata)
   except (ImproperXmlException, ET.ParseError):
     print_warning("Could not parse '{}'".format(settings.problem))
     print "Run '22edit validate' to check for common problems."
       
-  build(document, outname, settings.solutions, settings.rubrics, settings.metadata)
 
 def build_specific(settings):
   document = Document("")
@@ -208,7 +179,7 @@ def build_specific(settings):
     except (ImproperXmlException, ET.ParseError):
       print_warning("Could not parse {}".format(settings.filename))
       
-  build(document, settings.filename, settings.solutions, 
+  build_wrapper(document, settings.filename, settings.solutions, 
       settings.rubrics, settings.metadata)
     
 def add_common_flags(subparser, title=True):
