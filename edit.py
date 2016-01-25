@@ -13,7 +13,7 @@ from datetime import date
 from color import *
 from subprocess import call
 from random import randint
-from pdfbuilder import can_build, build2
+from pdfbuilder import can_build
 from grp import getgrgid
 from sys import platform
 
@@ -332,7 +332,7 @@ def validate(settings):
   test_document.blurb = ""
   test_document.versions.append(newest)
   
-  if build2(test_document.build(False, False, metadata=False)):
+  if can_build(test_document.build(False, False, metadata=False)):
     print color("Body LaTeX compiles", color_code(GREEN))
   else:
     print color("Body LaTeX does not compile", color_code(RED))
