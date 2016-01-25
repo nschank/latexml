@@ -128,7 +128,46 @@ def build_if(settings):
         settings.rubrics, settings.metadata)
   else:
     print_error("The directory '{}' does not exist".format(settings.directory))
-  
+ 
+def build_list(settings):
+  if os.path.isdir(get_problem_root()):
+    for dirpath, dirnames, filenames in os.walk(get_problem_root()):
+      for filename in filenames:
+        if filename.endswith(".xml"):
+          filename = os.path.join(dirpath, filename)
+          try:
+            tree = ET.parse(filename)
+            problem = Problem(filename)
+            problem.parse_tree(tree, validate_versions=False)
+            version = problem.newest_version()
+            version.validate()
+            
+            if satisfies(version, settings, problem.used_in):
+              if settings.verbose:
+                print color("Added: ", color_code(GREEN)), filename
+              else:
+                print filename
+            elif settings.verbose:
+              print color("Skipped (Predicate): ", color_code(CYAN)), filename
+          except ImproperXmlException:
+            if settings.verbose:
+              print color("Error (Validation): ", color_code(YELLOW)), filename
+          except ET.ParseError:
+            if settings.verbose:
+              print color("Error (XML Parsing): ", color_code(RED, bold=True)), filename
+          except IOError as e:
+            # Permission errors can be safely skipped
+            if e.errno != errno.EACCES: 
+              print color("Error (IO): ", color_code(RED)), filename
+              raise # TODO
+            elif settings.verbose:
+              print color("Error (Permissions): ", color_code(MAGENTA)), filename
+          except Exception:
+            print_error(filename)
+            raise
+  else:
+    print_error("The directory '{}' does not exist".format(get_problem_root()))
+    
 def build_single(settings):
   document = Document("")
   document.name = "".join(settings.title)
@@ -253,6 +292,13 @@ def add_all_parser(parser):
   add_predicate_flags(subparser)
   add_verbose_flag(subparser)
 
+def add_list_parser(parser):
+  subparser = parser.add_parser('list', 
+      help='Lists all problems that satisfy the given predicates within the problem root directory')
+  subparser.set_defaults(func=build_list)
+  add_predicate_flags(subparser)
+  add_verbose_flag(subparser)
+  
 def add_problem_parser(parser):
   subparser = parser.add_parser('problems', 
       help='Builds a problem or series of problems, in order')
@@ -281,6 +327,7 @@ def build_args():
   add_all_parser(subparsers)
   add_doc_parser(subparsers)
   add_from_parser(subparsers)
+  add_list_parser(subparsers)
   add_problem_parser(subparsers)
   add_single_parser(subparsers)
   

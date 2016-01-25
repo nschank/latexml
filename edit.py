@@ -251,6 +251,7 @@ def validate(settings):
   
   failed = False
   
+  print color("Validating: ", color_code(BLUE)), settings.filename
   if platform in ["linux", "linux2"]:    
     stat_info = os.stat(settings.filename)
     gid = stat_info.st_gid
