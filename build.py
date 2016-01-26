@@ -59,16 +59,17 @@ def satisfies(version, settings, used_ins):
     return False
   return True
 
-def build_wrapper(document, filename, solutions=False, 
-    rubrics=False, metadata=False):
+def build_wrapper(document, filename, settings):
   if document.versions:
     if filename.endswith(".pdf"):
       filename = filename[:-4]
       assert filename
     else:
       print_warning("Output will be named '{}.pdf'".format(filename))
-    build(document.build(solutions, rubrics, metadata),
-      filename)
+    build(document.build(settings.solutions, 
+            settings.rubrics, settings.metadata),
+        filename,
+        settings.keep)
   else:
     print_error("No problems were added to the build successfully.")
 
@@ -77,8 +78,7 @@ def build_doc(settings):
   try:
     tree = ET.parse(settings.document)
     document.parse_tree(tree)
-    build_wrapper(document, settings.filename, settings.solutions, 
-        settings.rubrics, settings.metadata)
+    build_wrapper(document, settings.filename, settings)
   except (ImproperXmlException, ET.ParseError):
     print_error("Could not parse {}".format(settings.document))
     
@@ -124,8 +124,7 @@ def build_if(settings):
           except Exception:
             print_error(filename)
             raise
-    build_wrapper(document, settings.filename, settings.solutions, 
-        settings.rubrics, settings.metadata)
+    build_wrapper(document, settings.filename, settings)
   else:
     print_error("The directory '{}' does not exist".format(settings.directory))
  
@@ -192,8 +191,7 @@ def build_single(settings):
     
     document.versions.append(version)
     
-    build_wrapper(document, outname, settings.solutions, 
-        settings.rubrics, settings.metadata)
+    build_wrapper(document, outname, settings)
   except (ImproperXmlException, ET.ParseError):
     print_warning("Could not parse '{}'".format(settings.problem))
     print "Run '22edit validate' to check for common problems."
@@ -218,10 +216,11 @@ def build_specific(settings):
     except (ImproperXmlException, ET.ParseError):
       print_warning("Could not parse {}".format(settings.filename))
       
-  build_wrapper(document, settings.filename, settings.solutions, 
-      settings.rubrics, settings.metadata)
+  build_wrapper(document, settings.filename, settings)
     
 def add_common_flags(subparser, title=True):
+  subparser.add_argument('-k', dest='keep', action='store_true', 
+      default=False, help='Keeps the intermediate .tex file')
   subparser.add_argument('-m', dest='metadata', action='store_true', 
       default=False, help='Builds the problems with attached metadata')
   subparser.add_argument('-r', dest='rubrics', action='store_true', 

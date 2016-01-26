@@ -3,11 +3,11 @@
     You can build any problem(s) into a PDF in one step by running the 
     following command:
     \begin{align*}\pybuild\texttt{problems }&\texttt{\textit{output[.pdf]} problem1.xml [problem2.xml \dots]}\\
-        ~&\texttt{[-s] [-m] [-r] [--title ``TITLE''] [--verbose]}\end{align*}
+        ~&\texttt{[-s] [-m] [-r] [-k] [--title ``TITLE''] [--verbose]}\end{align*}
         
     If making only a single problem, you can use the shortcut:
     \[\pybuild\texttt{single \textit{name.xml} 
-        [-s] [-m] [-r] [--title ``TITLE''] [--verbose]}\]
+        [-s] [-m] [-r] [-k] [--title ``TITLE''] [--verbose]}\]
     which simply names the output \texttt{name.pdf} (i.e. the same name as 
     the problem file, except with .pdf instead of .xml).
     
@@ -32,6 +32,9 @@
     printed, respectively. All are optional, and they can be used together 
     independently.
     
+    The \texttt{-k} flag (for \textit{keep}) tells the tool not to delete the
+    intermediary \texttt{.tex} file.
+    
     An invalid problem XML will be skipped silently, but the build will
     continue. Use the \texttt{--verbose} flag to have the tool print out 
     what files are being added or skipped and why.
@@ -44,7 +47,7 @@
     individually, building those that meet a set of criteria. You should run
     \begin{align*}
       \pybuild\texttt{all }&\texttt{\textit{output[.pdf]} [CRITERIA]}\\
-      ~&\texttt{[-s] [-m] [-r] [--title ``TITLE''] [--verbose]}
+      ~&\texttt{[-s] [-m] [-r] [-k] [--title ``TITLE''] [--verbose]}
     \end{align*}
     If no criteria are given, the above command builds every problem in 
     the problem root directory, with the four optional flags acting just 
@@ -54,7 +57,7 @@
     the \texttt{from} option:
     \begin{align*}
       \pybuild\texttt{from }&\texttt{\textit{problems/\ \ output[.pdf]} [CRITERIA]}\\
-      ~&\texttt{[-s] [-m] [-r] [--title ``TITLE''] [--verbose]}
+      ~&\texttt{[-s] [-m] [-r] [-k] [--title ``TITLE''] [--verbose]}
     \end{align*}
     This would search everything within the \texttt{problems/} directory.
     
@@ -115,3 +118,6 @@
         If present, only includes problems that were written in any of the 
         years given.
     \end{description}
+    
+  The command \[\texttt{\pytool list [CRITERIA] [--verbose]}\] is a quick way to
+  see the names of all files that would be included in a build.

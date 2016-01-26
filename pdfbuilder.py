@@ -7,7 +7,7 @@ from subprocess import CalledProcessError, check_call, check_output
 import errno
 import string
 
-def build(document_contents, filename):
+def build(document_contents, filename, keep=False):
   assert document_contents
   root = getcwd()
   dir = ".22tmp.r" + str(getpid()) + str(randint(0,1000))
@@ -25,12 +25,14 @@ def build(document_contents, filename):
     with open(devnull, 'wb') as DEVNULL:
       check_output(["pdflatex", "-halt-on-error", "render.tex"],
           stderr=DEVNULL)
-    result = True
   except CalledProcessError as e:
     print_error("The rendering failed due to a LaTeX error:")
     lines = map(string.rstrip, e.output.split('\n'))
     if len(lines) > 7:
       for line in lines[-8:-2]:
+        print "\t", line
+    else:
+      for line in lines:
         print "\t", line
     print_warning("Rendered .tex file kept as {}.tex".format(filename))
     safe_overwrite("render", root, filename, ".tex")
@@ -49,6 +51,8 @@ def build(document_contents, filename):
       else:
         filename = response
     safe_overwrite("render", root, filename, ".pdf")
+    if keep:
+      safe_overwrite("render", root, filename, ".tex")
   chdir(root)
   try: rmtree(dir)
   except OSError:

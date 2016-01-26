@@ -20,22 +20,28 @@
       \texttt{\pybuild single problem.xml -rms} &
         Renders a single problem (with its metadata, rubric, and solution) into
         \texttt{problem.pdf} \\\hline
-      \texttt{\pybuild all --required-topics logic counting -rms} &
+      \texttt{\pybuild all \textit{output.pdf} 
+          --required-topics logic counting -rms} &
         Renders all problems in the problem root that have either logic or
         counting as one of their topics. \\\hline
-      \texttt{\pybuild all --authors \`{ }whoami\`{ }} &
+      \texttt{\pybuild all \textit{output.pdf} --authors \`{ }whoami\`{ }} &
         Renders all problems in the problem root that you helped write. 
         \\\hline
-      \texttt{\pybuild all --authors \`{ }whoami\`{ } --todo -rms} &
+      \texttt{\pybuild all \textit{output.pdf} 
+          --authors \`{ }whoami\`{ } --todo -rms} &
         Renders all problems in the problem root that you wrote, and that still
         need a rubric or a solution. \\\hline
-      \texttt{\pybuild all --grep foo bar -rms} &
+      \texttt{\pybuild all \textit{output.pdf} --grep foo bar -rms} &
         Renders all problems in the problem root which contain the text
         `foo' and the text `bar' (case insensitive). \\\hline
-      \texttt{\pybuild all --written 2016} &
+      \texttt{\pybuild all \textit{output.pdf} --written 2016} &
         Renders all problems in the problem root which were written this year. 
         \\\hline
-      \texttt{\pybuild all --written 2016 --verbose} &
+      \texttt{\pybuild from . \textit{output.pdf} *.xml} &
+        Renders all problems in the current directory, without going into
+        subdirectories
+        \\\hline
+      \texttt{\pybuild list --written 2016 --verbose} &
         Quick way of seeing what recent problems are not compiling. 
         \\\hline
     \end{tabular}
