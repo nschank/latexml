@@ -7,7 +7,7 @@ import string
 import xml.etree.ElementTree as ET
 from problem import Problem, Version, UsedIn, Document
 from parseable import ImproperXmlException
-from config import get_topics, get_types
+from config import get_resource_root, get_topics, get_types
 from copy import deepcopy
 from datetime import date
 from color import *
@@ -264,8 +264,8 @@ def validate(settings):
       print_error("Wrong permissions, you MUST run `chmod 660 {}'".format(settings.filename))
       failed = True
   
-  invalid_lt = re.compile("<(?!/?(problem|usedin|version|authors?|year|topics?|types?|param|deps?|dependency|dependencies|body|solution|rubric))")
-  invalid_amp = re.compile("&(?!\w{1,10};)")
+  invalid_lt = re.compile("<(?!/?(problem|usedin|version|authors?|year|topics?|types?|param|deps?|dependency|dependencies|body|solution|rubric|resource))")
+  invalid_amp = re.compile(r"&(?!\w{1,10};)")
   invalid_char = re.compile(r"[^\x00-\x7f]")
   
   # Some more manual checking  
@@ -320,11 +320,28 @@ def validate(settings):
         print color("\t" + msg, 
             color_code(YELLOW, foreground=False) + color_code(BLACK))
         failed = True
+     
+  if newest.resources and get_resource_root() is None:
+    print_error("This problem has resources, but your system is not configured with a resource root.")
+    failed = True
+  elif newest.resources and not os.path.exists(get_resource_root()):
+    print_error("Resource root `{}' does not exist".format(get_resource_root()))
+    failed = True
+  elif newest.resources:
+    for resource in newest.resources:
+      resource_path = os.path.join(get_resource_root(), resource)
+      if not os.path.exists(resource_path):
+        print_warning("Resource at `{}' could not be found.".format(resource_path))
+        failed = True
   
   if failed:
     print color("\nValidation failure", color_code(RED))
   else:
     print color("\nValidation success", color_code(GREEN))
+    
+  if ("todo" in newest.topics or "todo" in newest.types 
+      or "needs_work" in newest.types):
+    print color("This problem needs work", color_code(YELLOW))
   
   test_document = Document("Validation Render")
   test_document.name = "Temp"

@@ -31,6 +31,7 @@ class Version(XmlParseable):
     self.year = None
     self.params = dict()
     self.deps = []
+    self.resources = []
     self.body = None
     self.solution = None
     self.rubric = None
@@ -77,6 +78,9 @@ class Version(XmlParseable):
     if self.deps:
       deps = ET.SubElement(version, 'dependencies')
       deps.text = " ".join(self.deps)
+    for resource in self.resources:
+      tag = ET.SubElement(version, 'resource')
+      tag.text = resource
       
     body = ET.SubElement(version, 'body')
     body.text = self.body
@@ -122,6 +126,10 @@ class Version(XmlParseable):
         "Parameter {} has no value".format(attributes['name']))
     self.params[attributes['name']] = string.strip(body)
     
+  def __parse_resource(self, attributes, body):
+    self.xml_assert(body, "empty resource body")
+    self.resources.append(body)
+    
   def __parse_rubric(self, attributes, body):
     self.xml_assert(self.rubric is None, "duplicate rubric")
     self.rubric = body
@@ -145,6 +153,7 @@ class Version(XmlParseable):
       'dep':__parse_dep, 'deps':__parse_dep,
           'dependency':__parse_dep, 'dependencies':__parse_dep,
       'param':__parse_param, 'parameter':__parse_param,
+      'resource':__parse_resource,
       'rubric':__parse_rubric,
       'solution':__parse_solution,
       'topic':__parse_topic, 'topics':__parse_topic,
