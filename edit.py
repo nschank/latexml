@@ -350,13 +350,15 @@ def validate(settings):
   test_document.blurb = ""
   test_document.versions.append(newest)
   
-  if can_build(test_document.build(False, False, metadata=False)):
+  if can_build(test_document.build(False, False, metadata=False),
+      newest.resources):
     print color("Body LaTeX compiles", color_code(GREEN))
   else:
     print color("Body LaTeX does not compile", color_code(RED))
     
   newest.body = newest.solution
-  built_sol = can_build(test_document.build(False, False, metadata=False))
+  built_sol = can_build(test_document.build(False, False, metadata=False),
+      newest.resources)
   todo_sol = "TODO" in newest.solution
   if built_sol and not todo_sol:
     print color("Solution LaTeX compiles", color_code(GREEN))
@@ -370,7 +372,8 @@ def validate(settings):
         color_code(RED))
   
   newest.body = newest.rubric
-  built_rub = can_build(test_document.build(False, False, metadata=False))
+  built_rub = can_build(test_document.build(False, False, metadata=False),
+      newest.resources)
   todo_rub = "TODO" in newest.rubric
   if built_rub and not todo_rub:
     print color("Rubric LaTeX compiles", color_code(GREEN))

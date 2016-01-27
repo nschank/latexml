@@ -60,14 +60,21 @@ def satisfies(version, settings, used_ins):
   return True
 
 def build_wrapper(document, filename, settings):
+  filename = os.path.basename(filename)
   if document.versions:
     if filename.endswith(".pdf"):
       filename = filename[:-4]
       assert filename
     else:
       print_warning("Output will be named '{}.pdf'".format(filename))
+      
+    resources = set()
+    for version in document.versions:
+      for resource in version.resources:
+        resources.add(resource)
     build(document.build(settings.solutions, 
             settings.rubrics, settings.metadata),
+        resources,
         filename,
         settings.keep)
   else:
