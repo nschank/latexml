@@ -1,6 +1,85 @@
 {
 \newcommand\comm[1]{\texttt{\textbackslash #1}}
 
+\section{Course Folder Organization}
+  \LaTeX ML was created because the 22 course folder was a mess, and was
+  built in the hopes of preventing that from happening again. The only way
+  to make sure that it \textit{doesn't} happen again is to have considerably
+  better institutional memory, even while the staff changes every year.
+  
+  These homework problems
+  stick around for literally decades -- at the time of writing, we have
+  problems going back to more than 13 years ago. Codifying standards will
+  allow this class to keep improving year by year, instead of constantly 
+  struggling to just put a single homework together. With that in
+  mind, here are some rules to keep in mind when working in the course
+  folder.
+  \begin{enumerate}
+    \item \textbf{Duplication is your enemy.} The number of person-hours which
+      have been wasted by 22 TAs due to problem duplication is truly
+      staggering. If you make a new problem, you should be SURE that there is
+      not a nearly identical problem lying around.\footnote{Use 
+      \texttt{\pybuild --grep}!} And if you are modernizing an old problem,
+      you should NEVER copy and paste the file -- make a new version
+      instead.
+    \item \textbf{Organize conceptually.} In particular, you should not
+      organize the entire problem root by year: organizing by year will
+      make duplication far too likely, and will bias the staff towards
+      using more recent problems.
+      
+      Instead, we recommend the following. Break up the problems into a
+      few directories based on topic (e.g. graph theory, number theory...).
+      Each of these folders should have a subdirectory called \texttt{old},
+      which contains all problems that have not been looked at by the 
+      \textit{current year}'s staff. When a problem is looked at and fixed
+      up, it should be moved into the main topic directory. Conversely,
+      at the end of the year, all problems should be put back into the
+      \texttt{old} subdirectory of their topic.
+    \item \textbf{Finalize assignments.} If you finalize your assignments,
+      later years will be able to much more easily find the problems they
+      can use. Finalizing an assignment marks each problem as used in
+      the correct year, and the build tool can filter out problems used
+      too recently, e.g. \texttt{--not-used-in 2014 2015}.
+      
+      Take advantage of \textit{private} assignments, which allow you to mark
+      an assignment as a midterm/exam which did not have solutions released.
+      The problems within it can be reused soon afterwards, and the finalize
+      tool will mark the problems as used privately (allowing the build tool
+      to not filted it out).
+    \item \textbf{Organize resources.} The resource directory, found at
+      \texttt{/course/cs022/resources}, should be kept neat and tidy.
+      Contrary to the problems folder, the resources folder \textit{should
+      be organized by year}. In fact, more specifically, you should never
+      edit or alter ANYTHING in a previous year's resources. Please instead
+      copy old resources into your own year.
+      
+      Reasoning: images and graphics have historically been very difficult to
+      keep straight, because everything keeps moving around. Old problems
+      would reference some old image, but it had been renamed since, and 
+      somebody edited the image too, so now the problem makes no sense. No
+      more! In later years, old versions will reference an image which
+      has the same filename and same contents as when the problem was
+      written.
+    \item \textbf{Be lenient when adding topics.} It is much better,
+      organizationally, if you include all topics that are relevant to your
+      problem... even if it is not the focus of that problem. By combined
+      usage of the \texttt{--allowed-topics} and \texttt{--required-topics}
+      tags, you will have a much easier time finding appropriate problems.
+      
+      As an example, let's say you write a question that focuses on graph
+      theory, but incorporates some set theory, and probability: you should
+      DEFINITELY include all three of them as topics. If we are looking for a
+      question on the set theory homework, it is easy to not include graph
+      theory questions, so the inclusion of the topic does no harm. But the
+      extra information is still useful if we are looking for a question that
+      connects back to set theory when making a graph theory homework.
+    \item \textbf{Validate constantly.} Spam the validation tool. It is the
+      most important and rapid way of making sure that your problem is up to
+      consistently set 
+      standards, which will save time for everyone overall. (Not to mention it
+      is fairly good at finding likely errors.)
+  \end{enumerate}
+
 \section{\LaTeX\ Style}
   In order to keep the formatting of \LaTeX\ consistent between problems, we 
   have a few special macros and stylistic choices you are \textit{required}

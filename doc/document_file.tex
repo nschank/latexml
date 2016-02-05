@@ -57,19 +57,34 @@
     
     The text of a problem tag should be the filepath of an existing, 
     validated problem XML file. (If it is invalid or does exist, the 
-    assignment build will fail.)
+    assignment build will fail.) Absolute paths are allowed, and
+    relative paths are appended to the problem root.
     
   \subsection{Building}
     You can build an assignment XML with the build tool as follows: 
     \begin{align*}
       \pybuild\texttt{doc }&\texttt{\textit{assign.xml output[.pdf]}}\\
-      ~&\texttt{[-s] [-m] [-r]}
+      ~&\texttt{[-s] [-m] [-r] [-k]}
     \end{align*}
     
     The \texttt{-s}, \texttt{-m}, and \texttt{-r} flags control whether 
     solutions, metadata (like filename and topics), and rubrics are printed, 
     respectively. All are optional, and they can be used together independently.
     
+    The \texttt{-k} flag prevents the rendered \texttt{.tex} file from
+    being deleted.
+    
   \subsection{Finalizing}
     Finalizing an assignment is simple, and has no options:
     \[\pytool\texttt{finalize \textit{assign.xml}}\]
+    
+  \subsection{Private Assignments}
+    A \textit{private} assignment is one for which solutions are not publicly
+    released -- generally, midterms and finals. You should always mark
+    private assignments private, by setting an attribute in the assignment tag: 
+    \texttt{<assignment private=}``\textit{true}''\texttt{>}
+    
+    If a problem was used in a private assignment, it is allowed to appear
+    in searches which ask for problems not used in the same year. So, for
+    instance, a problem used in the 2014 final may still appear when
+    searching with \texttt{--not-used-in 2014}. 

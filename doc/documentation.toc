@@ -18,9 +18,11 @@
 \contentsline {subsection}{\numberline {5.1}Assignment XML Specification}{15}
 \contentsline {subsection}{\numberline {5.2}Building}{16}
 \contentsline {subsection}{\numberline {5.3}Finalizing}{16}
+\contentsline {subsection}{\numberline {5.4}Private Assignments}{16}
 \contentsline {section}{\numberline {6}Features Being Implemented}{17}
-\contentsline {section}{\numberline {7}\LaTeX \ Style}{18}
-\contentsline {subsection}{\numberline {7.1}22-Specific Macros}{19}
-\contentsline {subsection}{\numberline {7.2}\LaTeX \ Tips}{19}
-\contentsline {subsection}{\numberline {7.3}Adding to This List}{20}
-\contentsline {section}{\numberline {8}Command Cheat Sheet}{21}
+\contentsline {section}{\numberline {7}Course Folder Organization}{18}
+\contentsline {section}{\numberline {8}\LaTeX \ Style}{19}
+\contentsline {subsection}{\numberline {8.1}22-Specific Macros}{20}
+\contentsline {subsection}{\numberline {8.2}\LaTeX \ Tips}{21}
+\contentsline {subsection}{\numberline {8.3}Adding to This List}{21}
+\contentsline {section}{\numberline {9}Command Cheat Sheet}{22}

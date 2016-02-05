@@ -51,10 +51,18 @@
     Change the contents of the \texttt{include} tag to contain the path 
     \[\texttt{/home/\textit{login}/latexml/include/simple22.sty}\] 
     This is the location of 
-    the header file inserted sinto the top of built documents. You may optionally
+    the header file inserted into the top of built documents. 
+    
+    You may optionally
     add a directory of your preference as the \texttt{problemroot} -- this
     is where \texttt{\pybuild all} and \texttt{\pybuild doc} search, but
     it is not necessary for single problems or for editing.
+    
+    If you will be working with graphics or other resources (e.g. if you
+    will be including an image or diagram in a problem), you will need to
+    set the \texttt{resourceroot} to an existing directory, and you will
+    need to store that image/diagram there. If you do not plan to work
+    with resources, the \texttt{resourceroot} does not need to be fixed.
     
     You should now run the tests (\texttt{python tests.py}) to make sure that 
     everything is running smoothly.

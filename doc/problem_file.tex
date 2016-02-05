@@ -10,16 +10,18 @@
       \texttt{
 <problem>\\
 \TB<usedin year=}``\textit{2015}''\texttt{>}Homework 5\texttt{</usedin>\\
-\TB<usedin year=}``\textit{2014}''\texttt{>}Midterm 1\texttt{</usedin>\\
+\TB<usedin year=}``\textit{2014}''\texttt{private=}``\textit{true}''\texttt{>}Midterm 1\texttt{</usedin>\\
 \TB<version id=}``\textit{2}''\texttt{>\\
 \TB\TB<author>}cjk\texttt{</author>\\
 \TB\TB<year>}2016\texttt{</year>\\
 \TB\TB<topics>}number\_theory graph\_theory\texttt{</topics>\\
 \TB\TB<types>}proof induction\texttt{</types>\\
 \TB\TB<param name=}``\textit{modulus}''\texttt{>}3\texttt{</param>\\
-\TB\TB<dependency>}tikz\texttt{</dependency>\\
+\TB\TB<dependencies>}tikz graphicx\texttt{</dependencies>\\
+\TB\TB<resource>}2016/prettypicture.jpg\texttt{</resource>\\
 \TB\TB<body>}\\
 \TB\TB\TB The modulus is \textbf{\textbackslash modulus}.\\
+\TB\TB\TB \textbf{\textbackslash includegraphics}\{\textit{prettypicture}\}\\
 \TB\TB\texttt{</body>\\
 \TB\TB<solution>}\\
 \TB\TB\TB Solution to problem goes 
@@ -114,6 +116,16 @@
     required in order to build the problem. \texttt{tikz} is the most 
     commonly included by far. These dependencies will by dynamically 
     imported when building an assignment including this problem.
+    
+    A version MAY have zero or more \texttt{resource} tags, each of which
+    should contain a single relative path to an image or file. This path
+    should be relative to the \texttt{resourceroot} specified in the config
+    file\footnote{In the course directory: \texttt{/course/cs022/resources}}
+    and it will be copied into the same temporary folder as the build.
+    Thus, for instance, the example problem file above includes the resource
+    in \texttt{2016/prettypicture.jpg}, and is therefore able to use
+    the \texttt{graphicx} package (which was included as a dependency!) to
+    show the graphic `prettypicture'. 
     
     \texttt{usedin} tags should never be created or edited by hand.
   
