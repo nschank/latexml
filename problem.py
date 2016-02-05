@@ -31,6 +31,7 @@ class Version(XmlParseable):
     self.year = None
     self.params = dict()
     self.deps = []
+    self.resources = []
     self.body = None
     self.solution = None
     self.rubric = None
@@ -39,20 +40,29 @@ class Version(XmlParseable):
     self.authors = [get_default_author()]
     self.year = str(date.today().year)
     
+  def _meta(self):
+    filename = "\\texttt{" + self.filename.replace('_', "\\_") + "}"
+    topics = "\\textbf{Topics Covered: }" + ", ".join(self.topics).replace('_', ' ')
+    types = "\\textbf{Types: }" + ", ".join(self.types).replace('_', ' ')
+    version = " Version " + str(self.vid) + " (Written " + str(self.year) + ")"
+    authors = "\\textbf{Authors}: " + ", ".join(self.authors).replace('_', "\\_")
+    return "\\\\".join([filename + version, topics, types, authors])
+    
+  def _solution(self):
+    return ("\\begin{mdframed}\n\\subsubsection*{Solution}\n\n" 
+              + self.solution + "\\end{mdframed}\n")
+  def _rubric(self):
+    return ("\\begin{mdframed}\n\\subsubsection*{Rubric}\n\n" 
+              + self.rubric + "\\end{mdframed}\n")
+    
   def pretty_print(self, solution=False, rubric=False, metadata=False):
     """Prints this version's contents as valid LaTeX, for building"""
     return ("\n".join(["\\newcommand\\" + name + "{" + value + "}" 
               for name, value in self.params.iteritems()]) +
-            ("\\texttt{" + self.filename.replace('_', "\\_") + "}\\\\\\textbf{Topics Covered: }" +
-              ", ".join(self.topics).replace('_', ' ') + "\\\\\\textbf{Types: }" +
-              ", ".join(self.types).replace('_', ' ') if metadata else "")
+            (self._meta() if metadata else "")
             + "\n\n" + self.body +
-            ("\\begin{mdframed}\n\\subsubsection*{Solution}\n\n" 
-              + self.solution + "\\end{mdframed}\n"
-             if solution else "") +
-            ("\\begin{mdframed}\n\\subsubsection*{Rubric}\n\n" 
-              + self.rubric + "\\end{mdframed}\n"
-             if rubric else ""))
+             (self._solution() if solution else "") +
+             (self._rubric() if rubric else ""))
     
   def to_element(self):
     version = ET.Element('version')
@@ -77,6 +87,9 @@ class Version(XmlParseable):
     if self.deps:
       deps = ET.SubElement(version, 'dependencies')
       deps.text = " ".join(self.deps)
+    for resource in self.resources:
+      tag = ET.SubElement(version, 'resource')
+      tag.text = resource
       
     body = ET.SubElement(version, 'body')
     body.text = self.body
@@ -122,6 +135,10 @@ class Version(XmlParseable):
         "Parameter {} has no value".format(attributes['name']))
     self.params[attributes['name']] = string.strip(body)
     
+  def __parse_resource(self, attributes, body):
+    self.xml_assert(body, "empty resource body")
+    self.resources.append(body)
+    
   def __parse_rubric(self, attributes, body):
     self.xml_assert(self.rubric is None, "duplicate rubric")
     self.rubric = body
@@ -145,6 +162,7 @@ class Version(XmlParseable):
       'dep':__parse_dep, 'deps':__parse_dep,
           'dependency':__parse_dep, 'dependencies':__parse_dep,
       'param':__parse_param, 'parameter':__parse_param,
+      'resource':__parse_resource,
       'rubric':__parse_rubric,
       'solution':__parse_solution,
       'topic':__parse_topic, 'topics':__parse_topic,
@@ -192,7 +210,10 @@ class Problem(XmlParseable):
         self.xml_assert('year' in child.attrib, "usedin tag must have year")
         self.xml_assert(child.text, "usedin tag must have text")
         self.xml_assert(child.attrib['year'] and child.attrib['year'] != 'unknown', "usedin year must be present and not 'unknown'")
-        self.used_in.append(UsedIn(child.attrib['year'], child.text))
+        private = False
+        if 'private' in child.attrib and str.lower(child.attrib['private']) == 'true':
+          private = True
+        self.used_in.append(UsedIn(child.attrib['year'], child.text, private))
       else:
         version = Version(self.filename)
         version.parse_element(child)
@@ -210,6 +231,8 @@ class Problem(XmlParseable):
     for pair in self.used_in:
       usedin = ET.SubElement(root, 'usedin')
       usedin.set("year", pair.year)
+      if pair.private:
+        usedin.set("private", "true")
       usedin.text = pair.assignment_name
     for key in sorted(self.versions.keys(), reverse=True):
       root.append(self.versions[key].to_element())
@@ -227,12 +250,15 @@ class Document(XmlParseable):
     self.filename = filename
     self.versions = []
     self.blurb = blurb
+    self.private = False
     
   def build(self, solutions=False, rubrics=False, metadata=False):
     return self._header() + self._document(self._problems(solutions, rubrics, metadata))
     
   def to_element(self):
     assign = ET.Element('assignment')
+    if self.private:
+      assign.set("private", "true")
     
     year = ET.SubElement(assign, 'year')
     year.text = self.year
@@ -342,13 +368,16 @@ class Document(XmlParseable):
   def parse_element(self, root):
     self.xml_assert(root.tag == 'assignment',
         "Invalid root tag '{}' (should be 'assignment')".format(root.tag))
+    if "private" in root.attrib and str.lower(root.attrib["private"]) == "true":
+      self.private = True
     for tag in root:
       self.xml_assert(tag.tag in Document.__parsers, 
           "Invalid tag '{}'".format(tag.tag))
       Document.__parsers[tag.tag](self, tag.attrib, tag.text)
     
 class UsedIn:
-  def __init__(self, year, assignment_name):
+  def __init__(self, year, assignment_name, private=False):
     self.year = year
     self.assignment_name = assignment_name
+    self.private = private
     

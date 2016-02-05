@@ -16,6 +16,7 @@ class BuildConfiguration(XmlParseable):
     self.blurb = None
     self.include = []
     self.problemroot = None
+    self.resourceroot = None
     
   def __parse_author(self, attributes, body):
     self.xml_assert(not attributes, "author tag should have no attributes")
@@ -42,6 +43,12 @@ class BuildConfiguration(XmlParseable):
     self.xml_assert(self.problemroot is None, "duplicate problemroot tag")
     self.problemroot = string.strip(body)
     
+  def __parse_resourceroot(self, attributes, body):
+    self.xml_assert(not attributes, "resourceroot tag should have no attributes")
+    self.xml_assert(body, "resourceroot tag must have a body")
+    self.xml_assert(self.resourceroot is None, "duplicate resourceroot tag")
+    self.resourceroot = string.strip(body)
+    
   def __parse_topics(self, attributes, body):
     self.xml_assert(not attributes, "topics tag should have no attributes")
     self.xml_assert(not self.topics, "duplicate topics tag")
@@ -57,6 +64,7 @@ class BuildConfiguration(XmlParseable):
     'blurb':__parse_blurb,
     'include':__parse_include,
     'problemroot':__parse_problemroot,
+    'resourceroot':__parse_resourceroot,
     'topics':__parse_topics,
     'types':__parse_types}
 
@@ -113,6 +121,9 @@ def get_inclusions():
   
 def get_problem_root():
   return get_configuration().problemroot
+  
+def get_resource_root():
+  return get_configuration().resourceroot
   
 def get_topics():
   return copy(get_configuration().topics)

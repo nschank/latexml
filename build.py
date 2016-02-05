@@ -44,7 +44,7 @@ def satisfies(version, settings, used_ins):
     for actual in used_ins:
       if settings.used_in and actual.year in settings.used_in:
         matches_used = True
-      if settings.not_used_in and actual.year in settings.not_used_in:
+      if settings.not_used_in and actual.year in settings.not_used_in and not actual.private:
         return False
     if not used_ins:
       if settings.used_in and "none" in settings.used_in:
@@ -60,14 +60,21 @@ def satisfies(version, settings, used_ins):
   return True
 
 def build_wrapper(document, filename, settings):
+  filename = os.path.basename(filename)
   if document.versions:
     if filename.endswith(".pdf"):
       filename = filename[:-4]
       assert filename
     else:
       print_warning("Output will be named '{}.pdf'".format(filename))
+      
+    resources = set()
+    for version in document.versions:
+      for resource in version.resources:
+        resources.add(resource)
     build(document.build(settings.solutions, 
             settings.rubrics, settings.metadata),
+        resources,
         filename,
         settings.keep)
   else:

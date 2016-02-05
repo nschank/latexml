@@ -8,6 +8,7 @@
   <types>computation core contradiction contrapositive direct element_method induction large needs_work notation piece proof repetitive todo</types>
   <include>/course/cs022/latexml/include/simple22.sty</include>
   <problemroot>/course/cs022/problems</problemroot>
+  <resourceroot>/course/cs022/resources</resourceroot>
   <blurb>
     All homeworks are due at 12:55 PM in the CS22 bin on the CIT second floor, next to the Fishbowl.
 

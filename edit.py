@@ -7,7 +7,7 @@ import string
 import xml.etree.ElementTree as ET
 from problem import Problem, Version, UsedIn, Document
 from parseable import ImproperXmlException
-from config import get_topics, get_types
+from config import get_resource_root, get_topics, get_types
 from copy import deepcopy
 from datetime import date
 from color import *
@@ -161,7 +161,7 @@ def finalize(settings):
     prob_tree = ET.parse(version.filename)
     problem = Problem(version.filename)
     problem.parse_tree(prob_tree, validate_versions=False)
-    problem.used_in.append(UsedIn(document.year, document.name))
+    problem.used_in.append(UsedIn(document.year, document.name, document.private))
     
     root = problem.to_element()
     indent(root)
@@ -264,8 +264,8 @@ def validate(settings):
       print_error("Wrong permissions, you MUST run `chmod 660 {}'".format(settings.filename))
       failed = True
   
-  invalid_lt = re.compile("<(?!/?(problem|usedin|version|authors?|year|topics?|types?|param|deps?|dependency|dependencies|body|solution|rubric))")
-  invalid_amp = re.compile("&(?!\w{1,10};)")
+  invalid_lt = re.compile("<(?!/?(problem|usedin|version|authors?|year|topics?|types?|param|deps?|dependency|dependencies|body|solution|rubric|resource))")
+  invalid_amp = re.compile(r"&(?!\w{1,10};)")
   invalid_char = re.compile(r"[^\x00-\x7f]")
   
   # Some more manual checking  
@@ -320,11 +320,28 @@ def validate(settings):
         print color("\t" + msg, 
             color_code(YELLOW, foreground=False) + color_code(BLACK))
         failed = True
+     
+  if newest.resources and get_resource_root() is None:
+    print_error("This problem has resources, but your system is not configured with a resource root.")
+    failed = True
+  elif newest.resources and not os.path.exists(get_resource_root()):
+    print_error("Resource root `{}' does not exist".format(get_resource_root()))
+    failed = True
+  elif newest.resources:
+    for resource in newest.resources:
+      resource_path = os.path.join(get_resource_root(), resource)
+      if not os.path.exists(resource_path):
+        print_warning("Resource at `{}' could not be found.".format(resource_path))
+        failed = True
   
   if failed:
     print color("\nValidation failure", color_code(RED))
   else:
     print color("\nValidation success", color_code(GREEN))
+    
+  if ("todo" in newest.topics or "todo" in newest.types 
+      or "needs_work" in newest.types):
+    print color("This problem needs work", color_code(YELLOW))
   
   test_document = Document("Validation Render")
   test_document.name = "Temp"
@@ -333,13 +350,15 @@ def validate(settings):
   test_document.blurb = ""
   test_document.versions.append(newest)
   
-  if can_build(test_document.build(False, False, metadata=False)):
+  if can_build(test_document.build(False, False, metadata=False),
+      newest.resources):
     print color("Body LaTeX compiles", color_code(GREEN))
   else:
     print color("Body LaTeX does not compile", color_code(RED))
     
   newest.body = newest.solution
-  built_sol = can_build(test_document.build(False, False, metadata=False))
+  built_sol = can_build(test_document.build(False, False, metadata=False),
+      newest.resources)
   todo_sol = "TODO" in newest.solution
   if built_sol and not todo_sol:
     print color("Solution LaTeX compiles", color_code(GREEN))
@@ -353,7 +372,8 @@ def validate(settings):
         color_code(RED))
   
   newest.body = newest.rubric
-  built_rub = can_build(test_document.build(False, False, metadata=False))
+  built_rub = can_build(test_document.build(False, False, metadata=False),
+      newest.resources)
   todo_rub = "TODO" in newest.rubric
   if built_rub and not todo_rub:
     print color("Rubric LaTeX compiles", color_code(GREEN))
