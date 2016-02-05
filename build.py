@@ -44,7 +44,7 @@ def satisfies(version, settings, used_ins):
     for actual in used_ins:
       if settings.used_in and actual.year in settings.used_in:
         matches_used = True
-      if settings.not_used_in and actual.year in settings.not_used_in:
+      if settings.not_used_in and actual.year in settings.not_used_in and not actual.private:
         return False
     if not used_ins:
       if settings.used_in and "none" in settings.used_in:
