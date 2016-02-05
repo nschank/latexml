@@ -250,12 +250,15 @@ class Document(XmlParseable):
     self.filename = filename
     self.versions = []
     self.blurb = blurb
+    self.private = False
     
   def build(self, solutions=False, rubrics=False, metadata=False):
     return self._header() + self._document(self._problems(solutions, rubrics, metadata))
     
   def to_element(self):
     assign = ET.Element('assignment')
+    if self.private:
+      assign.set("private", "true")
     
     year = ET.SubElement(assign, 'year')
     year.text = self.year
@@ -365,6 +368,8 @@ class Document(XmlParseable):
   def parse_element(self, root):
     self.xml_assert(root.tag == 'assignment',
         "Invalid root tag '{}' (should be 'assignment')".format(root.tag))
+    if "private" in root.attrib and str.lower(root.attrib["private"]) == "true":
+      self.private = True
     for tag in root:
       self.xml_assert(tag.tag in Document.__parsers, 
           "Invalid tag '{}'".format(tag.tag))

@@ -161,7 +161,7 @@ def finalize(settings):
     prob_tree = ET.parse(version.filename)
     problem = Problem(version.filename)
     problem.parse_tree(prob_tree, validate_versions=False)
-    problem.used_in.append(UsedIn(document.year, document.name))
+    problem.used_in.append(UsedIn(document.year, document.name, document.private))
     
     root = problem.to_element()
     indent(root)
