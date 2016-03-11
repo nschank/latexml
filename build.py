@@ -89,6 +89,28 @@ def build_doc(settings):
   except (ImproperXmlException, ET.ParseError):
     print_error("Could not parse {}".format(settings.document))
     
+def build_each(settings):
+  document = Document(settings.document)
+  try:
+    tree = ET.parse(settings.document)
+    document.parse_tree(tree)
+    settings.metadata = True
+    settings.solutions = True
+    settings.rubrics = True
+    settings.keep = False
+    
+    for i,v in enumerate(document.versions):
+      problem_document = Document()
+      problem_document.name = document.name + " Problem " + str(i)
+      problem_document.year = "1901"
+      problem_document.due = "Grading"
+      problem_document.blurb = ""
+      problem_document.versions.append(v)
+      
+      build_wrapper(problem_document, settings.document[:-4] + "." + str(i) + ".pdf", settings)
+  except (ImproperXmlException, ET.ParseError):
+    print_error("Could not parse {}".format(settings.document))
+    
 def build_if(settings):
   document = Document()
   document.name = "".join(settings.title)
@@ -276,6 +298,13 @@ def add_predicate_flags(subparser):
   subparser.add_argument('--written', required=False, dest='written', 
       nargs='+', help='If present, will specify a set of years that a problem\'s most recent version may have been written (to be included)')
     
+def add_each_parser(parser):
+  subparser = parser.add_parser('each', 
+      help='Builds each problem of a document into separate PDFs, in preparation for grading')
+  subparser.set_defaults(func=build_each)
+  subparser.add_argument('document', metavar='D', 
+      help='The assignment XML file where each problem is stored')
+  
 def add_from_parser(parser):
   subparser = parser.add_parser('from', 
       help='Builds all problems that satisfy the given predicates within a particular directory')
@@ -332,6 +361,7 @@ def build_args():
   
   add_all_parser(subparsers)
   add_doc_parser(subparsers)
+  add_each_parser(subparsers)
   add_from_parser(subparsers)
   add_list_parser(subparsers)
   add_problem_parser(subparsers)
