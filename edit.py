@@ -152,6 +152,7 @@ def finalize(settings):
   try:
     tree = ET.parse(settings.document)
     document.parse_tree(tree)
+    document.validate()
   except ImproperXmlException, ET.ParseError:
     print_error("Could not parse '{}'".format(settings.document))
     print "Are you sure it exists?"
@@ -161,6 +162,13 @@ def finalize(settings):
     prob_tree = ET.parse(version.filename)
     problem = Problem(version.filename)
     problem.parse_tree(prob_tree, validate_versions=False)
+    already_finalized = False
+    for usedin in problem.used_in:
+      if document.year == usedin.year and document.name == usedin.assignment_name:
+        already_finalized = True
+    if already_finalized:
+      break
+    
     problem.used_in.append(UsedIn(document.year, document.name, document.private))
     
     root = problem.to_element()

@@ -38,5 +38,6 @@
 % 22 style
 \newcommand\hint[1]{\textbf{Hint}: #1}
 \newcommand\note[1]{\textbf{Note}: #1}
-\newenvironment{22enumerate}{\begin{enumerate}[a.]\itemsep0em}{\end{enumerate}}
+\newcounter{enum22i}
+\newenvironment{22enumerate}{\begin{enumerate}[a.]\itemsep0em\setcounter{enumi}{\value{enum22i}}}{\setcounter{enum22i}{\value{enumi}}\end{enumerate}}
 \newenvironment{22itemize}{\begin{itemize}\itemsep0em}{\end{itemize}}

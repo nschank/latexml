@@ -49,18 +49,18 @@ class Version(XmlParseable):
     return "\\\\".join([filename + version, topics, types, authors])
     
   def _solution(self):
-    return ("\\begin{mdframed}\n\\subsubsection*{Solution}\n\n" 
-              + self.solution + "\\end{mdframed}\n")
+    return ("\\begin{mdframed}\n{\\subsubsection*{Solution}\\setcounter{enum22i}{0}\n\n" 
+              + self.solution + "}\\end{mdframed}\n")
   def _rubric(self):
-    return ("\\begin{mdframed}\n\\subsubsection*{Rubric}\n\n" 
-              + self.rubric + "\\end{mdframed}\n")
+    return ("\\begin{mdframed}\n{\\subsubsection*{Rubric}\\setcounter{enum22i}{0}\n\n" 
+              + self.rubric + "}\\end{mdframed}\n")
     
   def pretty_print(self, solution=False, rubric=False, metadata=False):
     """Prints this version's contents as valid LaTeX, for building"""
     return ("\n".join(["\\newcommand\\" + name + "{" + value + "}" 
               for name, value in self.params.iteritems()]) +
             (self._meta() if metadata else "")
-            + "\n\n" + self.body +
+            + "\n\n{\\setcounter{enum22i}{0}\n" + self.body + "\n}" +
              (self._solution() if solution else "") +
              (self._rubric() if rubric else ""))
     
