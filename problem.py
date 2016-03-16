@@ -345,7 +345,7 @@ class Document(XmlParseable):
   def _problems(self, solutions=False, rubrics=False, metadata=False):
     return "\n\n".join(
       [("\\noindent\\makebox[\\linewidth]{\\rule{\\paperwidth}{0.4pt}}\n\n" if v.separateFromPrevious else "") +
-      "\\subsection*{Problem " + str(i+1) + "}\n{\n" + 
+      "\\subsection*{Problem " + str(i+1) + "}\n{\n\\nopagebreak " + 
         v.pretty_print(solutions,rubrics,metadata) + "\n}\n\n" 
         for i, v in enumerate(self.versions)])
 
