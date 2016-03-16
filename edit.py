@@ -251,7 +251,6 @@ def edit(settings):
 def validate(settings):
   """
   Validates the correctness and style of a problem XML document.
-  TODO: INCOMPLETE
   """
   if not settings.filename.endswith(".xml"):
     print_error("{} must have a .xml extension to interoperate with build tool".format(settings.filename))

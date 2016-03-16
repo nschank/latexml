@@ -101,7 +101,7 @@ def build_each(settings):
     
     for i,v in enumerate(document.versions):
       problem_document = Document()
-      problem_document.name = document.name + " Problem " + str(i)
+      problem_document.name = document.name + " Problem " + str(i+1)
       problem_document.year = "1901"
       problem_document.due = "Grading"
       problem_document.blurb = ""

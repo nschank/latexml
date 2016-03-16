@@ -25,6 +25,8 @@ class Version(XmlParseable):
     self.filename = filename
     self.vid = vid
     
+    self.standalone = False
+    
     self.authors = []
     self.topics = []
     self.types = []
@@ -67,6 +69,8 @@ class Version(XmlParseable):
   def to_element(self):
     version = ET.Element('version')
     version.set('id', str(self.vid))
+    if self.standalone:
+      version.set('standalone', "true")
     
     author = ET.SubElement(version, 'authors')
     author.text = " ".join(self.authors)
@@ -173,10 +177,23 @@ class Version(XmlParseable):
     self.xml_assert(element.tag == 'version', 
         "Invalid version tag '{}'".format(element.tag))
     self.xml_assert('id' in element.attrib, "Version with no id")
+    if 'standalone' in element.attrib:
+      standalone = str.lower(element.attrib['standalone'])
+      if standalone == 'true':
+        self.standalone = True
+      else:
+        self.xml_assert(standalone == 'false',
+          "Version has unknown value `{}' for the standalone attribute:".format(standalone))
+      self.xml_assert(len(element.attrib) == 2,
+        "Version has unknown attributes (only `id' and `standalone' are allowed): `{}'".format(str(element.attrib.keys())))
+    else:
+      self.xml_assert(len(element.attrib) == 1,
+        "Version has unknown attributes (only `id' and `standalone' are allowed): `{}'".format(str(element.attrib.keys())))
+    
     try: self.vid = int(element.attrib['id'])
     except ValueError: 
       self.xml_assert(False, 
-        "Version has non-numeric id {}".format(element.attrib['id']))
+        "Version has non-numeric id `{}'".format(element.attrib['id']))
     
     for tag in element:
       self.xml_assert(tag.tag in Version.__parsers, 
@@ -217,7 +234,7 @@ class Problem(XmlParseable):
       else:
         version = Version(self.filename)
         version.parse_element(child)
-        if validate_versions:
+        if validate_versions or version.standalone:
           version.validate()
         self.xml_assert(version.vid not in self.versions, 
           "Duplicate version {}".format(version.vid))
