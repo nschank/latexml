@@ -128,18 +128,29 @@ def build_if(settings):
             tree = ET.parse(filename)
             problem = Problem(filename)
             problem.parse_tree(tree, validate_versions=False)
-            version = problem.newest_version()
-            version.validate()
             
-            if satisfies(version, settings, problem.used_in):
-              document.versions.append(version)
-              if settings.verbose:
-                print color("Added: ", color_code(GREEN)), filename
-            elif settings.verbose:
-              print color("Skipped (Predicate): ", color_code(CYAN)), filename
-          except ImproperXmlException:
-            if settings.verbose:
-              print color("Error (Validation): ", color_code(YELLOW)), filename
+            currentVersions = []
+            if settings.all:
+              everyVersion = problem.get_versions()
+              currentVersions = [everyVersion[0]] + [v for v in everyVersion[1:] if v.standalone]
+            else:
+              currentVersions = [problem.newest_version()]
+              
+            firstInProblem = settings.all # only use separators if including multiple versions per problem, 
+            for version in currentVersions:
+              try:
+                version.validate()
+                if satisfies(version, settings, problem.used_in):
+                  version.separateFromPrevious = firstInProblem
+                  firstInProblem = False
+                  document.versions.append(version)
+                  if settings.verbose:
+                    print color("Added: ", color_code(GREEN)), filename, "Version {}".format(version.vid)
+                elif settings.verbose:
+                  print color("Skipped (Predicate): ", color_code(CYAN)), filename, "Version {}".format(version.vid)
+              except ImproperXmlException:
+                if settings.verbose:
+                  print color("Error (Validation): ", color_code(YELLOW)), filename, "Version {}".format(version.vid)         
           except ET.ParseError:
             if settings.verbose:
               print color("Error (XML Parsing): ", color_code(RED, bold=True)), filename
@@ -276,6 +287,9 @@ def add_doc_parser(parser):
   add_common_flags(subparser, title=False)
     
 def add_predicate_flags(subparser):
+  subparser.add_argument('--all', required=False, 
+      dest='all', action='store_true', default=False,      
+      help='If present, will include any standalone versions in addition to the most recent ones')
   subparser.add_argument('--allowed-topics', required=False, 
       dest='allowed_topics', nargs='+', 
       help='If present, will restrict the allowed topics: a problem will not be built if it uses any topic outside of the provided')

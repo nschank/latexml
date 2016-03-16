@@ -26,6 +26,7 @@ class Version(XmlParseable):
     self.vid = vid
     
     self.standalone = False
+    self.separateFromPrevious = False
     
     self.authors = []
     self.topics = []
@@ -211,6 +212,12 @@ class Problem(XmlParseable):
     self.versions = dict()
     self.used_in = []
     
+  def get_versions(self):
+    ret = []
+    for id in sorted(self.versions.keys(), reverse=True):
+      ret.append(self.versions[id])
+    return ret
+    
   def newest_version(self):
     return self.versions[max(self.versions)]
     
@@ -234,7 +241,7 @@ class Problem(XmlParseable):
       else:
         version = Version(self.filename)
         version.parse_element(child)
-        if validate_versions or version.standalone:
+        if validate_versions:
           version.validate()
         self.xml_assert(version.vid not in self.versions, 
           "Duplicate version {}".format(version.vid))
@@ -337,7 +344,8 @@ class Document(XmlParseable):
 
   def _problems(self, solutions=False, rubrics=False, metadata=False):
     return "\n\n".join(
-      ["\\subsection*{Problem " + str(i+1) + "}\n{\n" + 
+      [("\\noindent\\makebox[\\linewidth]{\\rule{\\paperwidth}{0.4pt}}\n\n" if v.separateFromPrevious else "") +
+      "\\subsection*{Problem " + str(i+1) + "}\n{\n" + 
         v.pretty_print(solutions,rubrics,metadata) + "\n}\n\n" 
         for i, v in enumerate(self.versions)])
 
