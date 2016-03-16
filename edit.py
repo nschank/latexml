@@ -312,86 +312,96 @@ def validate(settings):
     print_error(e.args[0])
     print color("\nPlease rerun validation after fixing", color_code(CYAN))
     exit(1)
-  newest = problem.newest_version()
-  
-  if "unknown" in map(str.lower, newest.authors):
-    print_warning("Unknown author\n")
-  if "unknown" == newest.year.lower():
-    print_warning("Unknown year\n") 
     
-  for search_term, msg in stylistic_errors.iteritems():
-    for search_space in [newest.body, newest.solution, newest.rubric]:
-      results = re.search(search_term, search_space)
-      if results:
-        print_error("Found problematic text \"{}\"".format(results.group(0)))
-        print color("\t" + msg, 
-            color_code(YELLOW, foreground=False) + color_code(BLACK))
-        failed = True
-     
-  if newest.resources and get_resource_root() is None:
-    print_error("This problem has resources, but your system is not configured with a resource root.")
-    failed = True
-  elif newest.resources and not os.path.exists(get_resource_root()):
-    print_error("Resource root `{}' does not exist".format(get_resource_root()))
-    failed = True
-  elif newest.resources:
-    for resource in newest.resources:
-      resource_path = os.path.join(get_resource_root(), resource)
-      if not os.path.exists(resource_path):
-        print_warning("Resource at `{}' could not be found.".format(resource_path))
-        failed = True
-  
-  if failed:
-    print color("\nValidation failure", color_code(RED))
-  else:
-    print color("\nValidation success", color_code(GREEN))
+  firstProblem = True
+  checkpoint = failed
+  for version in problem.get_versions():
+    if not version.standalone and not firstProblem:
+      continue
+    firstProblem = False
+    failed = checkpoint
     
-  if ("todo" in newest.topics or "todo" in newest.types 
-      or "needs_work" in newest.types):
-    print color("This problem needs work", color_code(YELLOW))
+    print color("\n\nVERSION {}:\n".format(version.vid),
+              color_code(BLUE))
   
-  test_document = Document("Validation Render")
-  test_document.name = "Temp"
-  test_document.year = "1900"
-  test_document.due = "Never"
-  test_document.blurb = ""
-  test_document.versions.append(newest)
-  
-  if can_build(test_document.build(False, False, metadata=False),
-      newest.resources):
-    print color("Body LaTeX compiles", color_code(GREEN))
-  else:
-    print color("Body LaTeX does not compile", color_code(RED))
+    if "unknown" in map(str.lower, version.authors):
+      print_warning("Unknown author\n")
+    if "unknown" == version.year.lower():
+      print_warning("Unknown year\n") 
+      
+    for search_term, msg in stylistic_errors.iteritems():
+      for search_space in [version.body, version.solution, version.rubric]:
+        results = re.search(search_term, search_space)
+        if results:
+          print_error("Found problematic text \"{}\"".format(results.group(0)))
+          print color("\t" + msg, 
+              color_code(YELLOW, foreground=False) + color_code(BLACK))
+          failed = True
+       
+    if version.resources and get_resource_root() is None:
+      print_error("This problem has resources, but your system is not configured with a resource root.")
+      failed = True
+    elif version.resources and not os.path.exists(get_resource_root()):
+      print_error("Resource root `{}' does not exist".format(get_resource_root()))
+      failed = True
+    elif version.resources:
+      for resource in version.resources:
+        resource_path = os.path.join(get_resource_root(), resource)
+        if not os.path.exists(resource_path):
+          print_warning("Resource at `{}' could not be found.".format(resource_path))
+          failed = True
     
-  newest.body = newest.solution
-  built_sol = can_build(test_document.build(False, False, metadata=False),
-      newest.resources)
-  todo_sol = "TODO" in newest.solution
-  if built_sol and not todo_sol:
-    print color("Solution LaTeX compiles", color_code(GREEN))
-  elif built_sol and todo_sol:
-    print color("Solution LaTeX compiles but need to be finished", 
-        color_code(YELLOW))
-  elif not built_sol and not todo_sol:
-    print color("Solution LaTeX does not compile", color_code(RED, bold=True))
-  elif not built_sol and todo_sol:
-    print color("Solution LaTeX does not compile and needs to be finished",
-        color_code(RED))
-  
-  newest.body = newest.rubric
-  built_rub = can_build(test_document.build(False, False, metadata=False),
-      newest.resources)
-  todo_rub = "TODO" in newest.rubric
-  if built_rub and not todo_rub:
-    print color("Rubric LaTeX compiles", color_code(GREEN))
-  elif built_rub and todo_rub:
-    print color("Rubric LaTeX compiles but need to be finished", 
-        color_code(YELLOW))
-  elif not built_rub and not todo_rub:
-    print color("Rubric LaTeX does not compile", color_code(RED, bold=True))
-  elif not built_rub and todo_rub:
-    print color("Rubric LaTeX does not compile and needs to be finished",
-        color_code(RED))
+    if failed:
+      print color("\nValidation failure", color_code(RED))
+    else:
+      print color("\nValidation success", color_code(GREEN))
+      
+    if ("todo" in version.topics or "todo" in version.types 
+        or "needs_work" in version.types):
+      print color("This version needs work", color_code(YELLOW))
+    
+    test_document = Document("Validation Render")
+    test_document.name = "Temp"
+    test_document.year = "1900"
+    test_document.due = "Never"
+    test_document.blurb = ""
+    test_document.versions.append(version)
+    
+    if can_build(test_document.build(False, False, metadata=False),
+        version.resources):
+      print color("Body LaTeX compiles", color_code(GREEN))
+    else:
+      print color("Body LaTeX does not compile", color_code(RED))
+      
+    version.body = version.solution
+    built_sol = can_build(test_document.build(False, False, metadata=False),
+        version.resources)
+    todo_sol = "TODO" in version.solution
+    if built_sol and not todo_sol:
+      print color("Solution LaTeX compiles", color_code(GREEN))
+    elif built_sol and todo_sol:
+      print color("Solution LaTeX compiles but need to be finished", 
+          color_code(YELLOW))
+    elif not built_sol and not todo_sol:
+      print color("Solution LaTeX does not compile", color_code(RED, bold=True))
+    elif not built_sol and todo_sol:
+      print color("Solution LaTeX does not compile and needs to be finished",
+          color_code(RED))
+    
+    version.body = version.rubric
+    built_rub = can_build(test_document.build(False, False, metadata=False),
+        version.resources)
+    todo_rub = "TODO" in version.rubric
+    if built_rub and not todo_rub:
+      print color("Rubric LaTeX compiles", color_code(GREEN))
+    elif built_rub and todo_rub:
+      print color("Rubric LaTeX compiles but need to be finished", 
+          color_code(YELLOW))
+    elif not built_rub and not todo_rub:
+      print color("Rubric LaTeX does not compile", color_code(RED, bold=True))
+    elif not built_rub and todo_rub:
+      print color("Rubric LaTeX does not compile and needs to be finished",
+          color_code(RED))
         
 
 def add_branch_parser(parser):
