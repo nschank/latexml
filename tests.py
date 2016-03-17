@@ -94,6 +94,18 @@ class ProblemTest(unittest.TestCase):
           root.append(version_root[1])
           problem.parse_element(root, validate_versions=True)
         
+  def test_get_versions(self):
+    problem = Problem(test_filename)
+    
+    versions = [Version(test_filename, 0), Version(test_filename, 1), 
+        Version(test_filename, 2), Version(test_filename, 3)]
+    problem.versions[0] = versions[0]
+    problem.versions[1] = versions[1]
+    problem.versions[2] = versions[2]
+    problem.versions[3] = versions[3]
+    for i, v in enumerate(problem.get_versions()):
+      self.assertEqual(v, versions[3-i])
+    
           
   def test_newest(self):
     problem = Problem(test_filename)

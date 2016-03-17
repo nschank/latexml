@@ -248,6 +248,92 @@ def edit(settings):
   with open(settings.filename, "w") as f:
     f.write(ET.tostring(root))
     
+def validate_version(version, failed):
+  if "unknown" in map(str.lower, version.authors):
+    print_warning("Unknown author\n")
+  if "unknown" == version.year.lower():
+    print_warning("Unknown year\n") 
+    
+  for search_term, msg in stylistic_errors.iteritems():
+    for search_space in [version.body, version.solution, version.rubric]:
+      results = re.search(search_term, search_space)
+      if results:
+        print_error("Found problematic text \"{}\"".format(results.group(0)))
+        print color("\t" + msg, 
+            color_code(YELLOW, foreground=False) + color_code(BLACK))
+        failed = True
+     
+  if version.resources and get_resource_root() is None:
+    print_error("This problem has resources, but your system is not configured with a resource root.")
+    failed = True
+  elif version.resources and not os.path.exists(get_resource_root()):
+    print_error("Resource root `{}' does not exist".format(get_resource_root()))
+    failed = True
+  elif version.resources:
+    for resource in version.resources:
+      resource_path = os.path.join(get_resource_root(), resource)
+      if not os.path.exists(resource_path):
+        print_warning("Resource at `{}' could not be found.".format(resource_path))
+        failed = True
+        
+  try:
+    version.validate()
+  except ImproperXmlException as e:
+    print_error(e.args[0])
+    failed = True
+  
+  if failed:
+    print color("\nValidation failure", color_code(RED))
+  else:
+    print color("\nValidation success", color_code(GREEN))
+    
+  if ("todo" in version.topics or "todo" in version.types 
+      or "needs_work" in version.types):
+    print color("This version needs work", color_code(YELLOW))
+  
+  test_document = Document("Validation Render")
+  test_document.name = "Temp"
+  test_document.year = "1900"
+  test_document.due = "Never"
+  test_document.blurb = ""
+  test_document.versions.append(version)
+  
+  if can_build(test_document.build(False, False, metadata=False),
+      version.resources):
+    print color("Body LaTeX compiles", color_code(GREEN))
+  else:
+    print color("Body LaTeX does not compile", color_code(RED))
+    
+  version.body = version.solution
+  built_sol = can_build(test_document.build(False, False, metadata=False),
+      version.resources)
+  todo_sol = "TODO" in version.solution
+  if built_sol and not todo_sol:
+    print color("Solution LaTeX compiles", color_code(GREEN))
+  elif built_sol and todo_sol:
+    print color("Solution LaTeX compiles but need to be finished", 
+        color_code(YELLOW))
+  elif not built_sol and not todo_sol:
+    print color("Solution LaTeX does not compile", color_code(RED, bold=True))
+  elif not built_sol and todo_sol:
+    print color("Solution LaTeX does not compile and needs to be finished",
+        color_code(RED))
+  
+  version.body = version.rubric
+  built_rub = can_build(test_document.build(False, False, metadata=False),
+      version.resources)
+  todo_rub = "TODO" in version.rubric
+  if built_rub and not todo_rub:
+    print color("Rubric LaTeX compiles", color_code(GREEN))
+  elif built_rub and todo_rub:
+    print color("Rubric LaTeX compiles but need to be finished", 
+        color_code(YELLOW))
+  elif not built_rub and not todo_rub:
+    print color("Rubric LaTeX does not compile", color_code(RED, bold=True))
+  elif not built_rub and todo_rub:
+    print color("Rubric LaTeX does not compile and needs to be finished",
+        color_code(RED))
+    
 def validate(settings):
   """
   Validates the correctness and style of a problem XML document.
@@ -304,104 +390,97 @@ def validate(settings):
     print_error("XML in {} could not be parsed.".format(settings.filename))
     print color("\nPlease rerun validation once XML is fixed", color_code(CYAN))
     exit(1)
+  if tree.getroot().tag == 'assignment':
+    print_error("This looks like an assignment xml file. Did you mean 22edit validate_doc?")
+    exit(1)
   try:
     problem = Problem(settings.filename)
-    problem.parse_tree(tree)
-    # TODO: don't strict-validate versions
+    problem.parse_tree(tree, False)
   except ImproperXmlException as e:
     print_error(e.args[0])
     print color("\nPlease rerun validation after fixing", color_code(CYAN))
     exit(1)
     
   firstProblem = True
-  checkpoint = failed
   for version in problem.get_versions():
     if not version.standalone and not firstProblem:
       continue
     firstProblem = False
-    failed = checkpoint
     
     print color("\n\nVERSION {}:\n".format(version.vid),
               color_code(BLUE))
+    validate_version(version, failed)
+    
+def validate_document(settings):
+  """
+  Validates the correctness and style of a document XML.
+  """
+  if not settings.filename.endswith(".xml"):
+    print_error("{} must have a .xml extension to interoperate with build tool".format(settings.filename))
+    exit(1)
   
-    if "unknown" in map(str.lower, version.authors):
-      print_warning("Unknown author\n")
-    if "unknown" == version.year.lower():
-      print_warning("Unknown year\n") 
-      
-    for search_term, msg in stylistic_errors.iteritems():
-      for search_space in [version.body, version.solution, version.rubric]:
-        results = re.search(search_term, search_space)
-        if results:
-          print_error("Found problematic text \"{}\"".format(results.group(0)))
-          print color("\t" + msg, 
-              color_code(YELLOW, foreground=False) + color_code(BLACK))
-          failed = True
-       
-    if version.resources and get_resource_root() is None:
-      print_error("This problem has resources, but your system is not configured with a resource root.")
+  failed = False
+  
+  print color("Validating: ", color_code(BLUE)), settings.filename
+  if platform in ["linux", "linux2"]:    
+    stat_info = os.stat(settings.filename)
+    gid = stat_info.st_gid
+    mode = stat_info.st_mode & 0777
+    group = getgrgid(gid)[0]
+    if group != "cs022ta":
+      print_error("Wrong group, you MUST run `chgrp cs022ta {}'".format(settings.filename))
       failed = True
-    elif version.resources and not os.path.exists(get_resource_root()):
-      print_error("Resource root `{}' does not exist".format(get_resource_root()))
+    if mode ^ 0660 != 0000:
+      print_error("Wrong permissions, you MUST run `chmod 660 {}'".format(settings.filename))
       failed = True
-    elif version.resources:
-      for resource in version.resources:
-        resource_path = os.path.join(get_resource_root(), resource)
-        if not os.path.exists(resource_path):
-          print_warning("Resource at `{}' could not be found.".format(resource_path))
-          failed = True
-    
-    if failed:
-      print color("\nValidation failure", color_code(RED))
-    else:
-      print color("\nValidation success", color_code(GREEN))
+  
+  invalid_lt = re.compile("<(?!/?(assignment|problem|year|title|name|blurb|due))")
+  invalid_amp = re.compile(r"&(?!\w{1,10};)")
+  invalid_char = re.compile(r"[^\x00-\x7f]")
+  
+  # Some more manual checking  
+  with open(settings.filename) as f:
+    for num, line in enumerate(f):
+      if len(string.rstrip(line)) > 80:
+        print_warning("Line {} longer than 80 characters (has {})".format(num+1, len(string.rstrip(line))))
+        failed = True
+      problem_lt = re.search(invalid_lt, line)
+      if problem_lt:
+        print_error("Invalid < character on line {} at character {}".format(num+1, problem_lt.start()))
+        print color("\tMake sure the tags you are using are correct.", 
+            color_code(YELLOW, foreground=False) + color_code(BLACK))
+        failed = True
+      problem_amp = re.search(invalid_amp, line)
+      if problem_amp:
+        print_error("Invalid raw & character on line {} at character {}".format(num+1, problem_amp.start()))
+        print color("\tA literal & can be escaped by using \"&amp;\" instead.", 
+            color_code(YELLOW, foreground=False) + color_code(BLACK))
+        failed = True
+      problem_char = re.search(invalid_char, line)
+      if problem_char:
+        print_error("Invalid non-ASCII character on line {} at character {}".format(num+1, problem_char.start()))
+        failed = True
       
-    if ("todo" in version.topics or "todo" in version.types 
-        or "needs_work" in version.types):
-      print color("This version needs work", color_code(YELLOW))
+  try:
+    tree = ET.parse(settings.filename)
+  except Exception:
+    print_error("XML in {} could not be parsed at all.".format(settings.filename))
+    print color("\tAre you sure all tags are closed?", color_code(YELLOW))
+    print color("\nPlease rerun validation once XML is fixed", color_code(CYAN))
+    exit(1)
+  try:
+    document = Document(settings.filename)
+    document.parse_tree(tree)
+    document.validate()
+  except ImproperXmlException as e:
+    print_error(e.args[0])
+    print color("\nPlease rerun validation after fixing", color_code(CYAN))
+    exit(1)
     
-    test_document = Document("Validation Render")
-    test_document.name = "Temp"
-    test_document.year = "1900"
-    test_document.due = "Never"
-    test_document.blurb = ""
-    test_document.versions.append(version)
-    
-    if can_build(test_document.build(False, False, metadata=False),
-        version.resources):
-      print color("Body LaTeX compiles", color_code(GREEN))
-    else:
-      print color("Body LaTeX does not compile", color_code(RED))
-      
-    version.body = version.solution
-    built_sol = can_build(test_document.build(False, False, metadata=False),
-        version.resources)
-    todo_sol = "TODO" in version.solution
-    if built_sol and not todo_sol:
-      print color("Solution LaTeX compiles", color_code(GREEN))
-    elif built_sol and todo_sol:
-      print color("Solution LaTeX compiles but need to be finished", 
-          color_code(YELLOW))
-    elif not built_sol and not todo_sol:
-      print color("Solution LaTeX does not compile", color_code(RED, bold=True))
-    elif not built_sol and todo_sol:
-      print color("Solution LaTeX does not compile and needs to be finished",
-          color_code(RED))
-    
-    version.body = version.rubric
-    built_rub = can_build(test_document.build(False, False, metadata=False),
-        version.resources)
-    todo_rub = "TODO" in version.rubric
-    if built_rub and not todo_rub:
-      print color("Rubric LaTeX compiles", color_code(GREEN))
-    elif built_rub and todo_rub:
-      print color("Rubric LaTeX compiles but need to be finished", 
-          color_code(YELLOW))
-    elif not built_rub and not todo_rub:
-      print color("Rubric LaTeX does not compile", color_code(RED, bold=True))
-    elif not built_rub and todo_rub:
-      print color("Rubric LaTeX does not compile and needs to be finished",
-          color_code(RED))
+  for i, version in enumerate(document.versions):
+    print color("\n\nProblem {}: {}\n".format(i+1, version.filename),
+              color_code(BLUE))
+    validate_version(version, failed)
         
 
 def add_branch_parser(parser):
@@ -435,6 +514,11 @@ def add_validate_parser(parser):
   subparser.add_argument('filename', metavar='F', help='The XML file to create, edit, or validate')
   subparser.set_defaults(func=validate)
   
+def add_validate_document_parser(parser):
+  subparser = parser.add_parser('validate_doc', help='Validates the correctness of an assignment XML file')
+  subparser.add_argument('filename', metavar='F', help='The assignment to validate')
+  subparser.set_defaults(func=validate_document)
+  
 def build_args():
   """Parses command-line arguments using argparse and returns an object containing runtime information."""
   parser = argparse.ArgumentParser(description='Validates, edits, or creates a 22 XML file')
@@ -445,6 +529,7 @@ def build_args():
   add_finalize_parser(subparsers)
   add_new_parser(subparsers)
   add_validate_parser(subparsers)
+  add_validate_document_parser(subparsers)
   
   return parser.parse_args()
 

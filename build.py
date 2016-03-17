@@ -150,7 +150,10 @@ def build_if(settings):
                   print color("Skipped (Predicate): ", color_code(CYAN)), filename, "Version {}".format(version.vid)
               except ImproperXmlException:
                 if settings.verbose:
-                  print color("Error (Validation): ", color_code(YELLOW)), filename, "Version {}".format(version.vid)         
+                  print color("Error (Validation): ", color_code(YELLOW)), filename, "Version {}".format(version.vid)     
+          except ImproperXmlException:
+            if settings.verbose:
+              print color("Error (Problem Validation): ", color_code(YELLOW)), filename     
           except ET.ParseError:
             if settings.verbose:
               print color("Error (XML Parsing): ", color_code(RED, bold=True)), filename

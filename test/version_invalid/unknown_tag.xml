@@ -1,0 +1,15 @@
+<test>
+  <error>Invalid tag 'error'</error>
+  <version id="1">
+    <error>This is an error</error>
+    <authors>nschank</authors>
+    <year>1995</year>
+    <param name="name">value 1</param>
+    <param name="name">value 2</param>
+    <topics>set_theory probability</topics>
+    <types>piece proof</types>
+    <body>Body 1</body>
+    <solution>Solution 1</solution>
+    <rubric>Rubric 1</rubric>
+  </version>
+</test>

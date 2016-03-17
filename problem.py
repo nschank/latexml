@@ -339,7 +339,7 @@ class Document(XmlParseable):
   \\renewcommand{\\headrulewidth}{0pt}%
   \\lhead{\\textbf{CSCI 0220}}%
   \\chead{""" + self.name + """}%
-  \\rhead{\\textit{""" + self.due + """}}%
+  \\rhead{\\textit{""" + (self.due if len(self.due) < 30 else "") + """}}%
 }\n\\pagestyle{fancyplain}\n""" + dependencies + "\n\n")
 
   def _problems(self, solutions=False, rubrics=False, metadata=False):
