@@ -11,7 +11,7 @@
 <problem>\\
 \TB<usedin year=}``\textit{2015}''\texttt{>}Homework 5\texttt{</usedin>\\
 \TB<usedin year=}``\textit{2014}''\texttt{private=}``\textit{true}''\texttt{>}Midterm 1\texttt{</usedin>\\
-\TB<version id=}``\textit{2}''\texttt{>\\
+\TB<version id=}``\textit{3}''\texttt{>\\
 \TB\TB<author>}cjk\texttt{</author>\\
 \TB\TB<year>}2016\texttt{</year>\\
 \TB\TB<topics>}number\_theory graph\_theory\texttt{</topics>\\
@@ -31,7 +31,10 @@
 \TB\TB\TB}Problem rubric goes here\texttt{\\
 \TB\TB</rubric>\\
 \TB</version>\\
-\TB<version id=}``\textit{1}''\texttt{>\\
+\TB<version id=}``\textit{2}''\texttt{>\\
+\TB\TB...\\
+\TB</version>\\
+\TB<version id=}``\textit{1}''\texttt{ standalone=}``\textit{true}''\texttt{>\\
 \TB\TB...\\
 \TB</version>\\
 </problem>
@@ -126,6 +129,13 @@
     in \texttt{2016/prettypicture.jpg}, and is therefore able to use
     the \texttt{graphicx} package (which was included as a dependency!) to
     show the graphic `prettypicture'. 
+    
+    A version MAY have the attribute \texttt{standalone} set to ``true'';
+    ``false'' is also allowed, and is the default value. If a version is
+    marked as \texttt{standalone}, then it is viewable by the build tool
+    even though it is not the most recent version of the problem. This is
+    highly recommended whenever an old version of a problem has very different
+    (and interesting) parts that are no longer present in the new version.
     
     \texttt{usedin} tags should never be created or edited by hand.
   

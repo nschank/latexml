@@ -78,6 +78,18 @@
       consistently set 
       standards, which will save time for everyone overall. (Not to mention it
       is fairly good at finding likely errors.)
+      Documents can also be validated!
+    \item \textbf{Mark versions \texttt{standalone}.} If an old version is
+      distinctly different from the current version, and might be useful to
+      see later, then mark is as standalone so that it is not ignored by
+      the build tool. This is especially recommended if:
+        \begin{itemize}
+          \item The version is a list of lots of different parts that are 
+          only going to be used one at a time.
+          \item Two problems have been combined into one. Mark the old
+          problems as standalone versions, and have the combination be a 
+          distinct version.
+        \end{itemize}
   \end{enumerate}
 
 \section{\LaTeX\ Style}
@@ -90,6 +102,9 @@
       and \texttt{22enumerate} rather than \texttt{itemize} and 
       \texttt{enumerate} respectively. Specifically, these environments 
       change the spacing between items, and use a consistent lettering scheme.
+      
+      \texttt{22enumerate} resumes numbering within a single problem if you 
+      leave the environment and then enter it again.
     \item When providing a hint or a note, you \textbf{MUST} use the 
       commands \texttt{hint} and \texttt{note}, as in 
       \[\texttt{\textbackslash hint\{Think about the pigeonhole principle.\}}\] 

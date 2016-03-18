@@ -15,8 +15,9 @@
     building the same pdf simultaneously. In particular, it will build a 
     randomly named temporary file and check for overwriting afterwards, 
     allowing you to specify another name or to overwrite if necessary. The 
-    generated \texttt{.tex} file is removed, as are the logs and auxiliary 
-    files -- if you need these for some reason, let Nick know and he'll 
+    generated \texttt{.tex} file is removed unless you use the \texttt{-k} 
+    flag. The logs and auxiliary files are always removed -- if you need 
+    these for some reason, let Nick know and he'll 
     add an option to keep them. Exception: the \texttt{.tex} file is not 
     removed if there were \LaTeX\ errors, so that you can find where the 
     error occurred.\footnote{As a quick tip: use the \texttt{-m} flag to 
@@ -47,7 +48,7 @@
     individually, building those that meet a set of criteria. You should run
     \begin{align*}
       \pybuild\texttt{all }&\texttt{\textit{output[.pdf]} [CRITERIA]}\\
-      ~&\texttt{[-s] [-m] [-r] [-k] [--title ``TITLE''] [--verbose]}
+      ~&\texttt{[-s] [-m] [-r] [-k] [--title ``TITLE''] [--verbose] [--all]}
     \end{align*}
     If no criteria are given, the above command builds every problem in 
     the problem root directory, with the four optional flags acting just 
@@ -57,9 +58,14 @@
     the \texttt{from} option:
     \begin{align*}
       \pybuild\texttt{from }&\texttt{\textit{problems/\ \ output[.pdf]} [CRITERIA]}\\
-      ~&\texttt{[-s] [-m] [-r] [-k] [--title ``TITLE''] [--verbose]}
+      ~&\texttt{[-s] [-m] [-r] [-k] [--title ``TITLE''] [--verbose] [--all]}
     \end{align*}
     This would search everything within the \texttt{problems/} directory.
+    
+    Normally, as with other build options, the tool will ignore all but
+    the newest version of any problem. If the \texttt{--all} flag is used,
+    the tool will also look at any old versions which are marked as
+    \texttt{standalone}.
     
     The criteria for inclusion can be specified with any or all of the 
     following flags, where a problem will be included only if it satisfies 
