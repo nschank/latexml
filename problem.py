@@ -348,6 +348,10 @@ class Document(XmlParseable):
       "\\subsection*{Problem " + str(i+1) + "}\n{\n\\nopagebreak " + 
         v.pretty_print(solutions,rubrics,metadata) + "\n}\n\n" 
         for i, v in enumerate(self.versions)])
+        
+  def __parse_blurb(self, attributes, body):
+    self.xml_assert(not attributes, "blurb tag takes no attributes")
+    self.blurb = body
 
   def __parse_due(self, attributes, body):
     self.xml_assert(self.due is None, "duplicate due tag")
@@ -388,7 +392,8 @@ class Document(XmlParseable):
       'due':__parse_due,
       'problem':__parse_problem,
       'title':__parse_name,
-      'year':__parse_year}
+      'year':__parse_year,
+      'blurb':__parse_blurb}
       
   def parse_element(self, root):
     self.xml_assert(root.tag == 'assignment',
