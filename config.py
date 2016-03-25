@@ -14,9 +14,12 @@ class BuildConfiguration(XmlParseable):
     self.topics = []
     self.types = []
     self.blurb = None
+    self.classname = None
     self.include = []
     self.problemroot = None
+    self.professor = None
     self.resourceroot = None
+    self.shortname = None
     
   def __parse_author(self, attributes, body):
     self.xml_assert(not attributes, "author tag should have no attributes")
@@ -27,6 +30,12 @@ class BuildConfiguration(XmlParseable):
     self.xml_assert(not attributes, "blurb tag should have no attributes")
     self.xml_assert(self.blurb is None, "duplicate blurb tag")
     self.blurb = body
+    
+  def __parse_classname(self, attributes, body):
+    self.xml_assert(not attributes, "classname tag should have no attributes")
+    self.xml_assert(body, "classname tag must have a body")
+    self.xml_assert(self.classname is None, "duplicate classname tag")
+    self.classname = string.strip(body)
     
   def __parse_include(self, attributes, body):
     self.xml_assert(not attributes, "include tag should have no attributes")
@@ -43,11 +52,23 @@ class BuildConfiguration(XmlParseable):
     self.xml_assert(self.problemroot is None, "duplicate problemroot tag")
     self.problemroot = string.strip(body)
     
+  def __parse_professor(self, attributes, body):
+    self.xml_assert(not attributes, "professor tag should have no attributes")
+    self.xml_assert(body, "professor tag must have a body")
+    self.xml_assert(self.professor is None, "duplicate professor tag")
+    self.professor = string.strip(body)
+    
   def __parse_resourceroot(self, attributes, body):
     self.xml_assert(not attributes, "resourceroot tag should have no attributes")
     self.xml_assert(body, "resourceroot tag must have a body")
     self.xml_assert(self.resourceroot is None, "duplicate resourceroot tag")
     self.resourceroot = string.strip(body)
+    
+  def __parse_shortname(self, attributes, body):
+    self.xml_assert(not attributes, "shortname tag should have no attributes")
+    self.xml_assert(body, "shortname tag must have a body")
+    self.xml_assert(self.shortname is None, "duplicate shortname tag")
+    self.shortname = string.strip(body)
     
   def __parse_topics(self, attributes, body):
     self.xml_assert(not attributes, "topics tag should have no attributes")
@@ -62,9 +83,12 @@ class BuildConfiguration(XmlParseable):
   __parsers = {
     'author':__parse_author,
     'blurb':__parse_blurb,
+    'classname':__parse_classname,
     'include':__parse_include,
     'problemroot':__parse_problemroot,
+    'professor':__parse_professor,
     'resourceroot':__parse_resourceroot,
+    'shortname':__parse_shortname,
     'topics':__parse_topics,
     'types':__parse_types}
 
@@ -110,6 +134,12 @@ def get_configuration():
 def get_blurb():
   return get_configuration().blurb
   
+def get_classname():
+  classname = get_configuration().classname
+  if classname is None:
+    return ""
+  return classname
+  
 def get_default_author():
   if get_configuration().author is None:
     return getlogin()
@@ -122,8 +152,20 @@ def get_inclusions():
 def get_problem_root():
   return get_configuration().problemroot
   
+def get_professor():
+  professor = get_configuration().professor
+  if professor is None:
+    return ""
+  return professor
+  
 def get_resource_root():
   return get_configuration().resourceroot
+  
+def get_shortname():
+  shortname = get_configuration().shortname
+  if shortname is None:
+    return ""
+  return shortname
   
 def get_topics():
   return copy(get_configuration().topics)

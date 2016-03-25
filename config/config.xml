@@ -4,6 +4,9 @@
   use this or to edit it.
 -->
 <configuration>
+  <classname>Discrete Structures and Probability</classname>
+  <shortname>CSCI 0220</shortname>
+  <professor>C. Klivans</professor>
   <topics>basic big_o bijections circuits counting equivalence_relations graph_theory logic mod number_theory pigeonhole probability relations set_theory todo</topics>
   <types>computation core contradiction contrapositive direct element_method induction large needs_work notation piece proof repetitive todo</types>
   <include>/course/cs022/latexml/include/simple22.sty</include>

@@ -3,7 +3,7 @@ import string
 from os.path import exists, isabs, join
 from datetime import date
 from parseable import XmlParseable, ImproperXmlException
-from config import get_topics, get_types, get_blurb, get_inclusions, get_problem_root, get_default_author
+from config import get_topics, get_types, get_blurb, get_classname, get_inclusions, get_problem_root, get_professor, get_default_author, get_shortname
   
 def split_add(before, raw):
   """Used by any fields which can be whitespace separated"""
@@ -331,13 +331,13 @@ class Document(XmlParseable):
       get_inclusions() +
       """\\fancypagestyle{firstpagestyle} {
   \\renewcommand{\\headrulewidth}{0pt}%
-  \\lhead{\\textbf{CSCI 0220}}%
-  \\chead{\\textbf{Discrete Structures and Probability}}%
-  \\rhead{C. Klivans}%
+  \\lhead{\\textbf{""" + get_shortname() + """}}%
+  \\chead{\\textbf{""" + get_classname() + """}}%
+  \\rhead{""" + get_professor() + """}%
 }\n
 \\fancypagestyle{fancyplain} {%
   \\renewcommand{\\headrulewidth}{0pt}%
-  \\lhead{\\textbf{CSCI 0220}}%
+  \\lhead{\\textbf{""" + get_shortname() + """}}%
   \\chead{""" + self.name + """}%
   \\rhead{\\textit{""" + (self.due if len(self.due) < 30 else "") + """}}%
 }\n\\pagestyle{fancyplain}\n""" + dependencies + "\n\n")
