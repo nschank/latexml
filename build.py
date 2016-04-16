@@ -11,9 +11,10 @@ from color import *
 from pdfbuilder import build, temp_file_remove
 
 def types_imply_private(types):
-  for private in get_private_types():
-    if private in types:
-      return True
+  if types:
+    for private in get_private_types():
+      if private in types:
+        return True
   return False
 
 def satisfies(version, settings, used_ins):
