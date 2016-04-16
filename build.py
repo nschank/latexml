@@ -5,10 +5,16 @@ from parseable import ImproperXmlException
 from problem import Problem, Document
 from subprocess import call
 from random import randint
-from config import get_problem_root
+from config import get_problem_root, get_private_types
 import xml.etree.ElementTree as ET
 from color import *
 from pdfbuilder import build, temp_file_remove
+
+def types_imply_private(types):
+  for private in get_private_types():
+    if private in types:
+      return True
+  return False
 
 def satisfies(version, settings, used_ins):
   if (settings.allowed_topics and 
@@ -44,7 +50,7 @@ def satisfies(version, settings, used_ins):
     for actual in used_ins:
       if settings.used_in and actual.year in settings.used_in:
         matches_used = True
-      if settings.not_used_in and actual.year in settings.not_used_in and not actual.private:
+      if settings.not_used_in and actual.year in settings.not_used_in and not (actual.private or types_imply_private(version.types)):
         return False
     if not used_ins:
       if settings.used_in and "none" in settings.used_in:

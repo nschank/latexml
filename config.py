@@ -13,6 +13,7 @@ class BuildConfiguration(XmlParseable):
     self.author = None
     self.topics = []
     self.types = []
+    self.private_types = []
     self.blurb = None
     self.classname = None
     self.include = []
@@ -46,6 +47,12 @@ class BuildConfiguration(XmlParseable):
     except IOError:
       raise ConfigurationError("Could not include {}".format(body))
       
+  def __parse_private_types(self, attributes, body):
+    self.xml_assert(not attributes, "private_types tag should have no attributes")
+    self.xml_assert(body, "private_types tag must have a body")
+    self.xml_assert(not self.private_types, "duplicate private_types tag")
+    self.private_types = string.split(body)
+    
   def __parse_problemroot(self, attributes, body):
     self.xml_assert(not attributes, "problemroot tag should have no attributes")
     self.xml_assert(body, "problemroot tag must have a body")
@@ -85,6 +92,7 @@ class BuildConfiguration(XmlParseable):
     'blurb':__parse_blurb,
     'classname':__parse_classname,
     'include':__parse_include,
+    'private_types':__parse_private_types,
     'problemroot':__parse_problemroot,
     'professor':__parse_professor,
     'resourceroot':__parse_resourceroot,
@@ -106,6 +114,8 @@ class BuildConfiguration(XmlParseable):
     """Asserts that the BuildConfiguration satisfies the minimal requirements of being complete"""
     self.xml_assert(self.topics, "No topics")
     self.xml_assert(self.types, "No types")
+    for private_type in self.private_types:
+      self.xml_assert(private_type in self.types, "Private type '{}' must also be a type.".format(private_type))
     self.xml_assert(self.blurb is not None, "No blurb")
     self.xml_assert(self.problemroot is not None, "No problemroot")
     
@@ -148,6 +158,9 @@ def get_default_author():
   
 def get_inclusions():
   return ''.join(get_configuration().include)
+  
+def get_private_types():
+  return copy(get_configuration().private_types)
   
 def get_problem_root():
   return get_configuration().problemroot
