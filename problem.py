@@ -39,6 +39,10 @@ class Version(XmlParseable):
     self.solution = None
     self.rubric = None
     
+    # UsedIn objects are added to Versions for printing purposes only -
+    #  the Problem contains the actual UsedIn list
+    self.usedin = []
+    
   def add_defaults(self):
     self.authors = [get_default_author()]
     self.year = str(date.today().year)
@@ -49,7 +53,11 @@ class Version(XmlParseable):
     types = "\\textbf{Types: }" + ", ".join(self.types).replace('_', ' ')
     version = " Version " + str(self.vid) + " (Written " + str(self.year) + ")"
     authors = "\\textbf{Authors}: " + ", ".join(self.authors).replace('_', "\\_")
-    return "\\\\".join([filename + version, topics, types, authors])
+    usedins = "\\\\".join(["\\textbf{Used In}: " + usedin.assignment_name +
+        " (" + usedin.year + ")" for usedin in self.usedin])
+    if not usedins:
+      usedins = "\\textbf{Never Before Used}"
+    return "\\\\".join([filename + version, topics, types, authors, usedins])
     
   def _solution(self):
     return ("\\begin{mdframed}\n{\\subsubsection*{Solution}\\setcounter{enum22i}{0}\n\n" 
@@ -246,6 +254,9 @@ class Problem(XmlParseable):
         self.xml_assert(version.vid not in self.versions, 
           "Duplicate version {}".format(version.vid))
         self.versions[version.vid] = version
+    if self.used_in:
+      for version in self.versions:
+        self.versions[version].usedin = self.used_in
       
   def parse_tree(self, tree, validate_versions=True):
     self.parse_element(tree.getroot(), validate_versions)
