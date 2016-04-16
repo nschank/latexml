@@ -29,7 +29,8 @@ stylistic_errors = {
   re.compile(r"\\mathbb(?: Q|\{Q\})"):r"Use \Q instead.",
   re.compile(r"\\mathcal(?: P|\{P\})"):r"Use \Pow instead.",
   re.compile(r"\\newcommand(?![A-Za-z])"):r"Use a <param> tag instead.",
-  re.compile(r"\\(?:usepackage|require)(?![A-Za-z])"):r"Use a <dependency> tag instead."
+  re.compile(r"\\(?:usepackage|require)(?![A-Za-z])"):r"Use a <dependency> tag instead.",
+  re.compile(r"(?!\n\s*\n\s*)\\(hint|note)"):r"The \hint and \note commands should be placed in their own paragraph. Add two newlines (NOT '\\') before them."
 }
 
 def indent(elem, level=0):
@@ -261,6 +262,16 @@ def validate_version(version, failed):
         print_error("Found problematic text \"{}\"".format(results.group(0)))
         print color("\t" + msg, 
             color_code(YELLOW, foreground=False) + color_code(BLACK))
+        failed = True
+        
+  for search_space in [version.body, version.solution, version.rubric]:
+    if r"\\" in search_space:
+      align = r"\begin{align" in search_space
+      tabular = r"\begin{tab" in search_space
+      if align or tabular:
+        print_warning("Found raw newlines \"\\\\\". Make sure newlines are never used for separating\n\tparagraphs -- only for alignment within align or tabular environments.")
+      else:
+        print_error("Found raw newlines \"\\\\\" and no environments that use newlines for alignment.\n\tNever use raw newlines instead of using paragraph breaks.")
         failed = True
      
   if version.resources and get_resource_root() is None:
