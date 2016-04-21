@@ -30,7 +30,7 @@ stylistic_errors = {
   re.compile(r"\\mathcal(?: P|\{P\})"):r"Use \Pow instead.",
   re.compile(r"\\newcommand(?![A-Za-z])"):r"Use a <param> tag instead.",
   re.compile(r"\\(?:usepackage|require)(?![A-Za-z])"):r"Use a <dependency> tag instead.",
-  re.compile(r"(?!\n\s*\n\s*)\\(hint|note)"):r"The \hint and \note commands should be placed in their own paragraph. Add two newlines (NOT '\\') before them."
+  re.compile(r"\S(?:\r?\n)?[\t ]*\\(hint|note)"):r"The \hint and \note commands should be placed in their own paragraph. Add two newlines (NOT '\\') before them."
 }
 
 def indent(elem, level=0):
