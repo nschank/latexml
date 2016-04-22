@@ -7,7 +7,7 @@ import string
 import xml.etree.ElementTree as ET
 from problem import Problem, Version, UsedIn, Document
 from parseable import ImproperXmlException
-from config import get_resource_root, get_topics, get_types
+from config import get_default_author, get_problem_root, get_resource_root, get_topics, get_types
 from copy import deepcopy
 from datetime import date
 from color import *
@@ -249,7 +249,18 @@ def edit(settings):
   with open(settings.filename, "w") as f:
     f.write(ET.tostring(root))
     
+class ValidationResult:
+  def __init__(self, failed):
+    self.failed = failed
+    self.completeness = True
+    self.solutions = 2
+    self.rubric = 2
+    self.code_quality = 3
+    self.render = 3
+    
 def validate_version(version, failed):
+  result = ValidationResult(failed)
+  
   if "unknown" in map(str.lower, version.authors):
     print_warning("Unknown author\n")
   if "unknown" == version.year.lower():
@@ -262,7 +273,8 @@ def validate_version(version, failed):
         print_error("Found problematic text \"{}\"".format(results.group(0)))
         print color("\t" + msg, 
             color_code(YELLOW, foreground=False) + color_code(BLACK))
-        failed = True
+        result.failed = True
+        result.code_quality = result.code_quality - 1
         
   for search_space in [version.body, version.solution, version.rubric]:
     if r"\\" in search_space:
@@ -272,28 +284,33 @@ def validate_version(version, failed):
         print_warning("Found raw newlines \"\\\\\". Make sure newlines are never used for separating\n\tparagraphs -- only for alignment within align or tabular environments.")
       else:
         print_error("Found raw newlines \"\\\\\" and no environments that use newlines for alignment.\n\tNever use raw newlines instead of using paragraph breaks.")
-        failed = True
+        result.failed = True
+        result.code_quality = result.code_quality - 1
      
   if version.resources and get_resource_root() is None:
     print_error("This problem has resources, but your system is not configured with a resource root.")
-    failed = True
+    result.failed = True
+    result.render = 0
   elif version.resources and not os.path.exists(get_resource_root()):
     print_error("Resource root `{}' does not exist".format(get_resource_root()))
-    failed = True
+    result.failed = True
+    result.render = 0
   elif version.resources:
     for resource in version.resources:
       resource_path = os.path.join(get_resource_root(), resource)
       if not os.path.exists(resource_path):
         print_warning("Resource at `{}' could not be found.".format(resource_path))
-        failed = True
+        result.failed = True
+        result.render = 0
         
   try:
     version.validate()
   except ImproperXmlException as e:
     print_error(e.args[0])
-    failed = True
+    result.failed = True
+    
   
-  if failed:
+  if result.failed:
     print color("\nValidation failure", color_code(RED))
   else:
     print color("\nValidation success", color_code(GREEN))
@@ -301,6 +318,7 @@ def validate_version(version, failed):
   if ("todo" in version.topics or "todo" in version.types 
       or "needs_work" in version.types):
     print color("This version needs work", color_code(YELLOW))
+    result.completeness = False
   
   test_document = Document("Validation Render")
   test_document.name = "Temp"
@@ -314,6 +332,7 @@ def validate_version(version, failed):
     print color("Body LaTeX compiles", color_code(GREEN))
   else:
     print color("Body LaTeX does not compile", color_code(RED))
+    result.render = result.render - 1
     
   version.body = version.solution
   built_sol = can_build(test_document.build(False, False, metadata=False),
@@ -324,11 +343,18 @@ def validate_version(version, failed):
   elif built_sol and todo_sol:
     print color("Solution LaTeX compiles but need to be finished", 
         color_code(YELLOW))
+    result.completeness = False
+    result.solutions = 1
   elif not built_sol and not todo_sol:
     print color("Solution LaTeX does not compile", color_code(RED, bold=True))
+    result.render = result.render - 1
+    result.solutions = 1
   elif not built_sol and todo_sol:
     print color("Solution LaTeX does not compile and needs to be finished",
         color_code(RED))
+    result.render = result.render - 1
+    result.completeness = False
+    result.solutions = 0
   
   version.body = version.rubric
   built_rub = can_build(test_document.build(False, False, metadata=False),
@@ -339,11 +365,20 @@ def validate_version(version, failed):
   elif built_rub and todo_rub:
     print color("Rubric LaTeX compiles but need to be finished", 
         color_code(YELLOW))
+    result.completeness = False
+    result.rubrics = 1
   elif not built_rub and not todo_rub:
     print color("Rubric LaTeX does not compile", color_code(RED, bold=True))
+    result.render = result.render - 1
+    result.rubrics = 1
   elif not built_rub and todo_rub:
     print color("Rubric LaTeX does not compile and needs to be finished",
         color_code(RED))
+    result.render = result.render - 1
+    result.completeness = False
+    result.rubrics = 0
+        
+  return result
     
 def validate(settings):
   """
@@ -492,7 +527,82 @@ def validate_document(settings):
     print color("\n\nProblem {}: {}\n".format(i+1, version.filename),
               color_code(BLUE))
     validate_version(version, failed)
-        
+      
+def report_card(settings):
+  grading = get_default_author()
+  count = 0
+  validates = 0
+  complete = 0
+  solutions = 0
+  rubrics = 0
+  code_quality = 0
+  rendering = 0
+  
+  root = get_problem_root()
+  if os.path.isdir(root):
+    for dirpath, dirnames, filenames in os.walk(root):
+      for filename in filenames:
+        if filename.endswith(".xml"):
+          filename = os.path.join(dirpath, filename)
+          try:
+            tree = ET.parse(filename)
+            problem = Problem(filename)
+            problem.parse_tree(tree, validate_versions=False)
+            
+            everyVersion = problem.get_versions()
+            currentVersions = [everyVersion[0]] + [v for v in everyVersion[1:] if v.standalone]
+            for version in currentVersions:
+              try:
+                if grading in version.authors:
+                  count = count + 1
+                  print color("\n\nProblem {}\n\t{} ver{}".format(count, filename, version.vid),
+                            color_code(BLUE))
+                  result = validate_version(version, False)
+                  if not result.failed:
+                    validates = validates + 1
+                  if result.completeness:
+                    complete = complete + 1
+                  solutions = solutions + result.solutions
+                  rubrics = rubrics + result.rubrics
+                  code_quality = code_quality + result.code_quality
+                  rendering = rendering + result.render
+              except ImproperXmlException:
+                pass 
+          except ImproperXmlException:
+            pass   
+          except ET.ParseError:
+            pass
+          except IOError as e:
+            # Permission errors can be safely skipped
+            if e.errno != errno.EACCES: 
+              print color("Error (IO): ", color_code(RED)), filename
+              raise # TODO
+          except Exception:
+            raise
+            
+    if count > 0:
+      print color("\n\nREPORT CARD\n----------\n", color_code(MAGENTA))
+      print "\tCode Quality:\t{}/{}".format(code_quality, 3*count)
+      print "\tCompleteness:\t{}/{}".format(complete, count)
+      print "\tRendering:   \t{}/{}".format(rendering, 3*count)
+      print "\tSolutions:   \t{}/{}".format(solutions, 2*count)
+      print "\tRubrics:     \t{}/{}".format(rubrics, 2*count)
+      print "\tValidation:  \t{}/{}".format(validates, count)
+      
+      final = code_quality + complete + rendering + solutions + rubrics + validates
+      out_of = 12*count
+      code = color_code(RED)
+      if final > out_of / 2:
+        code = color_code(YELLOW)
+      elif final == out_of:
+        code = color_code(GREEN)
+      print color("\tFINAL SCORE: {}/{}".format(final, out_of), code)
+    else:
+      print color("NO PROBLEMS FOUND", color_code(RED))
+  else:
+    print_error("The directory '{}' does not exist".format(root))
+  
+   
 
 def add_branch_parser(parser):
   subparser = parser.add_parser('branch', help='Adds a new version to an XML file')
@@ -507,6 +617,11 @@ def add_finalize_parser(parser):
   subparser = parser.add_parser('finalize', help='Marks that a document XML has been released, and thus <usedin> tags should be added to appropriate problems')
   subparser.add_argument('document', metavar='D', help='The document file which has been released as an assignment')
   subparser.set_defaults(func=finalize)
+  
+def add_grade_parser(parser):
+  subparser = parser.add_parser('report_card', 
+      help='Renders your report card')
+  subparser.set_defaults(func=report_card)
   
 def add_new_parser(parser):
   subparser = parser.add_parser('new', help='Creates a new XML file')
@@ -538,6 +653,7 @@ def build_args():
   add_branch_parser(subparsers)
   add_edit_parser(subparsers)
   add_finalize_parser(subparsers)
+  add_grade_parser(subparsers)
   add_new_parser(subparsers)
   add_validate_parser(subparsers)
   add_validate_document_parser(subparsers)
