@@ -254,7 +254,7 @@ class ValidationResult:
     self.failed = failed
     self.completeness = True
     self.solutions = 2
-    self.rubric = 2
+    self.rubrics = 2
     self.code_quality = 3
     self.render = 3
     
