@@ -529,7 +529,7 @@ def validate_document(settings):
     validate_version(version, failed)
       
 def report_card(settings):
-  grading = get_default_author()
+  grading = settings.author
   count = 0
   validates = 0
   complete = 0
@@ -581,7 +581,8 @@ def report_card(settings):
             raise
             
     if count > 0:
-      print color("\n\nREPORT CARD\n----------\n", color_code(MAGENTA))
+      print color("\n\nREPORT CARD: {}\n--------------------\n".format(grading), 
+          color_code(MAGENTA))
       print "\tCode Quality:\t{}/{}".format(code_quality, 3*count)
       print "\tCompleteness:\t{}/{}".format(complete, count)
       print "\tRendering:   \t{}/{}".format(rendering, 3*count)
@@ -596,7 +597,7 @@ def report_card(settings):
         code = color_code(YELLOW)
       elif final == out_of:
         code = color_code(GREEN)
-      print color("\tFINAL SCORE: {}/{}".format(final, out_of), code)
+      print color("\tFINAL SCORE:\t{}/{}".format(final, out_of), code)
     else:
       print color("NO PROBLEMS FOUND", color_code(RED))
   else:
@@ -621,6 +622,7 @@ def add_finalize_parser(parser):
 def add_grade_parser(parser):
   subparser = parser.add_parser('report_card', 
       help='Renders your report card')
+  subparser.add_argument('author', nargs='?', default=get_default_author())
   subparser.set_defaults(func=report_card)
   
 def add_new_parser(parser):
