@@ -1,0 +1,13 @@
+<snippet>
+    <content><![CDATA[\\begin{22itemize}
+	\item $0
+\\end{22itemize}]]></content>
+    <tabTrigger>22item</tabTrigger>
+    <scope>
+        latexml.body.embedded.xml,
+        latexml.solution.embedded.xml,
+        latexml.rubric.embedded.xml,
+        latexml.blurb.embedded.xml
+    </scope>
+    <description>22itemize</description>
+</snippet>
