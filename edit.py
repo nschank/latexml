@@ -487,9 +487,6 @@ def validate_document(settings):
   # Some more manual checking  
   with open(settings.filename) as f:
     for num, line in enumerate(f):
-      if len(string.rstrip(line)) > 80:
-        print_warning("Line {} longer than 80 characters (has {})".format(num+1, len(string.rstrip(line))))
-        failed = True
       problem_lt = re.search(invalid_lt, line)
       if problem_lt:
         print_error("Invalid < character on line {} at character {}".format(num+1, problem_lt.start()))
