@@ -391,7 +391,7 @@ def validate(settings):
   failed = False
   
   print color("Validating: ", color_code(BLUE)), settings.filename
-  if platform in ["linux", "linux2"]:    
+  if platform in ["linux", "linux2"] and not(settings.skip_permissions):
     stat_info = os.stat(settings.filename)
     gid = stat_info.st_gid
     mode = stat_info.st_mode & 0777
@@ -637,6 +637,7 @@ def add_edit_parser(parser):
 def add_validate_parser(parser):
   subparser = parser.add_parser('validate', help='Validates the correctness of a problem XML file')
   subparser.add_argument('filename', metavar='F', help='The XML file to create, edit, or validate')
+  subparser.add_argument('--skip-permissions', action='store_true', default=False, help='set to skip checking permissions')
   subparser.set_defaults(func=validate)
   
 def add_validate_document_parser(parser):
