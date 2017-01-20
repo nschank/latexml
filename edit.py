@@ -209,7 +209,7 @@ def create_new(settings):
     exit(1)
   try:
     print "New file created.\nSetting permissions..."
-    os.chmod(settings.filename, stat.S_IRWXU | stat.S_IRWXG)
+    os.chmod(settings.filename, stat.S_IRUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IWUSR)
   except OSError:
     print_error("Permissions not successfully fixed, please run chmod 660")
     
