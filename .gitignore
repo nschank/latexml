@@ -62,3 +62,4 @@ proj.odo
 config
 include/
 resources/
+*.aux
