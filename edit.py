@@ -396,8 +396,8 @@ def validate(settings):
     gid = stat_info.st_gid
     mode = stat_info.st_mode & 0777
     group = getgrgid(gid)[0]
-    if group != "cs022ta":
-      print_error("Wrong group, you MUST run `chgrp cs022ta {}'".format(settings.filename))
+    if group != "cs0220ta":
+      print_error("Wrong group, you MUST run `chgrp cs0220ta {}'".format(settings.filename))
       failed = True
     if mode ^ 0660 != 0000:
       print_error("Wrong permissions, you MUST run `chmod 660 {}'".format(settings.filename))
@@ -473,8 +473,8 @@ def validate_document(settings):
     gid = stat_info.st_gid
     mode = stat_info.st_mode & 0777
     group = getgrgid(gid)[0]
-    if group != "cs022ta":
-      print_error("Wrong group, you MUST run `chgrp cs022ta {}'".format(settings.filename))
+    if group != "cs0220ta":
+      print_error("Wrong group, you MUST run `chgrp cs0220ta {}'".format(settings.filename))
       failed = True
     if mode ^ 0660 != 0000:
       print_error("Wrong permissions, you MUST run `chmod 660 {}'".format(settings.filename))
