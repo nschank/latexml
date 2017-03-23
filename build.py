@@ -110,7 +110,7 @@ def build_each(settings):
       problem_document.blurb = ""
       problem_document.versions.append(v)
       
-      build_wrapper(problem_document, settings.document[:-4] + "." + str(i+1) + ".pdf", settings)
+      build_wrapper(problem_document, settings.document[:-4] + "-" + str(i+1) + ".pdf", settings)
   except (ImproperXmlException, ET.ParseError):
     print_error("Could not parse {}".format(settings.document))
     
