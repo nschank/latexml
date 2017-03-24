@@ -4,6 +4,7 @@ from config import BuildConfiguration
 from parseable import ImproperXmlException
 from problem import Version, ImproperXmlException, Problem, Document, UsedIn
 from build import satisfies
+from stringutil import strip_latex_comments_test
 import os
 import string
 
@@ -138,8 +139,11 @@ class ProblemTest(unittest.TestCase):
     self.assertEqual(problem.next_id(), 4)
     del problem.versions[3]
     self.assertEqual(problem.next_id(), 3)
-    
 
+
+class StringUtilTest(unittest.TestCase):
+    def test_strip_comments(self):
+        self.assertTrue(strip_latex_comments_test())
 
 class VersionTest(unittest.TestCase):
   def versions_equal(self, version1, version2):

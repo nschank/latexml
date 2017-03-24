@@ -1,0 +1,64 @@
+<problem>
+  <version id="1">
+    <authors>awstlaur</authors>
+    <year>1993</year>
+    <topics>counting</topics>
+    <types>contradiction proof</types>
+    <body>
+      % Some comment
+      % Comment w/ escaped percent sign: \%
+      %%% Comment starting w/ multiple percents
+      Here's some math: $3 + 3 = 6$ % and here's a comment
+      % Yes.
+      Look a percent sign: \%. Isn't it great?
+      Hard newline then comment: \\%this is a comment.
+      % p break:
+
+      \begin{verbatim}%
+      % Unescaped % percent % signs are allowed here.
+      As are backslashes and such \%\\%%% Hello. %
+      \end{verbatim}% This is a line comment.
+
+      We want to keep comment env in its entirety:
+      \begin{comment}% This should stay
+      This is inside the comment environment.
+          It (\%) should stay.\\ % So should I.
+      \end{comment} This should leave.
+      In the generated tex, there is a comment block above this sentence.
+      %
+    </body>
+    <solution>Here's some math: $3 + 3 = 6$ 
+      Look a percent sign: \%. Isn't it great?
+      Hard newline then comment: \\
+
+      \begin{verbatim}%
+      % Unescaped % percent % signs are allowed here.
+      As are backslashes and such \%\\%%% Hello. %
+      \end{verbatim}
+
+      We want to keep comment env in its entirety:
+      \begin{comment}% This should stay
+      This is inside the comment environment.
+          It (\%) should stay.\\ % So should I.
+      \end{comment}
+      In the generated tex, there is a comment block above this sentence.
+    </solution>
+    <rubric>Rubric:
+
+      The comments should get stripped out such that, in the generated tex file,
+      the Problem and Solution have the same contents.
+
+      Also, this file fails validation, because its tests include raw
+      newlines.
+    </rubric>
+  </version>
+  <version id="0">
+    <authors>nschank</authors>
+    <year>1994</year>
+    <topics>set_theory probability</topics>
+    <types>piece proof</types>
+    <body>Body 0</body>
+    <solution>Solution 0</solution>
+    <rubric>Rubric 0</rubric>
+  </version>
+</problem>

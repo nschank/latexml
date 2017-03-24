@@ -3,7 +3,9 @@ from config import get_resource_root
 from os import chdir, devnull, getcwd, getpid, mkdir, rename, remove
 from os.path import basename, exists, join
 from random import randint
+from re import sub
 from shutil import copy, move, rmtree
+from stringutil import strip_latex_comments
 from subprocess import CalledProcessError, check_call, check_output
 import errno
 import string
@@ -25,6 +27,7 @@ def prepare_resources(resource_list):
   return True
 
 def build(document_contents, resources, filename, keep=False):
+  document_contents = strip_latex_comments(document_contents)
   assert document_contents
   root = getcwd()
   dir = ".22tmp.r" + str(getpid()) + str(randint(0,1000))

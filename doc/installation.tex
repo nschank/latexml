@@ -35,8 +35,13 @@
     First, open a terminal (Linux or Mac) or Cygwin (Windows - currently do not
     know another option, sorry!). Create a new folder where \LaTeX ML will 
     be installed (\texttt{mkdir \mytilde/latexml}) and switch into it (
-    \texttt{cd \mytilde/latexml}). Download \LaTeX ML using git by running 
-    \[\texttt{git clone https://www.github.com/nschank/latexml}\]
+    \texttt{cd \mytilde/latexml}). Download \LaTeX ML using git by running
+    the following commands:
+    \begin{align*}
+      &\texttt{git clone https://www.github.com/nschank/latexml}\\
+      &\texttt{cd latexml}\\
+      &\texttt{git submodule update}\\
+    \end{align*}
     
     Open your .bashrc file (\texttt{\mytilde/.bashrc})
     \footnote{In some systems, this is .bash\_profile.} 
