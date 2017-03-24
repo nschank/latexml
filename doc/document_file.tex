@@ -73,6 +73,18 @@
     
     The \texttt{-k} flag prevents the rendered \texttt{.tex} file from
     being deleted.
+
+    If you want to build each of the problems of an assignment
+    \emph{individually}, you can do so with the \texttt{each} subcommand as
+    follows:\tabularnewline
+    \begin{align*}
+      \pybuild\texttt{each }&\texttt{\textit{assign.xml}}
+      \texttt{[-s] [-m] [-r] [-k]}
+    \end{align*}
+
+    This will create files named \texttt{assign-1.pdf}, \texttt{assign-2.pdf},
+    $\ldots$, \texttt{assign-$n$.pdf}, where $n$ is the number of problems
+    included in the \texttt{assign.xml} file. This is useful for grading!
     
   \subsection{Finalizing}
     Finalizing an assignment is simple, and has no options:
