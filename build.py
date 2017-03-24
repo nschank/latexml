@@ -101,11 +101,7 @@ def build_each(settings):
   try:
     tree = ET.parse(settings.document)
     document.parse_tree(tree)
-    settings.metadata = True
-    settings.solutions = True
-    settings.rubrics = True
-    settings.keep = False
-    
+
     for i,v in enumerate(document.versions):
       problem_document = Document()
       problem_document.name = document.name + " Problem " + str(i+1)
@@ -114,7 +110,7 @@ def build_each(settings):
       problem_document.blurb = ""
       problem_document.versions.append(v)
       
-      build_wrapper(problem_document, settings.document[:-4] + "." + str(i+1) + ".pdf", settings)
+      build_wrapper(problem_document, settings.document[:-4] + "-" + str(i+1) + ".pdf", settings)
   except (ImproperXmlException, ET.ParseError):
     print_error("Could not parse {}".format(settings.document))
     
@@ -328,6 +324,7 @@ def add_each_parser(parser):
   subparser.set_defaults(func=build_each)
   subparser.add_argument('document', metavar='D', 
       help='The assignment XML file where each problem is stored')
+  add_common_flags(subparser)
   
 def add_from_parser(parser):
   subparser = parser.add_parser('from', 
